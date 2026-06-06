@@ -91,13 +91,6 @@ export default async function LoginPage() {
 
           <div className="rounded-md border border-border bg-vault-bg p-4">
             <LoginButton />
-            <p className="text-micro-label mt-4 text-center">
-              Requires
-              {" "}
-              <span className="text-foreground">repo</span>
-              {" "}
-              scope
-            </p>
           </div>
         </div>
       </section>

@@ -57,16 +57,18 @@ export function ActivityHeatmap({
 
   return (
     <div className="w-full min-w-0">
-      <div className="flex min-w-max gap-1">
-        {columns.map((column, columnIndex) => (
-          <div key={columnIndex} className="flex flex-col gap-1">
-            {column.map((day) => (
-              <HeatmapCell key={day.date} date={day.date} count={day.count} />
-            ))}
-          </div>
-        ))}
+      <div className="overflow-x-auto pb-2 scrollbar-thin">
+        <div className="flex min-w-max gap-1">
+          {columns.map((column, columnIndex) => (
+            <div key={columnIndex} className="flex flex-col gap-1">
+              {column.map((day) => (
+                <HeatmapCell key={day.date} date={day.date} count={day.count} />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="mt-4 flex items-center justify-end gap-2 font-mono text-[11px] text-muted-foreground">
+      <div className="mt-4 flex items-center justify-center gap-2 font-mono text-[11px] text-muted-foreground">
         <span>Less</span>
         <div className="flex gap-1">
           <div className="h-3 w-3 rounded-[2px] bg-zinc-800" />

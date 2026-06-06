@@ -57,7 +57,7 @@ export default async function DashboardPage() {
         streak={streak}
       />
 
-      <AnimatedMain className="mx-auto max-w-6xl p-container-padding" grid>
+      <AnimatedMain className="mx-auto max-w-6xl p-container-padding">
         <div className="stagger-children grid gap-gutter md:grid-cols-4">
           {statConfig.map(({ label, key, icon: Icon, suffix }) => {
             const raw = stats[key];

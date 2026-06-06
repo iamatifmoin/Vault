@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ExternalLink } from "lucide-react";
 import { AnimatedMain } from "@/components/animated-main";
 import { ActivityHeatmap } from "@/components/activity-heatmap";
+import { LogoutButton } from "@/components/logout-button";
 import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
 import { PLATFORM_LABELS } from "@/lib/constants";
@@ -62,6 +63,7 @@ export default async function ProfilePage() {
               @{login}
               <ExternalLink className="h-3 w-3" />
             </Link>
+            <LogoutButton />
           </section>
 
           <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -134,11 +136,9 @@ export default async function ProfilePage() {
             ))}
           </section>
 
-          <section className="surface-card overflow-hidden p-container-padding">
+          <section className="surface-card p-container-padding">
             <h3 className="text-section-title mb-6 text-muted-foreground">Activity</h3>
-            <div className="overflow-x-auto pb-2 scrollbar-thin">
-              <ActivityHeatmap days={heatmap} />
-            </div>
+            <ActivityHeatmap days={heatmap} />
           </section>
         </div>
       </AnimatedMain>

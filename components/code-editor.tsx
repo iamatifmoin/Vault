@@ -151,11 +151,11 @@ export function CodeEditor({
       </div>
 
       {mode === "edit" ? (
-        <div className="code-area flex min-h-[420px] flex-1 overflow-hidden">
+        <div className="code-area flex min-h-0 flex-1 overflow-hidden">
           <div
             ref={gutterRef}
             aria-hidden
-            className="code-gutter shrink-0 overflow-hidden py-4 pl-4"
+            className="code-gutter min-h-0 shrink-0 overflow-hidden py-4 pl-4"
           >
             {Array.from({ length: lineCount }, (_, index) => (
               <div key={index}>{index + 1}</div>
@@ -166,22 +166,22 @@ export function CodeEditor({
             value={value}
             onChange={(event) => onChange(event.target.value)}
             onScroll={syncGutterScroll}
-            className="h-full min-h-[420px] flex-1 resize-none bg-vault-inset py-4 pr-4 font-mono text-[13px] leading-6 text-foreground outline-none scrollbar-thin"
+            className="min-h-0 flex-1 resize-none overflow-auto bg-vault-inset py-4 pr-4 font-mono text-[13px] leading-6 text-foreground outline-none scrollbar-thin"
             spellCheck={false}
           />
         </div>
       ) : (
-        <div className="code-area flex min-h-[420px] flex-1 overflow-auto">
+        <div className="code-area flex min-h-0 flex-1 overflow-hidden">
           <div
             aria-hidden
-            className="code-gutter shrink-0 py-4 pl-4"
+            className="code-gutter min-h-0 shrink-0 overflow-hidden py-4 pl-4"
           >
             {Array.from({ length: lineCount }, (_, index) => (
               <div key={index}>{index + 1}</div>
             ))}
           </div>
           <div
-            className="min-w-0 flex-1 overflow-auto py-4 pr-4 scrollbar-thin [&_.shiki]:!bg-transparent [&_.shiki]:!p-0"
+            className="min-h-0 min-w-0 flex-1 overflow-auto py-4 pr-4 scrollbar-thin [&_.shiki]:!bg-transparent [&_.shiki]:!p-0"
             dangerouslySetInnerHTML={{ __html: highlighted }}
           />
         </div>

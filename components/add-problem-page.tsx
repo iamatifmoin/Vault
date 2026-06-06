@@ -9,7 +9,6 @@ import { AIPanel } from "@/components/ai-panel";
 import { AppLogo } from "@/components/app-logo";
 import { CodeEditor } from "@/components/code-editor";
 import { PageHeader } from "@/components/page-header";
-import { PlatformIcon } from "@/components/platform-icon";
 import { ProblemMarkdown } from "@/components/problem-markdown";
 import { WindowChrome } from "@/components/window-chrome";
 import { Button } from "@/components/ui/button";
@@ -239,18 +238,14 @@ export function AddProblemPage({ streak }: { streak: number }) {
                         key={item}
                         type="button"
                         className={cn(
-                          "flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-sm transition-colors",
+                          "flex flex-1 items-center justify-center rounded-md px-2 py-1.5 text-sm transition-colors",
                           item === platform
                             ? "border border-border bg-vault-raised text-foreground"
                             : "text-muted-foreground hover:text-foreground",
                         )}
                         onClick={() => setPlatform(item)}
                       >
-                        <PlatformIcon
-                          platform={item}
-                          className={item === platform ? "text-foreground" : undefined}
-                        />
-                        <span className="hidden sm:inline">{platformLabels[item]}</span>
+                        {platformLabels[item]}
                       </button>
                     ))}
                   </div>
@@ -401,7 +396,7 @@ export function AddProblemPage({ streak }: { streak: number }) {
                 ))}
               </div>
 
-              <div className="min-h-[520px]">
+              <div className="h-[520px] min-h-[420px]">
                 <CodeEditor value={code} onChange={setCode} language={language} />
               </div>
 

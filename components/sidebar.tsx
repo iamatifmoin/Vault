@@ -41,7 +41,7 @@ export function Sidebar() {
     <>
       <nav className="fixed left-0 top-0 z-40 hidden h-screen w-sidebar-width flex-col border-r border-border bg-vault-bg py-gutter md:flex">
         <div className="px-container-padding pb-8">
-          <AppLogo size="sm" />
+          <AppLogo size="md" />
         </div>
 
         <div className="flex flex-1 flex-col gap-1">
