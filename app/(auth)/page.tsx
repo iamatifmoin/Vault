@@ -34,11 +34,11 @@ export default async function LoginPage() {
 
   return (
     <main className="min-h-screen bg-background text-foreground md:flex">
-      <section className="flex w-full flex-col justify-between border-b border-vault-border bg-vault-surface px-8 py-8 md:w-[55%] md:border-b-0 md:border-r md:px-16 md:py-16">
+      <section className="flex w-full flex-col justify-between border-b border-border bg-vault-surface px-8 py-8 md:w-[55%] md:border-b-0 md:border-r md:px-16 md:py-16">
         <AppLogo size="md" />
 
         <div className="my-auto max-w-lg space-y-12 py-16 md:py-0">
-          <h1 className="text-4xl font-semibold leading-tight tracking-[-0.02em] text-zinc-50 md:text-[40px]">
+          <h1 className="text-balance text-4xl font-semibold leading-tight tracking-tight text-foreground md:text-[40px]">
             Your DSA practice,
             <br />
             properly organised.
@@ -49,14 +49,12 @@ export default async function LoginPage() {
               const Icon = feature.icon;
               return (
                 <div key={feature.title} className="flex items-start gap-4">
-                  <div className="rounded-sm border border-vault-border bg-vault-raised p-2 text-zinc-400">
+                  <div className="rounded-md border border-border bg-vault-raised p-2 text-muted-foreground">
                     <Icon className="h-5 w-5" strokeWidth={1.6} />
                   </div>
                   <div>
-                    <h2 className="text-[15px] font-medium text-zinc-50">
-                      {feature.title}
-                    </h2>
-                    <p className="mt-1 text-sm leading-6 text-zinc-400">
+                    <h2 className="text-card-title">{feature.title}</h2>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
                       {feature.description}
                     </p>
                   </div>
@@ -66,36 +64,31 @@ export default async function LoginPage() {
           </div>
         </div>
 
-        <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-zinc-500">
-          Own the repo. Own the history.
-        </p>
+        <p className="text-micro-label">Own the repo. Own the history.</p>
       </section>
 
       <section className="flex w-full items-center justify-center px-8 py-16 md:w-[45%] md:px-16">
-        <div className="w-full max-w-md rounded-md border border-vault-border bg-vault-surface p-8">
+        <div className="surface-card relative w-full max-w-md overflow-hidden p-8">
+          <div className="absolute inset-x-0 top-0 h-px bg-vault-brand/60" />
           <div className="mb-8">
-            <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-zinc-500">
-              GitHub OAuth
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold text-zinc-50">
-              Log into Vault
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-zinc-400">
+            <p className="text-micro-label">GitHub OAuth</p>
+            <h2 className="text-page-title mt-3">Log into Vault</h2>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
               Sign in with GitHub to fetch problems, analyze attempts, and save
               everything directly into your own
               {" "}
-              <span className="text-zinc-200">Data Structures &amp; Algorithms</span>
+              <span className="text-foreground">Data Structures &amp; Algorithms</span>
               {" "}
               repository.
             </p>
           </div>
 
-          <div className="rounded-md border border-vault-border bg-vault-bg p-4">
+          <div className="rounded-md border border-border bg-vault-bg p-4">
             <LoginButton />
-            <p className="mt-4 text-center font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-500">
+            <p className="text-micro-label mt-4 text-center">
               Requires
               {" "}
-              <span className="text-zinc-300">repo</span>
+              <span className="text-foreground">repo</span>
               {" "}
               scope
             </p>

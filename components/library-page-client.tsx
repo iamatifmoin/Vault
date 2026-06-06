@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { ProblemCard } from "@/components/problem-card";
-import { StreakBadge } from "@/components/streak-badge";
+import { PageHeader } from "@/components/page-header";
+import { Input } from "@/components/ui/input";
 import { VaultSelect } from "@/components/vault-select";
 import { DIFFICULTY_LABELS, LANGUAGE_LABELS, PLATFORM_LABELS } from "@/lib/constants";
 import { SHEETS } from "@/lib/sheets";
@@ -102,21 +103,16 @@ export function LibraryPageClient({
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-vault-border bg-background/90 px-container-padding backdrop-blur">
-        <div className="text-2xl font-semibold text-zinc-50">Library</div>
-        <StreakBadge streak={streak} />
-      </header>
+      <PageHeader title="Library" streak={streak} />
 
       <main className="mx-auto max-w-7xl p-container-padding">
         <div className="flex flex-col gap-4">
-          <div className="relative">
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              className="h-10 w-full rounded-sm border border-vault-border bg-vault-surface px-4 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-zinc-50"
-              placeholder="Search problems, topics, or languages..."
-            />
-          </div>
+          <Input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            className="bg-vault-surface"
+            placeholder="Search problems, topics, or languages..."
+          />
 
           <div className="flex flex-wrap gap-2">
             <FilterSelect value={platform} onChange={setPlatform} options={platformOptions} />
@@ -127,7 +123,7 @@ export function LibraryPageClient({
 
             <button
               type="button"
-              className="h-8 px-3 font-mono text-[11px] uppercase text-zinc-500 hover:text-zinc-50"
+              className="text-micro-label h-8 px-3 hover:text-foreground"
               onClick={() => {
                 setSearch("");
                 setPlatform("all");
@@ -142,6 +138,10 @@ export function LibraryPageClient({
           </div>
         </div>
 
+        <p className="text-micro-label mt-4 normal-case tracking-normal">
+          Showing {problems.length} of {initialIndex.length} problems
+        </p>
+
         <div className="mt-6 grid gap-gutter md:grid-cols-2 lg:grid-cols-3">
           {problems.map((problem) => (
             <ProblemCard key={problem.id} problem={problem} />
@@ -149,7 +149,7 @@ export function LibraryPageClient({
         </div>
 
         {!problems.length ? (
-          <div className="mt-10 rounded-md border border-dashed border-vault-border bg-vault-surface p-8 text-sm text-zinc-500">
+          <div className="surface-card mt-10 border-dashed p-8 text-sm text-muted-foreground">
             No problems match the current filters.
           </div>
         ) : null}

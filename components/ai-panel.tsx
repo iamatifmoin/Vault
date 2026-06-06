@@ -21,12 +21,12 @@ export function AIPanel({
   ];
 
   return (
-    <div className="flex flex-col gap-6 rounded-lg border border-vault-border bg-vault-surface p-6">
+    <div className="surface-card flex flex-col gap-6 p-6">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="text-2xl font-semibold text-zinc-50">AI Analysis</h2>
+        <h2 className="text-section-title">AI Analysis</h2>
         <div
           className={cn(
-            "rounded-sm border px-3 py-1 font-mono text-[11px] uppercase",
+            "rounded-full border px-3 py-1 font-mono text-[11px] uppercase",
             tones[analysis.classification],
           )}
         >
@@ -36,14 +36,14 @@ export function AIPanel({
 
       <div className="flex gap-3">
         <div className="flex flex-col gap-1">
-          <span className="font-mono text-[11px] uppercase text-zinc-500">Time</span>
-          <div className="rounded-sm border border-vault-border bg-vault-raised px-3 py-1.5 font-mono text-sm text-zinc-50">
+          <span className="text-micro-label">Time</span>
+          <div className="rounded-md border border-border bg-vault-raised px-3 py-1.5 font-mono text-sm text-foreground">
             {analysis.time_complexity}
           </div>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="font-mono text-[11px] uppercase text-zinc-500">Space</span>
-          <div className="rounded-sm border border-vault-border bg-vault-raised px-3 py-1.5 font-mono text-sm text-zinc-50">
+          <span className="text-micro-label">Space</span>
+          <div className="rounded-md border border-border bg-vault-raised px-3 py-1.5 font-mono text-sm text-foreground">
             {analysis.space_complexity}
           </div>
         </div>
@@ -53,10 +53,10 @@ export function AIPanel({
         {sections.map(({ label, items }) => (
           <div
             key={label}
-            className="rounded-md border border-vault-border bg-vault-raised px-4 py-4"
+            className="rounded-md border border-border bg-vault-raised px-4 py-4"
           >
-            <h3 className="text-sm font-medium text-zinc-50">{label}</h3>
-            <ul className="mt-3 space-y-2 text-sm text-zinc-300">
+            <h3 className="text-sm font-medium text-foreground">{label}</h3>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               {items.length ? (
                 items.map((item) => <li key={item}>• {item}</li>)
               ) : (
@@ -67,17 +67,17 @@ export function AIPanel({
         ))}
       </div>
 
-      <div className="rounded-md border border-vault-border bg-vault-raised p-4">
-        <div className="font-mono text-[11px] uppercase text-zinc-500">Pattern</div>
-        <div className="mt-2 text-lg font-medium text-zinc-50">{analysis.pattern.name}</div>
-        <p className="mt-2 text-sm leading-6 text-zinc-300">
+      <div className="rounded-md border border-border bg-vault-raised p-4">
+        <div className="text-micro-label">Pattern</div>
+        <div className="mt-2 text-lg font-medium text-foreground">{analysis.pattern.name}</div>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
           {analysis.pattern.when_to_use}
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           {analysis.pattern.related_problems.map((item) => (
             <span
               key={item}
-              className="rounded-sm border border-vault-border px-2 py-1 font-mono text-[11px] text-zinc-400"
+              className="rounded-full border border-border px-2 py-1 font-mono text-[11px] text-muted-foreground"
             >
               {item}
             </span>

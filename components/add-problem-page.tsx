@@ -7,8 +7,9 @@ import { toast } from "sonner";
 import { AIPanel } from "@/components/ai-panel";
 import { CodeEditor } from "@/components/code-editor";
 import { ProblemMarkdown } from "@/components/problem-markdown";
-import { StreakBadge } from "@/components/streak-badge";
+import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VaultSelect } from "@/components/vault-select";
 import { SHEETS } from "@/lib/sheets";
@@ -168,31 +169,24 @@ export function AddProblemPage({ streak }: { streak: number }) {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-vault-border bg-background/90 px-container-padding backdrop-blur">
-        <h1 className="text-3xl font-semibold tracking-[-0.02em] text-zinc-50">
-          Add Problem
-        </h1>
-        <StreakBadge streak={streak} />
-      </header>
+      <PageHeader title="Add Problem" streak={streak} />
 
       <main className="p-container-padding">
         <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-gutter lg:grid-cols-12">
           <div className="flex flex-col gap-gutter lg:col-span-5">
-            <div className="rounded-md border border-vault-border bg-vault-surface p-4">
+            <div className="surface-card p-4">
               <div className="flex flex-col gap-4">
                 <div>
-                  <label className="font-mono text-[11px] uppercase text-zinc-500">
-                    Platform
-                  </label>
-                  <div className="mt-2 flex rounded-sm border border-vault-border bg-background p-1">
+                  <label className="text-micro-label">Platform</label>
+                  <div className="mt-2 flex rounded-md border border-border bg-background p-1">
                     {platforms.map((item) => (
                       <button
                         key={item}
                         type="button"
                         className={
                           item === platform
-                            ? "flex-1 rounded-sm border border-vault-border bg-vault-raised px-3 py-1.5 text-sm text-zinc-50"
-                            : "flex-1 rounded-sm px-3 py-1.5 text-sm text-zinc-400 hover:text-zinc-50"
+                            ? "flex-1 rounded-md border border-border bg-vault-raised px-3 py-1.5 text-sm text-foreground"
+                            : "flex-1 rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground"
                         }
                         onClick={() => setPlatform(item)}
                       >
@@ -208,9 +202,7 @@ export function AddProblemPage({ streak }: { streak: number }) {
 
                 <div className="grid gap-4">
                   <div>
-                    <label className="font-mono text-[11px] uppercase text-zinc-500">
-                      Target Sheet
-                    </label>
+                    <label className="text-micro-label">Target Sheet</label>
                     <VaultSelect
                       value={sheet || "unassigned"}
                       onChange={(event) => {
@@ -229,19 +221,17 @@ export function AddProblemPage({ streak }: { streak: number }) {
                   </div>
 
                   <div className="min-w-0">
-                    <label className="font-mono text-[11px] uppercase text-zinc-500">
-                      Problem URL / ID
-                    </label>
+                    <label className="text-micro-label">Problem URL / ID</label>
                     <div className="mt-2 flex min-w-0 flex-col gap-2 sm:flex-row">
-                      <input
+                      <Input
                         value={query}
                         onChange={(event) => setQuery(event.target.value)}
-                        className="h-10 min-w-0 flex-1 rounded-sm border border-vault-border bg-background px-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-zinc-50"
+                        className="min-w-0 flex-1"
                         placeholder="e.g. 1 or 1234A"
                       />
                       <Button
                         type="button"
-                        className="h-10 shrink-0 rounded-sm bg-primary px-4 text-primary-foreground hover:bg-primary/90 sm:w-auto"
+                        className="h-10 shrink-0 px-4 sm:w-auto"
                         onClick={() => void handleFetch()}
                         disabled={isFetching}
                       >
@@ -257,21 +247,21 @@ export function AddProblemPage({ streak }: { streak: number }) {
               </div>
             </div>
 
-            <div className="flex min-h-[420px] flex-1 flex-col overflow-hidden rounded-md border border-vault-border bg-vault-surface">
-              <div className="border-b border-vault-border p-4">
+            <div className="surface-card flex min-h-[420px] flex-1 flex-col overflow-hidden">
+              <div className="border-b border-border p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h2 className="text-2xl font-semibold text-zinc-50">
+                    <h2 className="text-section-title">
                       {problem ? `${problem.number}. ${problem.title}` : "Problem Preview"}
                     </h2>
                     {existingProblem ? (
-                      <p className="mt-2 rounded-sm bg-zinc-800 px-3 py-2 text-sm text-zinc-400">
+                      <p className="mt-2 rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
                         You&apos;ve already solved this problem ({existingProblem.attempt_count} attempts). You&apos;re adding Attempt {existingProblem.attempt_count + 1}.
                       </p>
                     ) : null}
                   </div>
                   {problem ? (
-                    <span className="rounded-sm border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 font-mono text-[11px] uppercase text-emerald-300">
+                    <span className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 font-mono text-[11px] uppercase text-emerald-300">
                       {problem.difficulty}
                     </span>
                   ) : null}
@@ -281,7 +271,7 @@ export function AddProblemPage({ streak }: { streak: number }) {
                     {problem.topics.map((topic) => (
                       <span
                         key={topic.slug}
-                        className="rounded-sm border border-vault-border bg-vault-raised px-2 py-1 font-mono text-[11px] text-zinc-400"
+                        className="rounded-full border border-border bg-vault-raised px-2 py-1 font-mono text-[11px] text-muted-foreground"
                       >
                         {topic.name}
                       </span>
@@ -292,7 +282,7 @@ export function AddProblemPage({ streak }: { streak: number }) {
 
               <div className="flex-1 overflow-auto p-4 scrollbar-thin">
                 {notice ? (
-                  <div className="mb-4 rounded-sm border border-yellow-500/30 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-200">
+                  <div className="mb-4 rounded-md border border-yellow-500/30 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-200">
                     {notice}
                   </div>
                 ) : null}
@@ -310,13 +300,13 @@ export function AddProblemPage({ streak }: { streak: number }) {
                           : current,
                       )
                     }
-                    className="min-h-[320px] w-full rounded-md border border-vault-border bg-vault-bg p-4 font-mono text-sm leading-6 text-zinc-100 outline-none focus:border-zinc-50"
+                    className="min-h-[320px] w-full rounded-md border border-border bg-vault-bg p-4 font-mono text-sm leading-6 text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                     placeholder="Paste the problem statement here..."
                   />
                 ) : problem ? (
                   <ProblemMarkdown content={problem.content} />
                 ) : (
-                  <div className="flex h-full items-center justify-center text-sm text-zinc-500">
+                  <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
                     Fetch a problem to populate this panel.
                   </div>
                 )}
@@ -332,8 +322,8 @@ export function AddProblemPage({ streak }: { streak: number }) {
                   type="button"
                   className={
                     item === language
-                      ? "rounded-sm border border-vault-border bg-vault-raised px-3 py-1 font-mono text-[11px] uppercase text-zinc-50"
-                      : "rounded-sm border border-transparent px-3 py-1 font-mono text-[11px] uppercase text-zinc-400 hover:border-vault-border hover:bg-vault-raised hover:text-zinc-50"
+                      ? "rounded-md border border-border bg-vault-raised px-3 py-1 font-mono text-[11px] uppercase text-foreground"
+                      : "rounded-md border border-transparent px-3 py-1 font-mono text-[11px] uppercase text-muted-foreground hover:border-border hover:bg-vault-raised hover:text-foreground"
                   }
                   onClick={() => {
                     setLanguage(item);
@@ -356,7 +346,6 @@ export function AddProblemPage({ streak }: { streak: number }) {
                 type="button"
                 onClick={() => void handleAnalyze()}
                 disabled={!problem || isAnalyzing || !code.trim()}
-                className="rounded-sm bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {isAnalyzing ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -370,7 +359,6 @@ export function AddProblemPage({ streak }: { streak: number }) {
                 variant="outline"
                 onClick={() => void handleSave(null)}
                 disabled={!problem || isSaving || isAnalyzing}
-                className="rounded-sm border-vault-border bg-transparent text-zinc-300 hover:bg-vault-raised hover:text-zinc-50"
               >
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Save without Analysis
@@ -380,7 +368,7 @@ export function AddProblemPage({ streak }: { streak: number }) {
                   type="button"
                   onClick={() => void handleSave(analysis)}
                   disabled={isSaving}
-                  className="rounded-sm bg-emerald-500 text-zinc-950 hover:bg-emerald-400"
+                  className="bg-emerald-500 text-zinc-950 hover:bg-emerald-400"
                 >
                   {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                   Save to Vault
@@ -389,11 +377,11 @@ export function AddProblemPage({ streak }: { streak: number }) {
             </div>
 
             {analysisError ? (
-              <p className="text-sm text-zinc-400">{analysisError}</p>
+              <p className="text-sm text-muted-foreground">{analysisError}</p>
             ) : null}
 
             {isAnalyzing ? (
-              <div className="rounded-lg border border-vault-border bg-vault-surface p-6">
+              <div className="surface-card p-6">
                 <Skeleton className="h-8 w-40 bg-zinc-800" />
                 <div className="mt-6 space-y-3">
                   <Skeleton className="h-16 w-full bg-zinc-800" />
@@ -404,7 +392,7 @@ export function AddProblemPage({ streak }: { streak: number }) {
             ) : analysis ? (
               <AIPanel analysis={analysis} />
             ) : (
-              <div className="rounded-lg border border-vault-border bg-vault-surface p-6 text-sm text-zinc-500">
+              <div className="surface-card p-6 text-sm text-muted-foreground">
                 Run analysis to populate the coaching panel, or save the attempt directly to GitHub.
               </div>
             )}

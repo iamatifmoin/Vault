@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { ChevronRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { AIPanel } from "@/components/ai-panel";
 import { AttemptTimeline } from "@/components/attempt-timeline";
 import { CodeSnippet } from "@/components/code-snippet";
 import { HintLadder } from "@/components/hint-ladder";
+import { PageHeader } from "@/components/page-header";
 import { ProblemMarkdown } from "@/components/problem-markdown";
 import { Button } from "@/components/ui/button";
 import { DIFFICULTY_BADGE_TONES } from "@/lib/constants";
@@ -115,23 +116,30 @@ export function ProblemViewClient({
   }
 
   return (
-    <main className="mx-auto flex max-w-7xl flex-col gap-8 px-container-padding py-8 md:flex-row">
-      <section className="w-full md:w-[58%]">
-        <nav className="flex items-center gap-2 text-sm text-zinc-500">
-          <Link href="/library" className="hover:text-zinc-50">
-            Library
-          </Link>
-          <span>›</span>
-          <span className="text-zinc-100">{`${problem.number}. ${problem.title}`}</span>
-        </nav>
+    <div className="min-h-screen">
+      <PageHeader
+        breadcrumb={
+          <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <Link href="/library" className="transition-colors hover:text-foreground">
+              Library
+            </Link>
+            <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate text-foreground">
+              {`${problem.number}. ${problem.title}`}
+            </span>
+          </nav>
+        }
+      />
 
-        <div className="mt-4 flex items-center gap-4">
-          <h1 className="text-3xl font-semibold tracking-[-0.02em] text-zinc-50">
+      <main className="mx-auto flex max-w-7xl flex-col gap-8 px-container-padding py-8 md:flex-row">
+      <section className="w-full md:w-[58%]">
+        <div className="flex flex-wrap items-center gap-4">
+          <h1 className="text-page-title">
             {problem.number}. {problem.title}
           </h1>
           <span
             className={cn(
-              "rounded-sm border px-2 py-1 font-mono text-[11px] uppercase",
+              "rounded-full border px-2 py-1 font-mono text-[11px] uppercase",
               DIFFICULTY_BADGE_TONES[problem.difficulty],
             )}
           >
@@ -148,16 +156,16 @@ export function ProblemViewClient({
           />
         </div>
 
-        <div className="mt-8 rounded-md border border-vault-border bg-vault-surface p-6">
+        <div className="surface-card mt-8 p-6">
           <ProblemMarkdown content={problemStatement} />
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-md border border-vault-border bg-[#09090b]">
-          <div className="flex items-center justify-between border-b border-vault-border bg-vault-surface px-4 py-2">
-            <span className="font-mono text-[11px] uppercase text-zinc-500">
+        <div className="surface-card mt-8 overflow-hidden bg-vault-inset">
+          <div className="flex items-center justify-between border-b border-border bg-vault-surface px-4 py-2">
+            <span className="text-micro-label">
               Solution.{selectedAttempt.language}
             </span>
-            <span className="font-mono text-[11px] uppercase text-zinc-500">
+            <span className="text-micro-label">
               Attempt {selectedAttempt.number}
             </span>
           </div>
@@ -168,22 +176,22 @@ export function ProblemViewClient({
       </section>
 
       <aside className="w-full md:w-[42%]">
-        <div className="sticky top-24 space-y-6">
+        <div className="sticky top-20 space-y-6 pb-24 md:pb-0">
           {selectedAttempt.analysis ? (
             <>
               <AIPanel analysis={selectedAttempt.analysis} />
               <HintLadder analysis={selectedAttempt.analysis} />
             </>
           ) : (
-            <div className="rounded-lg border border-vault-border bg-vault-surface p-6">
-              <h2 className="text-2xl font-semibold text-zinc-50">AI Analysis</h2>
-              <p className="mt-4 text-sm leading-7 text-zinc-400">
+            <div className="surface-card p-6">
+              <h2 className="text-section-title">AI Analysis</h2>
+              <p className="mt-4 text-sm leading-7 text-muted-foreground">
                 This attempt was saved without analysis. Run the coach now to attach
                 hints, complexity feedback, and the likely pattern.
               </p>
               <Button
                 type="button"
-                className="mt-6 rounded-sm bg-primary text-primary-foreground hover:bg-primary/90"
+                className="mt-6"
                 onClick={() => void analyzeAttempt()}
                 disabled={isAnalyzing}
               >
@@ -195,5 +203,6 @@ export function ProblemViewClient({
         </div>
       </aside>
     </main>
+    </div>
   );
 }

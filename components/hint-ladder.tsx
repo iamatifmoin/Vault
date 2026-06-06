@@ -15,19 +15,17 @@ export function HintLadder({ analysis }: { analysis: AIAnalysis }) {
   ];
 
   return (
-    <div className="rounded-lg border border-vault-border bg-vault-surface p-6">
+    <div className="surface-card p-6">
       <div className="flex items-center justify-between gap-4">
-        <h3 className="text-xl font-semibold text-zinc-50">Hint Ladder</h3>
-        <span className="font-mono text-[11px] uppercase text-zinc-500">
-          Level {level}
-        </span>
+        <h3 className="text-section-title">Hint Ladder</h3>
+        <span className="text-micro-label">Level {level}</span>
       </div>
-      <p className="mt-4 text-sm leading-7 text-zinc-300">{hints[level - 1]}</p>
+      <p className="mt-4 text-sm leading-7 text-muted-foreground">{hints[level - 1]}</p>
       {level < 5 ? (
         <Button
           type="button"
           variant="outline"
-          className="mt-4 border-vault-border bg-transparent text-zinc-300 hover:bg-vault-raised hover:text-zinc-50"
+          className="mt-4"
           onClick={() => setLevel((previous) => Math.min(previous + 1, 5) as 1 | 2 | 3 | 4 | 5)}
         >
           Need more help →

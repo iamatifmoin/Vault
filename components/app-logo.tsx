@@ -32,9 +32,9 @@ export function AppLogo({
 
   return (
     <div className={cn("flex items-center", config.gap, className)}>
-      <Binary className={cn(config.icon, "shrink-0 text-emerald-400")} strokeWidth={1.8} />
+      <Binary className={cn(config.icon, "shrink-0 text-vault-brand")} strokeWidth={1.8} />
       {showWordmark ? (
-        <span className={cn(config.text, "font-semibold text-zinc-50")}>Vault</span>
+        <span className={cn(config.text, "font-semibold text-lg text-foreground")}>Vault</span>
       ) : null}
     </div>
   );

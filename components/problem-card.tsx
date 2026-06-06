@@ -13,57 +13,57 @@ export function ProblemCard({ problem }: { problem: ProblemIndex }) {
   return (
     <Link
       href={`/library/${problem.id}`}
-      className="group flex flex-col gap-stack-md rounded-md border border-vault-border bg-vault-surface p-4 transition-colors hover:border-zinc-500"
+      className="group surface-card flex flex-col gap-stack-md p-4 transition-colors hover:border-muted"
     >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
           <span
             className={cn(
-              "rounded-sm border px-1.5 py-0.5 font-mono text-[11px] uppercase",
+              "rounded-full border px-1.5 py-0.5 font-mono text-[11px] uppercase",
               DIFFICULTY_BADGE_TONES[problem.difficulty],
             )}
           >
             {DIFFICULTY_LABELS[problem.difficulty]}
           </span>
-          <span className="font-mono text-[11px] text-zinc-500">
+          <span className="font-mono text-[11px] text-muted-foreground">
             {sheet ? SHEETS[sheet].label : PLATFORM_LABELS[problem.platform]}
           </span>
         </div>
-        <ArrowUpRight className="h-4 w-4 text-zinc-500 transition-colors group-hover:text-zinc-50" />
+        <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-foreground" />
       </div>
 
       <div>
-        <h3 className="text-[15px] font-medium text-zinc-50">{problem.title}</h3>
+        <h3 className="text-card-title">{problem.title}</h3>
       </div>
 
       <div className="mt-auto flex flex-wrap gap-2">
         {problem.topics.slice(0, 3).map((topic) => (
           <span
             key={topic}
-            className="rounded-sm border border-vault-border px-2 py-0.5 font-mono text-[11px] uppercase text-zinc-400"
+            className="rounded-full border border-border px-2 py-0.5 font-mono text-[11px] uppercase text-muted-foreground"
           >
             {topic}
           </span>
         ))}
       </div>
 
-      <div className="mt-2 flex items-center justify-between border-t border-vault-border pt-2">
+      <div className="mt-2 flex items-center justify-between border-t border-border pt-2">
         <div className="flex items-center gap-2">
           {latestApproach ? (
             <span
               className={cn(
-                "rounded-sm border px-2 py-0.5 font-mono text-[11px]",
+                "rounded-full border px-2 py-0.5 font-mono text-[11px]",
                 latestApproach.className,
               )}
             >
               {latestApproach.label}
             </span>
           ) : null}
-          <span className="rounded-sm bg-vault-raised px-1.5 py-0.5 font-mono text-[11px] text-zinc-100">
+          <span className="rounded-md bg-vault-raised px-1.5 py-0.5 font-mono text-[11px] text-foreground">
             {problem.latest_language.toUpperCase()}
           </span>
         </div>
-        <div className="flex items-center gap-1 font-mono text-[11px] text-zinc-500">
+        <div className="flex items-center gap-1 font-mono text-[11px] text-muted-foreground">
           <GitCommitHorizontal className="h-3.5 w-3.5" />
           <span>{problem.attempt_count}</span>
         </div>

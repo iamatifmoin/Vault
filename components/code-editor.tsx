@@ -81,18 +81,18 @@ export function CodeEditor({
   }, [deferredValue, language]);
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-md border border-vault-border bg-[#0d0d0f]">
-      <div className="flex h-12 items-center justify-between border-b border-vault-border bg-vault-surface px-4">
+    <div className="flex h-full flex-col overflow-hidden rounded-md border border-border bg-vault-inset">
+      <div className="flex h-12 items-center justify-between border-b border-border bg-vault-surface px-4">
         <div className="flex gap-2">
           <Button
             type="button"
             variant={mode === "edit" ? "secondary" : "ghost"}
             size="sm"
             className={cn(
-              "rounded-sm border font-mono text-[11px] uppercase",
+              "rounded-md border font-mono text-[11px] uppercase",
               mode === "edit"
-                ? "border-vault-border bg-vault-raised text-zinc-50"
-                : "border-transparent text-zinc-400 hover:bg-vault-raised hover:text-zinc-50",
+                ? "border-border bg-vault-raised text-foreground"
+                : "border-transparent text-muted-foreground hover:bg-vault-raised hover:text-foreground",
             )}
             onClick={() => setMode("edit")}
           >
@@ -104,10 +104,10 @@ export function CodeEditor({
             variant={mode === "preview" ? "secondary" : "ghost"}
             size="sm"
             className={cn(
-              "rounded-sm border font-mono text-[11px] uppercase",
+              "rounded-md border font-mono text-[11px] uppercase",
               mode === "preview"
-                ? "border-vault-border bg-vault-raised text-zinc-50"
-                : "border-transparent text-zinc-400 hover:bg-vault-raised hover:text-zinc-50",
+                ? "border-border bg-vault-raised text-foreground"
+                : "border-transparent text-muted-foreground hover:bg-vault-raised hover:text-foreground",
             )}
             onClick={() => setMode("preview")}
           >
@@ -116,14 +116,14 @@ export function CodeEditor({
           </Button>
         </div>
 
-        <div className="font-mono text-[12px] text-zinc-500">{duration}</div>
+        <div className="font-mono text-xs tabular-nums text-muted-foreground">{duration}</div>
       </div>
 
       {mode === "edit" ? (
         <textarea
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="h-full min-h-[420px] flex-1 resize-none bg-[#0d0d0f] px-4 py-4 font-mono text-[13px] leading-6 text-zinc-100 outline-none scrollbar-thin"
+          className="h-full min-h-[420px] flex-1 resize-none bg-vault-inset px-4 py-4 font-mono text-[13px] leading-6 text-foreground outline-none scrollbar-thin"
           spellCheck={false}
         />
       ) : (

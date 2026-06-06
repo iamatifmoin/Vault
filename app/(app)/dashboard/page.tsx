@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { StreakBadge } from "@/components/streak-badge";
+import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
 import { APPROACH_BADGE_TONES, DIFFICULTY_LABELS, PLATFORM_LABELS } from "@/lib/constants";
 import { getIndex } from "@/lib/github";
@@ -21,9 +21,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-end border-b border-vault-border bg-background/90 px-container-padding backdrop-blur">
-        <StreakBadge streak={streak} />
-      </header>
+      <PageHeader title="Dashboard" streak={streak} />
 
       <main className="mx-auto max-w-6xl p-container-padding">
         <div className="grid gap-gutter md:grid-cols-4">
@@ -33,22 +31,19 @@ export default async function DashboardPage() {
             ["Streak", `${stats.currentStreak} days`],
             ["Optimal", stats.optimal],
           ].map(([label, value]) => (
-            <div
-              key={label}
-              className="rounded-md border border-vault-border bg-vault-raised p-6"
-            >
-              <div className="font-mono text-[11px] uppercase text-zinc-500">{label}</div>
-              <div className="mt-2 text-4xl font-semibold text-zinc-50">{value}</div>
+            <div key={label} className="surface-card p-6">
+              <div className="text-micro-label">{label}</div>
+              <div className="text-stat mt-2">{value}</div>
             </div>
           ))}
         </div>
 
-        <section className="mt-6 overflow-hidden rounded-md border border-vault-border bg-vault-surface">
-          <div className="border-b border-vault-border bg-zinc-950/40 px-6 py-4">
-            <h2 className="text-2xl font-semibold text-zinc-50">Recent Activity</h2>
+        <section className="surface-card mt-6 overflow-hidden">
+          <div className="border-b border-border bg-vault-bg/60 px-6 py-4">
+            <h2 className="text-section-title">Recent Activity</h2>
           </div>
 
-          <div className="divide-y divide-vault-border">
+          <div className="divide-y divide-border">
             {recent.length ? (
               recent.map((problem) => (
                 <Link
@@ -57,22 +52,22 @@ export default async function DashboardPage() {
                   className="flex flex-col justify-between gap-4 px-6 py-4 transition-colors hover:bg-vault-raised md:flex-row md:items-center"
                 >
                   <div>
-                    <p className="text-[15px] font-medium text-zinc-50">{problem.title}</p>
-                    <p className="mt-1 font-mono text-[11px] text-zinc-500">
+                    <p className="text-card-title">{problem.title}</p>
+                    <p className="text-micro-label mt-1 normal-case tracking-normal">
                       {formatRelativeDate(problem.latest_date)}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <span className="rounded-sm border border-vault-border px-2 py-1 font-mono text-[11px] uppercase text-zinc-400">
+                    <span className="rounded-full border border-border px-2 py-1 font-mono text-[11px] uppercase text-muted-foreground">
                       {PLATFORM_LABELS[problem.platform]}
                     </span>
-                    <span className="rounded-sm border border-vault-border px-2 py-1 font-mono text-[11px] uppercase text-zinc-200">
+                    <span className="rounded-full border border-border px-2 py-1 font-mono text-[11px] uppercase text-foreground">
                       {DIFFICULTY_LABELS[problem.difficulty]}
                     </span>
                     {problem.latest_approach ? (
                       <span
                         className={cn(
-                          "rounded-sm border px-2 py-1 font-mono text-[11px]",
+                          "rounded-full border px-2 py-1 font-mono text-[11px]",
                           APPROACH_BADGE_TONES[problem.latest_approach].className,
                         )}
                       >
@@ -83,10 +78,10 @@ export default async function DashboardPage() {
                 </Link>
               ))
             ) : (
-              <div className="px-6 py-10 text-sm text-zinc-500">
+              <div className="px-6 py-10 text-sm text-muted-foreground">
                 No attempts yet. Head to
                 {" "}
-                <Link href="/add" className="text-zinc-100 underline underline-offset-4">
+                <Link href="/add" className="text-foreground underline underline-offset-4">
                   Add Problem
                 </Link>
                 {" "}
