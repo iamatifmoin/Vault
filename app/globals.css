@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #09090b;
+    --foreground: #e5e1e4;
+    --card: #18181b;
+    --card-foreground: #e5e1e4;
+    --popover: #18181b;
+    --popover-foreground: #e5e1e4;
+    --primary: #f4f4f5;
+    --primary-foreground: #09090b;
+    --secondary: #18181b;
+    --secondary-foreground: #fafafa;
+    --muted: #18181b;
+    --muted-foreground: #a1a1aa;
+    --accent: #27272a;
+    --accent-foreground: #fafafa;
+    --destructive: #ef4444;
+    --destructive-foreground: #fff1f2;
+    --border: #3f3f46;
+    --input: #3f3f46;
+    --ring: #fafafa;
+    --radius: 0.5rem;
+    --sidebar: #09090b;
+    --sidebar-foreground: #e5e1e4;
+    --sidebar-primary: #18181b;
+    --sidebar-primary-foreground: #fafafa;
+    --sidebar-accent: #18181b;
+    --sidebar-accent-foreground: #fafafa;
+    --sidebar-border: #3f3f46;
+    --sidebar-ring: #fafafa;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply bg-vault-bg text-foreground font-sans;
+  }
+
+  body {
+    @apply min-h-screen bg-background text-foreground antialiased;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scrollbar-thin {
+    scrollbar-color: #3f3f46 transparent;
+    scrollbar-width: thin;
+  }
+}
+
+body::-webkit-scrollbar,
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+body::-webkit-scrollbar-thumb,
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 9999px;
+}
+
+::selection {
+  background: rgba(244, 244, 245, 0.2);
+  color: #fafafa;
+}
+
+.prose-vault {
+  color: #d4d4d8;
+}
+
+.prose-vault h1,
+.prose-vault h2,
+.prose-vault h3,
+.prose-vault h4 {
+  color: #fafafa;
+}
+
+.prose-vault a {
+  color: #fafafa;
+}
+
+.prose-vault code {
+  color: #fafafa;
+  background: #18181b;
+  border: 1px solid #3f3f46;
+  border-radius: 0.375rem;
+  padding: 0.125rem 0.375rem;
+}
+
+.prose-vault pre {
+  background: #09090b;
+  border: 1px solid #3f3f46;
+  border-radius: 0.5rem;
+}

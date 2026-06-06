@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vault - Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed-dim": "#c8c5ca",
+                      "primary-fixed-dim": "#c6c6c7",
+                      "on-tertiary-fixed-variant": "#494643",
+                      "inverse-primary": "#5d5f5f",
+                      "on-secondary-fixed": "#1b1b1e",
+                      "surface-container": "#201f22",
+                      "on-surface-variant": "#c4c7c8",
+                      "text-secondary": "#a1a1aa",
+                      "primary-fixed": "#e2e2e2",
+                      "surface-variant": "#353437",
+                      "on-primary": "#2f3131",
+                      "error-container": "#93000a",
+                      "surface-container-high": "#2a2a2c",
+                      "secondary": "#c8c5ca",
+                      "indicator-optimized": "#eab308",
+                      "on-tertiary-fixed": "#1d1b19",
+                      "secondary-fixed": "#e4e1e6",
+                      "surface-container-highest": "#353437",
+                      "on-surface": "#e5e1e4",
+                      "on-primary-fixed-variant": "#454747",
+                      "on-primary-fixed": "#1a1c1c",
+                      "on-secondary-fixed-variant": "#47464a",
+                      "outline": "#8e9192",
+                      "surface-raised": "#27272a",
+                      "on-secondary-container": "#b6b4b8",
+                      "text-muted": "#52525b",
+                      "surface-bright": "#39393b",
+                      "on-primary-container": "#636565",
+                      "outline-variant": "#444748",
+                      "tertiary-fixed": "#e7e1dd",
+                      "brand-accent": "#f4f4f5",
+                      "indicator-hard": "#ef4444",
+                      "surface-container-lowest": "#0e0e10",
+                      "tertiary": "#ffffff",
+                      "background": "#131315",
+                      "on-tertiary-container": "#676460",
+                      "tertiary-container": "#e7e1dd",
+                      "inverse-surface": "#e5e1e4",
+                      "on-error": "#690005",
+                      "indicator-medium": "#3b82f6",
+                      "secondary-container": "#47464a",
+                      "primary-container": "#e2e2e2",
+                      "surface": "#131315",
+                      "border-subtle": "#3f3f46",
+                      "surface-tint": "#c6c6c7",
+                      "surface-container-low": "#1c1b1d",
+                      "tertiary-fixed-dim": "#cbc6c1",
+                      "on-error-container": "#ffdad6",
+                      "on-tertiary": "#32302d",
+                      "surface-dim": "#131315",
+                      "on-background": "#e5e1e4",
+                      "primary": "#ffffff",
+                      "error": "#ffb4ab",
+                      "inverse-on-surface": "#313032",
+                      "on-secondary": "#303033",
+                      "indicator-success": "#22c55e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "container-padding": "24px",
+                      "stack-lg": "24px",
+                      "sidebar-width": "220px",
+                      "stack-sm": "8px",
+                      "stack-md": "12px"
+              },
+              "fontFamily": {
+                      "code-block": [
+                              "Geist Mono", "monospace"
+                      ],
+                      "code-label": [
+                              "Geist Mono", "monospace"
+                      ],
+                      "body-medium": [
+                              "Inter", "sans-serif"
+                      ],
+                      "page-heading": [
+                              "Inter", "sans-serif"
+                      ],
+                      "body-base": [
+                              "Inter", "sans-serif"
+                      ],
+                      "label-caps": [
+                              "Geist Mono", "monospace"
+                      ],
+                      "section-heading": [
+                              "Inter", "sans-serif"
+                      ]
+              },
+              "fontSize": {
+                      "code-block": [
+                              "13px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "code-label": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-medium": [
+                              "15px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "page-heading": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-base": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "11px",
+                              {
+                                      "lineHeight": "12px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "section-heading": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .heatmap-cell {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+        .level-0 { background-color: #18181b; border: 1px solid #3f3f46; }
+        .level-1 { background-color: #064e3b; }
+        .level-2 { background-color: #047857; }
+        .level-3 { background-color: #059669; }
+        .level-4 { background-color: #10b981; }
+    </style>
+</head>
+<body class="bg-background text-primary font-body-base antialiased flex h-screen overflow-hidden selection:bg-brand-accent selection:text-background">
+<!-- SideNavBar -->
+<nav class="hidden md:flex bg-background dark:bg-background font-body-base text-body-base fixed left-0 top-0 h-screen w-[220px] border-r border-border-subtle flex-col py-gutter z-50">
+<div class="px-container-padding mb-8">
+<h1 class="font-page-heading text-[16px] font-semibold text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-brand-accent" style="font-variation-settings: 'FILL' 1;">dataset</span>
+                Vault
+            </h1>
+<span class="text-text-secondary font-code-label text-code-label uppercase tracking-widest mt-1 block">DSA Tracker</span>
+</div>
+<div class="flex flex-col gap-1 w-full">
+<a class="text-text-secondary flex items-center h-8 px-4 hover:bg-surface-container-high hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]">dashboard</span>
+                Dashboard
+            </a>
+<a class="text-text-secondary flex items-center h-8 px-4 hover:bg-surface-container-high hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]">add_box</span>
+                Add Problem
+            </a>
+<a class="text-text-secondary flex items-center h-8 px-4 hover:bg-surface-container-high hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]">menu_book</span>
+                Library
+            </a>
+<!-- Active State -->
+<a class="bg-surface-variant text-primary border-l-2 border-primary flex items-center h-8 px-4 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]">person</span>
+                Profile
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col min-w-0 md:ml-sidebar-width h-screen overflow-hidden relative">
+<!-- TopNavBar -->
+<header class="bg-background/80 backdrop-blur-md text-primary dark:text-primary font-section-heading text-section-heading border-b border-border-subtle flex justify-between items-center h-16 px-container-padding sticky top-0 z-40">
+<div class="font-page-heading text-page-heading text-primary font-semibold text-[20px]">Profile</div>
+<div class="flex items-center gap-4 cursor-default">
+<span class="text-text-secondary text-sm font-code-block flex items-center gap-1.5 border border-border-subtle bg-surface px-3 py-1 rounded">
+<span class="material-symbols-outlined text-[16px] text-indicator-optimized">local_fire_department</span>
+                    14 day streak
+                </span>
+</div>
+</header>
+<!-- Scrollable Canvas -->
+<main class="flex-1 overflow-y-auto p-container-padding flex justify-center">
+<!-- 680px Centered Container -->
+<div class="w-full max-w-[680px] flex flex-col gap-stack-lg pb-12">
+<!-- Profile Header -->
+<section class="flex flex-col items-center justify-center pt-8 pb-4 text-center">
+<div class="w-24 h-24 rounded-full border border-border-subtle overflow-hidden mb-4 p-1 bg-surface-raised relative">
+<img alt="Profile Avatar" class="w-full h-full object-cover rounded-full" data-alt="A close-up portrait of a professional developer, dramatic studio lighting against a dark minimalist background, emphasizing sharp details and high contrast, monochromatic aesthetic with subtle warm tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUMNuhCBHwK1zOIAmaavw3PfScq8yjgsTIdNZshvZTb6rYsh4AsHpdP0wQ2APooUChxgraE3_wKtLA5TtInRUKLRPKkMMV4RpU6cWhfCv7prFPI0MBkXBNjMdNnaQVomtG2EB2Ui6ozQ4BNumSB4W1Jlh9N_ZebEDXNh34zmkO9sqtBmciNg3KX9avVTuT5hv5m6pE_hXECEGd8_aAKtp81xmABz7OqpOu-iTge55I3e7Mke5LpHKWkrBbNgUxgoPzrZOtlr8kjvxV"/>
+<!-- Online Indicator -->
+<div class="absolute bottom-1 right-1 w-4 h-4 bg-indicator-success rounded-full border-2 border-surface-raised"></div>
+</div>
+<h2 class="font-section-heading text-section-heading text-primary">Alex Chen</h2>
+<p class="font-code-block text-code-block text-text-secondary mt-1">@alexc_dev</p>
+</section>
+<!-- Stat Chips Row -->
+<section class="grid grid-cols-3 gap-4">
+<div class="bg-surface border border-border-subtle rounded p-4 flex flex-col items-center justify-center">
+<span class="font-code-label text-code-label text-text-secondary uppercase tracking-wider mb-1">Total Solved</span>
+<span class="font-page-heading text-page-heading text-primary">482</span>
+</div>
+<div class="bg-surface border border-border-subtle rounded p-4 flex flex-col items-center justify-center">
+<span class="font-code-label text-code-label text-text-secondary uppercase tracking-wider mb-1">Platforms</span>
+<span class="font-page-heading text-page-heading text-primary">3</span>
+</div>
+<div class="bg-surface border border-border-subtle rounded p-4 flex flex-col items-center justify-center">
+<span class="font-code-label text-code-label text-text-secondary uppercase tracking-wider mb-1">Best Streak</span>
+<span class="font-page-heading text-page-heading text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[24px] text-indicator-optimized" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                            42
+                        </span>
+</div>
+</section>
+<!-- Difficulty Breakdown -->
+<section class="bg-surface border border-border-subtle rounded p-container-padding">
+<h3 class="font-body-medium text-body-medium text-text-secondary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">bar_chart</span>
+                        Difficulty Breakdown
+                    </h3>
+<div class="space-y-4">
+<!-- Easy -->
+<div class="flex items-center gap-4">
+<div class="w-20 font-code-block text-code-block text-text-secondary flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-indicator-success"></div>
+                                Easy
+                            </div>
+<div class="flex-1 h-2 bg-surface-raised rounded overflow-hidden">
+<div class="h-full bg-indicator-success w-[45%]"></div>
+</div>
+<div class="w-12 text-right font-code-block text-code-block text-primary">218</div>
+</div>
+<!-- Medium -->
+<div class="flex items-center gap-4">
+<div class="w-20 font-code-block text-code-block text-text-secondary flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-indicator-medium"></div>
+                                Medium
+                            </div>
+<div class="flex-1 h-2 bg-surface-raised rounded overflow-hidden">
+<div class="h-full bg-indicator-medium w-[40%]"></div>
+</div>
+<div class="w-12 text-right font-code-block text-code-block text-primary">192</div>
+</div>
+<!-- Hard -->
+<div class="flex items-center gap-4">
+<div class="w-20 font-code-block text-code-block text-text-secondary flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-indicator-hard"></div>
+                                Hard
+                            </div>
+<div class="flex-1 h-2 bg-surface-raised rounded overflow-hidden">
+<div class="h-full bg-indicator-hard w-[15%]"></div>
+</div>
+<div class="w-12 text-right font-code-block text-code-block text-primary">72</div>
+</div>
+</div>
+</section>
+<!-- By Platform Row -->
+<section class="grid grid-cols-2 gap-4">
+<div class="bg-surface border border-border-subtle rounded p-4 flex items-center justify-between hover:bg-surface-raised transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-surface-raised border border-border-subtle rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-text-secondary">code</span>
+</div>
+<span class="font-body-medium text-body-medium text-primary">LeetCode</span>
+</div>
+<span class="font-code-block text-code-block text-text-secondary">340 solved</span>
+</div>
+<div class="bg-surface border border-border-subtle rounded p-4 flex items-center justify-between hover:bg-surface-raised transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-surface-raised border border-border-subtle rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-text-secondary">terminal</span>
+</div>
+<span class="font-body-medium text-body-medium text-primary">Codeforces</span>
+</div>
+<span class="font-code-block text-code-block text-text-secondary">142 solved</span>
+</div>
+</section>
+<!-- Activity Heatmap -->
+<section class="bg-surface border border-border-subtle rounded p-container-padding overflow-x-auto">
+<h3 class="font-body-medium text-body-medium text-text-secondary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">calendar_month</span>
+                        Activity
+                    </h3>
+<div class="min-w-max">
+<div class="flex gap-1" id="heatmap-container">
+<!-- JS will populate columns here -->
+</div>
+<div class="mt-4 flex items-center justify-end gap-2 font-code-label text-code-label text-text-secondary">
+                            Less
+                            <div class="flex gap-1">
+<div class="heatmap-cell level-0"></div>
+<div class="heatmap-cell level-1"></div>
+<div class="heatmap-cell level-2"></div>
+<div class="heatmap-cell level-3"></div>
+<div class="heatmap-cell level-4"></div>
+</div>
+                            More
+                        </div>
+</div>
+</section>
+<!-- Logout Button -->
+<section class="flex justify-center pt-8">
+<button class="font-body-medium text-body-medium text-indicator-hard hover:bg-surface-raised px-4 py-2 rounded transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+                        Sign Out
+                    </button>
+</section>
+</div>
+</main>
+</div>
+<script>
+        // Generate Activity Heatmap (52 columns, 7 rows)
+        const container = document.getElementById('heatmap-container');
+        const cols = 52;
+        const rows = 7;
+
+        for (let i = 0; i < cols; i++) {
+            const colDiv = document.createElement('div');
+            colDiv.className = 'flex flex-col gap-1';
+            
+            for (let j = 0; j < rows; j++) {
+                const cell = document.createElement('div');
+                
+                // Randomize activity level heavily weighted towards 0
+                let level = 0;
+                const rand = Math.random();
+                if (rand > 0.95) level = 4;
+                else if (rand > 0.85) level = 3;
+                else if (rand > 0.70) level = 2;
+                else if (rand > 0.50) level = 1;
+                
+                // Add a dense patch to simulate a recent streak
+                if (i > 45 && rand > 0.3) {
+                    level = Math.floor(Math.random() * 4) + 1;
+                }
+
+                cell.className = `heatmap-cell level-${level}`;
+                cell.title = `${level > 0 ? (level * 3) + Math.floor(Math.random()*3) : 0} submissions on this day`;
+                colDiv.appendChild(cell);
+            }
+            container.appendChild(colDiv);
+        }
+    </script>
+</body></html>

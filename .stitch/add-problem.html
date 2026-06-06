@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add Problem - Vault</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed-dim": "#c8c5ca",
+                      "primary-fixed-dim": "#c6c6c7",
+                      "on-tertiary-fixed-variant": "#494643",
+                      "inverse-primary": "#5d5f5f",
+                      "on-secondary-fixed": "#1b1b1e",
+                      "surface-container": "#201f22",
+                      "on-surface-variant": "#c4c7c8",
+                      "text-secondary": "#a1a1aa",
+                      "primary-fixed": "#e2e2e2",
+                      "surface-variant": "#353437",
+                      "on-primary": "#2f3131",
+                      "error-container": "#93000a",
+                      "surface-container-high": "#2a2a2c",
+                      "secondary": "#c8c5ca",
+                      "indicator-optimized": "#eab308",
+                      "on-tertiary-fixed": "#1d1b19",
+                      "secondary-fixed": "#e4e1e6",
+                      "surface-container-highest": "#353437",
+                      "on-surface": "#e5e1e4",
+                      "on-primary-fixed-variant": "#454747",
+                      "on-primary-fixed": "#1a1c1c",
+                      "on-secondary-fixed-variant": "#47464a",
+                      "outline": "#8e9192",
+                      "surface-raised": "#27272a",
+                      "on-secondary-container": "#b6b4b8",
+                      "text-muted": "#52525b",
+                      "surface-bright": "#39393b",
+                      "on-primary-container": "#636565",
+                      "outline-variant": "#444748",
+                      "tertiary-fixed": "#e7e1dd",
+                      "brand-accent": "#f4f4f5",
+                      "indicator-hard": "#ef4444",
+                      "surface-container-lowest": "#0e0e10",
+                      "tertiary": "#ffffff",
+                      "background": "#131315",
+                      "on-tertiary-container": "#676460",
+                      "tertiary-container": "#e7e1dd",
+                      "inverse-surface": "#e5e1e4",
+                      "on-error": "#690005",
+                      "indicator-medium": "#3b82f6",
+                      "secondary-container": "#47464a",
+                      "primary-container": "#e2e2e2",
+                      "surface": "#131315",
+                      "border-subtle": "#3f3f46",
+                      "surface-tint": "#c6c6c7",
+                      "surface-container-low": "#1c1b1d",
+                      "tertiary-fixed-dim": "#cbc6c1",
+                      "on-error-container": "#ffdad6",
+                      "on-tertiary": "#32302d",
+                      "surface-dim": "#131315",
+                      "on-background": "#e5e1e4",
+                      "primary": "#ffffff",
+                      "error": "#ffb4ab",
+                      "inverse-on-surface": "#313032",
+                      "on-secondary": "#303033",
+                      "indicator-success": "#22c55e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "container-padding": "24px",
+                      "stack-lg": "24px",
+                      "sidebar-width": "220px",
+                      "stack-sm": "8px",
+                      "stack-md": "12px"
+              },
+              "fontFamily": {
+                      "code-block": [
+                              "Geist", "monospace"
+                      ],
+                      "code-label": [
+                              "Geist", "monospace"
+                      ],
+                      "body-medium": [
+                              "Inter", "sans-serif"
+                      ],
+                      "page-heading": [
+                              "Inter", "sans-serif"
+                      ],
+                      "body-base": [
+                              "Inter", "sans-serif"
+                      ],
+                      "label-caps": [
+                              "Geist", "monospace"
+                      ],
+                      "section-heading": [
+                              "Inter", "sans-serif"
+                      ]
+              },
+              "fontSize": {
+                      "code-block": [
+                              "13px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "code-label": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-medium": [
+                              "15px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "page-heading": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-base": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "11px",
+                              {
+                                      "lineHeight": "12px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "section-heading": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for editor */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3f3f46;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #52525b;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex antialiased">
+<!-- SideNavBar -->
+<nav class="bg-background dark:bg-background text-primary dark:text-primary font-body-base text-body-base fixed left-0 top-0 h-screen w-[220px] border-r border-border-subtle flex flex-col py-gutter hidden md:flex z-50">
+<div class="px-container-padding mb-8">
+<h1 class="font-page-heading text-[16px] font-semibold text-primary flex items-center gap-2">
+<span class="material-symbols-outlined">dataset</span>
+                Vault
+            </h1>
+<p class="text-text-secondary text-code-label font-code-label mt-1">DSA Tracker</p>
+</div>
+<div class="flex flex-col gap-1 flex-1">
+<a class="text-text-secondary flex items-center h-8 px-4 hover:bg-surface-container-high hover:text-primary transition-colors duration-200 gap-3" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+                Dashboard
+            </a>
+<a class="bg-surface-variant text-primary border-l-2 border-primary flex items-center h-8 px-4 transition-colors duration-200 gap-3 pl-[14px]" href="#">
+<span class="material-symbols-outlined text-[20px]">add_box</span>
+                Add Problem
+            </a>
+<a class="text-text-secondary flex items-center h-8 px-4 hover:bg-surface-container-high hover:text-primary transition-colors duration-200 gap-3" href="#">
+<span class="material-symbols-outlined text-[20px]">menu_book</span>
+                Library
+            </a>
+<a class="text-text-secondary flex items-center h-8 px-4 hover:bg-surface-container-high hover:text-primary transition-colors duration-200 gap-3" href="#">
+<span class="material-symbols-outlined text-[20px]">person</span>
+                Profile
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 ml-0 md:ml-[220px] flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-background/80 backdrop-blur-md text-primary dark:text-primary font-section-heading text-section-heading docked full-width top-0 border-b border-border-subtle flex justify-between items-center h-16 px-container-padding sticky z-40">
+<div class="flex items-center gap-4">
+<span class="font-page-heading text-page-heading text-primary">Add Problem</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-indicator-optimized font-body-medium text-body-medium border border-border-subtle px-3 py-1 rounded">
+<span class="material-symbols-outlined text-[18px]">local_fire_department</span>
+<span>14 day streak</span>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<main class="flex-1 p-container-padding">
+<div class="max-w-[1600px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-gutter h-[calc(100vh-120px)]">
+<!-- Left Column (Problem Setup) -->
+<div class="lg:col-span-5 flex flex-col gap-gutter h-full">
+<!-- Fetch Controls Card -->
+<div class="bg-surface border border-border-subtle rounded flex flex-col p-4 gap-4">
+<!-- Platform Selector -->
+<div class="flex flex-col gap-2">
+<label class="font-code-label text-code-label text-text-secondary uppercase">Platform</label>
+<div class="flex border border-border-subtle rounded p-1 bg-background">
+<button class="flex-1 py-1.5 px-3 bg-surface-raised text-primary text-body-base font-body-base rounded shadow-sm border border-border-subtle text-center transition-colors">LeetCode</button>
+<button class="flex-1 py-1.5 px-3 text-text-secondary hover:text-primary text-body-base font-body-base rounded text-center transition-colors">Codeforces</button>
+<button class="flex-1 py-1.5 px-3 text-text-secondary hover:text-primary text-body-base font-body-base rounded text-center transition-colors">CodeChef</button>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Sheet Dropdown -->
+<div class="flex flex-col gap-2">
+<label class="font-code-label text-code-label text-text-secondary uppercase">Target Sheet</label>
+<div class="relative">
+<select class="w-full bg-background border border-border-subtle rounded px-3 py-2 text-primary font-body-base text-body-base appearance-none focus:outline-none focus:border-primary transition-colors">
+<option>NeetCode 150</option>
+<option>Blind 75</option>
+<option>Striver SDE Sheet</option>
+<option>Unassigned</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-text-secondary pointer-events-none text-[20px]">arrow_drop_down</span>
+</div>
+</div>
+<!-- Problem Input -->
+<div class="flex flex-col gap-2">
+<label class="font-code-label text-code-label text-text-secondary uppercase">Problem URL / ID</label>
+<div class="flex gap-2">
+<input class="flex-1 bg-background border border-border-subtle rounded px-3 py-2 text-primary font-body-base text-body-base placeholder:text-text-muted focus:outline-none focus:border-primary transition-colors" placeholder="e.g. 1 or two-sum" type="text"/>
+<button class="bg-brand-accent text-background px-4 py-2 rounded font-body-medium text-body-medium hover:bg-primary transition-colors whitespace-nowrap">Fetch</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Fetched Problem Preview -->
+<div class="bg-surface border border-border-subtle rounded flex flex-col flex-1 overflow-hidden">
+<div class="p-4 border-b border-border-subtle flex flex-col gap-3">
+<div class="flex items-start justify-between">
+<h2 class="font-section-heading text-section-heading text-primary">1. Two Sum</h2>
+<span class="px-2 py-1 rounded text-indicator-success border border-indicator-success/30 bg-indicator-success/10 font-label-caps text-label-caps uppercase tracking-wider">Easy</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-raised border border-border-subtle rounded font-code-label text-code-label text-text-secondary">Array</span>
+<span class="px-2 py-1 bg-surface-raised border border-border-subtle rounded font-code-label text-code-label text-text-secondary">Hash Table</span>
+</div>
+</div>
+<div class="p-4 overflow-y-auto flex-1 font-body-base text-body-base text-on-surface-variant leading-relaxed">
+<p class="mb-4">Given an array of integers <code class="bg-surface-raised px-1 py-0.5 rounded border border-border-subtle font-code-block text-code-block text-primary">nums</code> and an integer <code class="bg-surface-raised px-1 py-0.5 rounded border border-border-subtle font-code-block text-code-block text-primary">target</code>, return <em>indices of the two numbers such that they add up to <code class="bg-surface-raised px-1 py-0.5 rounded border border-border-subtle font-code-block text-code-block text-primary">target</code></em>.</p>
+<p class="mb-4">You may assume that each input would have <strong><em>exactly</em> one solution</strong>, and you may not use the <em>same</em> element twice.</p>
+<p class="mb-4">You can return the answer in any order.</p>
+<h3 class="font-body-medium text-body-medium text-primary mt-6 mb-2">Example 1:</h3>
+<div class="bg-background border border-border-subtle rounded p-3 mb-4 font-code-block text-code-block text-text-secondary">
+<span class="text-primary">Input:</span> nums = [2,7,11,15], target = 9<br/>
+<span class="text-primary">Output:</span> [0,1]<br/>
+<span class="text-primary">Explanation:</span> Because nums[0] + nums[1] == 9, we return [0, 1].
+                            </div>
+</div>
+</div>
+</div>
+<!-- Right Column (Solution Editor) -->
+<div class="lg:col-span-7 flex flex-col h-full border border-border-subtle rounded bg-[#0d0d0f] overflow-hidden">
+<!-- Editor Header -->
+<div class="h-12 border-b border-border-subtle bg-surface flex items-center justify-between px-4">
+<div class="flex gap-2">
+<button class="px-3 py-1 bg-surface-raised border border-border-subtle rounded font-code-label text-code-label text-primary">C++</button>
+<button class="px-3 py-1 hover:bg-surface-raised border border-transparent hover:border-border-subtle rounded font-code-label text-code-label text-text-secondary transition-all">Python</button>
+<button class="px-3 py-1 hover:bg-surface-raised border border-transparent hover:border-border-subtle rounded font-code-label text-code-label text-text-secondary transition-all">Java</button>
+</div>
+<div class="flex items-center gap-2 text-text-muted font-code-label text-code-label">
+<span class="material-symbols-outlined text-[16px]">timer</span>
+<span>00:00:00</span>
+</div>
+</div>
+<!-- Editor Body -->
+<div class="flex-1 flex flex-col font-code-block text-code-block overflow-y-auto">
+<!-- Line Numbers & Boilerplate -->
+<div class="flex px-4 pt-4 text-text-muted">
+<div class="flex flex-col text-right select-none pr-4 border-r border-border-subtle/30 opacity-50">
+<span>1</span>
+<span>2</span>
+<span>3</span>
+<span>4</span>
+<span>5</span>
+<span>6</span>
+</div>
+<div class="pl-4 whitespace-pre">class Solution {
+public:
+    vector&lt;int&gt; twoSum(vector&lt;int&gt;&amp; nums, int target) {
+        
+    }
+};</div>
+</div>
+<!-- Divider -->
+<div class="flex items-center px-4 py-4 opacity-50">
+<div class="flex-1 border-t border-border-subtle border-dashed"></div>
+<span class="px-4 font-code-label text-code-label text-text-secondary">-- Your Solution Below --</span>
+<div class="flex-1 border-t border-border-subtle border-dashed"></div>
+</div>
+<!-- User Code Area -->
+<div class="flex px-4 pb-4 text-primary flex-1">
+<div class="flex flex-col text-right select-none pr-4 border-r border-border-subtle/30 text-text-muted opacity-50">
+<span>7</span>
+<span>8</span>
+<span>9</span>
+<span>10</span>
+<span>11</span>
+</div>
+<div class="pl-4 w-full outline-none" contenteditable="true" spellcheck="false">
+<span class="text-text-secondary">// Optimal O(N) Hash Map approach</span>
+unordered_map&lt;int, int&gt; m;
+for(int i=0; i&lt;nums.size(); i++) {
+    <span class="animate-pulse border-r-2 border-primary"></span>
+}</div>
+</div>
+</div>
+<!-- Editor Footer Actions -->
+<div class="h-14 border-t border-border-subtle bg-surface flex items-center justify-between px-4">
+<div class="text-text-muted font-code-label text-code-label flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">sync_saved_locally</span>
+                            Unsaved changes
+                        </div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-2 bg-transparent border border-border-subtle text-primary rounded font-body-medium text-body-medium hover:bg-surface-raised transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                                Save Draft
+                            </button>
+<button class="px-4 py-2 bg-brand-accent text-background rounded font-body-medium text-body-medium hover:bg-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+                                Analyze with AI
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

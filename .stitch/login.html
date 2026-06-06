@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vault - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed-dim": "#c8c5ca",
+                      "primary-fixed-dim": "#c6c6c7",
+                      "on-tertiary-fixed-variant": "#494643",
+                      "inverse-primary": "#5d5f5f",
+                      "on-secondary-fixed": "#1b1b1e",
+                      "surface-container": "#201f22",
+                      "on-surface-variant": "#c4c7c8",
+                      "text-secondary": "#a1a1aa",
+                      "primary-fixed": "#e2e2e2",
+                      "surface-variant": "#353437",
+                      "on-primary": "#2f3131",
+                      "error-container": "#93000a",
+                      "surface-container-high": "#2a2a2c",
+                      "secondary": "#c8c5ca",
+                      "indicator-optimized": "#eab308",
+                      "on-tertiary-fixed": "#1d1b19",
+                      "secondary-fixed": "#e4e1e6",
+                      "surface-container-highest": "#353437",
+                      "on-surface": "#e5e1e4",
+                      "on-primary-fixed-variant": "#454747",
+                      "on-primary-fixed": "#1a1c1c",
+                      "on-secondary-fixed-variant": "#47464a",
+                      "outline": "#8e9192",
+                      "surface-raised": "#27272a",
+                      "on-secondary-container": "#b6b4b8",
+                      "text-muted": "#52525b",
+                      "surface-bright": "#39393b",
+                      "on-primary-container": "#636565",
+                      "outline-variant": "#444748",
+                      "tertiary-fixed": "#e7e1dd",
+                      "brand-accent": "#f4f4f5",
+                      "indicator-hard": "#ef4444",
+                      "surface-container-lowest": "#0e0e10",
+                      "tertiary": "#ffffff",
+                      "background": "#131315",
+                      "on-tertiary-container": "#676460",
+                      "tertiary-container": "#e7e1dd",
+                      "inverse-surface": "#e5e1e4",
+                      "on-error": "#690005",
+                      "indicator-medium": "#3b82f6",
+                      "secondary-container": "#47464a",
+                      "primary-container": "#e2e2e2",
+                      "surface": "#131315",
+                      "border-subtle": "#3f3f46",
+                      "surface-tint": "#c6c6c7",
+                      "surface-container-low": "#1c1b1d",
+                      "tertiary-fixed-dim": "#cbc6c1",
+                      "on-error-container": "#ffdad6",
+                      "on-tertiary": "#32302d",
+                      "surface-dim": "#131315",
+                      "on-background": "#e5e1e4",
+                      "primary": "#ffffff",
+                      "error": "#ffb4ab",
+                      "inverse-on-surface": "#313032",
+                      "on-secondary": "#303033",
+                      "indicator-success": "#22c55e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "container-padding": "24px",
+                      "stack-lg": "24px",
+                      "sidebar-width": "220px",
+                      "stack-sm": "8px",
+                      "stack-md": "12px"
+              },
+              "fontFamily": {
+                      "code-block": [
+                              "Geist Mono", "monospace"
+                      ],
+                      "code-label": [
+                              "Geist Mono", "monospace"
+                      ],
+                      "body-medium": [
+                              "Inter", "sans-serif"
+                      ],
+                      "page-heading": [
+                              "Inter", "sans-serif"
+                      ],
+                      "body-base": [
+                              "Inter", "sans-serif"
+                      ],
+                      "label-caps": [
+                              "Geist Mono", "monospace"
+                      ],
+                      "section-heading": [
+                              "Inter", "sans-serif"
+                      ]
+              },
+              "fontSize": {
+                      "code-block": [
+                              "13px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "code-label": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-medium": [
+                              "15px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "page-heading": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-base": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "11px",
+                              {
+                                      "lineHeight": "12px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "section-heading": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row antialiased">
+<!-- Left Panel (55%) -->
+<div class="w-full md:w-[55%] bg-[#18181b] border-r border-border-subtle p-8 md:p-16 flex flex-col justify-between">
+<!-- Logo -->
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-indicator-success text-2xl" style="font-variation-settings: 'FILL' 1;">data_object</span>
+<span class="font-page-heading text-xl text-primary font-bold">Vault</span>
+</div>
+<!-- Main Content Left -->
+<div class="my-auto max-w-lg space-y-12">
+<h1 class="font-page-heading text-[40px] leading-tight text-primary font-semibold tracking-tight">
+                Your DSA practice,<br/>properly organised.
+            </h1>
+<div class="space-y-6">
+<!-- Feature 1 -->
+<div class="flex items-start gap-4">
+<div class="p-2 rounded bg-surface-raised border border-border-subtle text-text-secondary">
+<svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+</div>
+<div>
+<h3 class="font-body-medium text-body-medium text-primary mb-1">GitHub Auto-Sync</h3>
+<p class="font-body-base text-body-base text-text-secondary">Automatically push your solutions and maintain your commit history seamlessly.</p>
+</div>
+</div>
+<!-- Feature 2 -->
+<div class="flex items-start gap-4">
+<div class="p-2 rounded bg-surface-raised border border-border-subtle text-text-secondary">
+<svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+</div>
+<div>
+<h3 class="font-body-medium text-body-medium text-primary mb-1">AI Complexity Analysis</h3>
+<p class="font-body-base text-body-base text-text-secondary">Get instant Big O analysis and optimization suggestions for your code.</p>
+</div>
+</div>
+<!-- Feature 3 -->
+<div class="flex items-start gap-4">
+<div class="p-2 rounded bg-surface-raised border border-border-subtle text-text-secondary">
+<svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path></svg>
+</div>
+<div>
+<h3 class="font-body-medium text-body-medium text-primary mb-1">Spaced Repetition Tracking</h3>
+<p class="font-body-base text-body-base text-text-secondary">Never forget a pattern. Vault schedules reviews based on your confidence level.</p>
+</div>
+</div>
+</div>
+<!-- Code Path Example -->
+<div class="mt-8 p-4 bg-surface-container-lowest border border-border-subtle rounded flex items-center gap-3">
+<span class="material-symbols-outlined text-text-secondary text-sm">folder_open</span>
+<span class="font-code-block text-code-block text-text-muted">Data Structures &amp; Algorithms / leetcode / arrays / <span class="text-primary">0001-two_sum.md</span></span>
+</div>
+</div>
+</div>
+<!-- Right Panel (45%) -->
+<div class="w-full md:w-[45%] bg-[#09090b] flex items-center justify-center p-8">
+<div class="w-full max-w-sm flex flex-col items-center text-center space-y-8">
+<div class="space-y-2">
+<h2 class="font-page-heading text-[28px] leading-tight text-primary font-semibold tracking-tight">Welcome back.</h2>
+<p class="font-body-base text-body-base text-text-secondary">Connect your GitHub account to get started or sync your existing progress.</p>
+</div>
+<button class="w-full bg-brand-accent text-[#09090b] font-body-medium text-body-medium py-3 px-4 rounded flex items-center justify-center gap-3 hover:bg-opacity-90 transition-opacity">
+<svg fill="currentColor" height="20" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.379.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z"></path></svg>
+                Continue with GitHub
+            </button>
+<p class="font-body-base text-[12px] text-text-muted max-w-xs text-center mt-8">
+                By connecting, you agree to our Terms of Service and Privacy Policy. Vault requires repository access to sync your solutions.
+            </p>
+</div>
+</div>
+</body></html>
