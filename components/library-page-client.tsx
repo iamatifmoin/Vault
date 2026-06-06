@@ -2,7 +2,65 @@
 
 import { useState } from "react";
 import { ProblemCard } from "@/components/problem-card";
+import { StreakBadge } from "@/components/streak-badge";
+import { VaultSelect } from "@/components/vault-select";
+import { DIFFICULTY_LABELS, LANGUAGE_LABELS, PLATFORM_LABELS } from "@/lib/constants";
+import { SHEETS } from "@/lib/sheets";
 import type { ProblemIndex } from "@/types";
+
+const filterSelectClassName =
+  "h-8 min-w-[148px] py-1 pl-3 pr-9 text-[11px] font-mono uppercase";
+
+const platformOptions = [
+  { value: "all", label: "All Platforms" },
+  ...Object.entries(PLATFORM_LABELS).map(([value, label]) => ({ value, label })),
+];
+
+const sheetOptions = [
+  { value: "all", label: "All Sheets" },
+  ...Object.entries(SHEETS).map(([value, meta]) => ({ value, label: meta.label })),
+];
+
+const difficultyOptions = [
+  { value: "all", label: "All Difficulties" },
+  ...Object.entries(DIFFICULTY_LABELS).map(([value, label]) => ({ value, label })),
+];
+
+const approachOptions = [
+  { value: "all", label: "All Approaches" },
+  { value: "Brute Force", label: "Brute Force" },
+  { value: "Optimized", label: "Optimized" },
+  { value: "Optimal", label: "Optimal" },
+];
+
+const languageOptions = [
+  { value: "all", label: "All Languages" },
+  ...Object.entries(LANGUAGE_LABELS).map(([value, label]) => ({ value, label })),
+];
+
+function FilterSelect({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  options: Array<{ value: string; label: string }>;
+}) {
+  return (
+    <VaultSelect
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      className={filterSelectClassName}
+    >
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </VaultSelect>
+  );
+}
 
 export function LibraryPageClient({
   initialIndex,
@@ -46,9 +104,7 @@ export function LibraryPageClient({
     <div className="min-h-screen">
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-vault-border bg-background/90 px-container-padding backdrop-blur">
         <div className="text-2xl font-semibold text-zinc-50">Library</div>
-        <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-          {streak} day streak
-        </div>
+        <StreakBadge streak={streak} />
       </header>
 
       <main className="mx-auto max-w-7xl p-container-padding">
@@ -63,26 +119,11 @@ export function LibraryPageClient({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {[
-              { value: platform, setter: setPlatform, options: ["all", "leetcode", "codeforces", "codechef"] },
-              { value: sheet, setter: setSheet, options: ["all", "neetcode-150", "neetcode-roadmap", "blind-75", "strivers-sde", "strivers-a2z", "strivers-cp"] },
-              { value: difficulty, setter: setDifficulty, options: ["all", "easy", "medium", "hard"] },
-              { value: approach, setter: setApproach, options: ["all", "Brute Force", "Optimized", "Optimal"] },
-              { value: language, setter: setLanguage, options: ["all", "cpp", "python", "java"] },
-            ].map((filter, index) => (
-              <select
-                key={index}
-                value={filter.value}
-                onChange={(event) => filter.setter(event.target.value)}
-                className="h-8 rounded-sm border border-vault-border bg-vault-surface px-3 font-mono text-[11px] uppercase text-zinc-300 outline-none"
-              >
-                {filter.options.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            ))}
+            <FilterSelect value={platform} onChange={setPlatform} options={platformOptions} />
+            <FilterSelect value={sheet} onChange={setSheet} options={sheetOptions} />
+            <FilterSelect value={difficulty} onChange={setDifficulty} options={difficultyOptions} />
+            <FilterSelect value={approach} onChange={setApproach} options={approachOptions} />
+            <FilterSelect value={language} onChange={setLanguage} options={languageOptions} />
 
             <button
               type="button"

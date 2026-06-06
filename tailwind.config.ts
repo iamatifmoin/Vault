@@ -86,9 +86,28 @@ const config: Config = {
       boxShadow: {
         subtle: "0 0 0 1px rgba(63, 63, 70, 0.65)",
       },
+      typography: {
+        invert: {
+          css: {
+            "--tw-prose-body": "#d4d4d8",
+            "--tw-prose-headings": "#fafafa",
+            "--tw-prose-links": "#fafafa",
+            "--tw-prose-bold": "#fafafa",
+            "--tw-prose-code": "#fafafa",
+            "--tw-prose-pre-code": "#d4d4d8",
+            "--tw-prose-pre-bg": "#09090b",
+            "--tw-prose-quotes": "#a1a1aa",
+            "--tw-prose-quote-borders": "#3f3f46",
+            "--tw-prose-hr": "#3f3f46",
+            "--tw-prose-th-borders": "#3f3f46",
+            "--tw-prose-td-borders": "#3f3f46",
+            maxWidth: "none",
+          },
+        },
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 };
 
 export default config;

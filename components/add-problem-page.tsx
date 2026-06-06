@@ -7,15 +7,17 @@ import { toast } from "sonner";
 import { AIPanel } from "@/components/ai-panel";
 import { CodeEditor } from "@/components/code-editor";
 import { ProblemMarkdown } from "@/components/problem-markdown";
+import { StreakBadge } from "@/components/streak-badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { VaultSelect } from "@/components/vault-select";
 import { SHEETS } from "@/lib/sheets";
 import type { AIAnalysis, FetchedProblem, Language, Platform, ProblemIndex, Sheet } from "@/types";
 
 const platforms: Platform[] = ["leetcode", "codeforces", "codechef"];
 const languages: Language[] = ["cpp", "python", "java"];
 
-export function AddProblemPage() {
+export function AddProblemPage({ streak }: { streak: number }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [platform, setPlatform] = useState<Platform>(
@@ -170,9 +172,7 @@ export function AddProblemPage() {
         <h1 className="text-3xl font-semibold tracking-[-0.02em] text-zinc-50">
           Add Problem
         </h1>
-        <div className="rounded-sm border border-vault-border bg-vault-surface px-3 py-1 font-medium text-yellow-300">
-          14 day streak
-        </div>
+        <StreakBadge streak={streak} />
       </header>
 
       <main className="p-container-padding">
@@ -206,39 +206,42 @@ export function AddProblemPage() {
                   </div>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4">
                   <div>
                     <label className="font-mono text-[11px] uppercase text-zinc-500">
                       Target Sheet
                     </label>
-                    <select
-                      value={sheet}
-                      onChange={(event) => setSheet(event.target.value as Sheet | "")}
-                      className="mt-2 h-10 w-full rounded-sm border border-vault-border bg-background px-3 text-sm text-zinc-100 outline-none focus:border-zinc-50"
+                    <VaultSelect
+                      value={sheet || "unassigned"}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        setSheet(value === "unassigned" ? "" : (value as Sheet));
+                      }}
+                      className="mt-2"
                     >
-                      <option value="">Unassigned</option>
+                      <option value="unassigned">Unassigned</option>
                       {Object.entries(SHEETS).map(([value, meta]) => (
                         <option key={value} value={value}>
                           {meta.label}
                         </option>
                       ))}
-                    </select>
+                    </VaultSelect>
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <label className="font-mono text-[11px] uppercase text-zinc-500">
                       Problem URL / ID
                     </label>
-                    <div className="mt-2 flex gap-2">
+                    <div className="mt-2 flex min-w-0 flex-col gap-2 sm:flex-row">
                       <input
                         value={query}
                         onChange={(event) => setQuery(event.target.value)}
-                        className="h-10 flex-1 rounded-sm border border-vault-border bg-background px-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-zinc-50"
+                        className="h-10 min-w-0 flex-1 rounded-sm border border-vault-border bg-background px-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-zinc-50"
                         placeholder="e.g. 1 or 1234A"
                       />
                       <Button
                         type="button"
-                        className="rounded-sm bg-primary text-primary-foreground hover:bg-primary/90"
+                        className="h-10 shrink-0 rounded-sm bg-primary px-4 text-primary-foreground hover:bg-primary/90 sm:w-auto"
                         onClick={() => void handleFetch()}
                         disabled={isFetching}
                       >

@@ -14,6 +14,12 @@ export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   hard: "Hard",
 };
 
+export const DIFFICULTY_BADGE_TONES: Record<Difficulty, string> = {
+  easy: "border-zinc-700 text-zinc-200",
+  medium: "border-blue-500/40 text-blue-300",
+  hard: "border-red-500/40 text-red-300",
+};
+
 export const LANGUAGE_LABELS: Record<Language, string> = {
   cpp: "C++",
   python: "Python",

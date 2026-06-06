@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { StreakBadge } from "@/components/streak-badge";
 import { auth } from "@/lib/auth";
 import { APPROACH_BADGE_TONES, DIFFICULTY_LABELS, PLATFORM_LABELS } from "@/lib/constants";
 import { getIndex } from "@/lib/github";
@@ -21,9 +22,7 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-30 flex h-16 items-center justify-end border-b border-vault-border bg-background/90 px-container-padding backdrop-blur">
-        <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-          {streak} day streak
-        </div>
+        <StreakBadge streak={streak} />
       </header>
 
       <main className="mx-auto max-w-6xl p-container-padding">

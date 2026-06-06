@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { Binary, BrainCircuit, Repeat2, Vault } from "lucide-react";
+import { BrainCircuit, Repeat2, Vault } from "lucide-react";
+import { AppLogo } from "@/components/app-logo";
 import { LoginButton } from "@/components/login-button";
 import { auth } from "@/lib/auth";
 
@@ -34,10 +35,7 @@ export default async function LoginPage() {
   return (
     <main className="min-h-screen bg-background text-foreground md:flex">
       <section className="flex w-full flex-col justify-between border-b border-vault-border bg-vault-surface px-8 py-8 md:w-[55%] md:border-b-0 md:border-r md:px-16 md:py-16">
-        <div className="flex items-center gap-2">
-          <Binary className="h-6 w-6 text-emerald-400" />
-          <span className="text-xl font-semibold text-zinc-50">Vault</span>
-        </div>
+        <AppLogo size="md" />
 
         <div className="my-auto max-w-lg space-y-12 py-16 md:py-0">
           <h1 className="text-4xl font-semibold leading-tight tracking-[-0.02em] text-zinc-50 md:text-[40px]">

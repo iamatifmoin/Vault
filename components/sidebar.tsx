@@ -7,8 +7,8 @@ import {
   LayoutDashboard,
   PlusSquare,
   UserRound,
-  Vault,
 } from "lucide-react";
+import { AppLogo } from "@/components/app-logo";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -41,10 +41,7 @@ export function Sidebar() {
     <>
       <nav className="fixed left-0 top-0 z-40 hidden h-screen w-sidebar-width flex-col border-r border-vault-border bg-vault-bg py-gutter md:flex">
         <div className="px-container-padding pb-8">
-          <div className="flex items-center gap-2 text-sm font-semibold text-zinc-50">
-            <Vault className="h-4 w-4 text-emerald-400" />
-            <span>Vault</span>
-          </div>
+          <AppLogo size="sm" />
           <p className="mt-1 font-mono text-xs uppercase tracking-[0.24em] text-zinc-500">
             DSA Tracker
           </p>

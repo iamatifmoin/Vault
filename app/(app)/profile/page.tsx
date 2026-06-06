@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { ActivityHeatmap } from "@/components/activity-heatmap";
+import { StreakBadge } from "@/components/streak-badge";
 import { auth } from "@/lib/auth";
 import { PLATFORM_LABELS } from "@/lib/constants";
 import { getIndex } from "@/lib/github";
@@ -21,9 +22,7 @@ export default async function ProfilePage() {
     <div className="min-h-screen">
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-vault-border bg-background/90 px-container-padding backdrop-blur">
         <div className="text-2xl font-semibold text-zinc-50">Profile</div>
-        <div className="rounded-sm border border-vault-border bg-vault-surface px-3 py-1 font-mono text-[11px] uppercase text-yellow-300">
-          {computeCurrentStreak(index)} day streak
-        </div>
+        <StreakBadge streak={computeCurrentStreak(index)} />
       </header>
 
       <main className="flex justify-center p-container-padding">
@@ -116,9 +115,11 @@ export default async function ProfilePage() {
             ))}
           </section>
 
-          <section className="rounded-md border border-vault-border bg-vault-surface p-container-padding">
+          <section className="overflow-hidden rounded-md border border-vault-border bg-vault-surface p-container-padding">
             <h3 className="mb-6 text-[15px] font-medium text-zinc-400">Activity</h3>
-            <ActivityHeatmap days={heatmap} />
+            <div className="overflow-x-auto pb-2 scrollbar-thin">
+              <ActivityHeatmap days={heatmap} />
+            </div>
           </section>
         </div>
       </main>

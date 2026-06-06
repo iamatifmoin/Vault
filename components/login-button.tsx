@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Vault } from "lucide-react";
+import { Loader2, Binary } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 
@@ -21,7 +21,7 @@ export function LoginButton() {
       {loading ? (
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
       ) : (
-        <Vault className="mr-2 h-4 w-4" />
+        <Binary className="mr-2 h-4 w-4" />
       )}
       Continue with GitHub
     </Button>

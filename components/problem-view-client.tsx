@@ -10,6 +10,8 @@ import { CodeSnippet } from "@/components/code-snippet";
 import { HintLadder } from "@/components/hint-ladder";
 import { ProblemMarkdown } from "@/components/problem-markdown";
 import { Button } from "@/components/ui/button";
+import { DIFFICULTY_BADGE_TONES } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import type { AIAnalysis, Problem } from "@/types";
 
 function slugifyTitle(value: string) {
@@ -127,7 +129,12 @@ export function ProblemViewClient({
           <h1 className="text-3xl font-semibold tracking-[-0.02em] text-zinc-50">
             {problem.number}. {problem.title}
           </h1>
-          <span className="rounded-sm border border-blue-500/40 px-2 py-1 font-mono text-[11px] uppercase text-blue-300">
+          <span
+            className={cn(
+              "rounded-sm border px-2 py-1 font-mono text-[11px] uppercase",
+              DIFFICULTY_BADGE_TONES[problem.difficulty],
+            )}
+          >
             {problem.difficulty}
           </span>
         </div>

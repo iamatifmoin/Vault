@@ -26,8 +26,8 @@ export function ActivityHeatmap({
   );
 
   return (
-    <div className="min-w-max">
-      <div className="flex gap-1">
+    <div className="w-full min-w-0">
+      <div className="flex min-w-max gap-1">
         {columns.map((column, columnIndex) => (
           <div key={columnIndex} className="flex flex-col gap-1">
             {column.map((day) => (
