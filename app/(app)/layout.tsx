@@ -14,7 +14,7 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="vault-app-bg text-foreground">
       <Sidebar />
       <div className="pb-20 md:pl-[220px] md:pb-0">{children}</div>
     </div>

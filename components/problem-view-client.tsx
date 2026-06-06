@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Check, ChevronRight, Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { AnimatedMain } from "@/components/animated-main";
 import { AIPanel } from "@/components/ai-panel";
 import { AttemptTimeline } from "@/components/attempt-timeline";
 import { CodeSnippet } from "@/components/code-snippet";
@@ -132,7 +133,7 @@ export function ProblemViewClient({
         }
       />
 
-      <main className="mx-auto flex max-w-7xl flex-col gap-8 px-container-padding py-8 md:flex-row">
+      <AnimatedMain className="mx-auto flex max-w-7xl flex-col gap-8 px-container-padding py-8 md:flex-row">
       <section className="w-full md:w-[58%]">
         <div className="flex flex-wrap items-center gap-4">
           <h1 className="text-page-title">
@@ -226,7 +227,7 @@ export function ProblemViewClient({
           )}
         </div>
       </aside>
-    </main>
+    </AnimatedMain>
     </div>
   );
 }

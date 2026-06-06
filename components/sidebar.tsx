@@ -56,7 +56,7 @@ export function Sidebar() {
                 className={cn(
                   "flex h-9 items-center gap-3 border-l-2 px-4 text-sm text-muted-foreground transition-colors hover:bg-vault-surface hover:text-foreground",
                   active &&
-                    "border-vault-brand bg-vault-surface text-foreground",
+                    "border-vault-brand bg-gradient-to-r from-vault-brand-muted to-transparent text-foreground",
                   !active && "border-transparent",
                 )}
               >
@@ -79,7 +79,7 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "relative flex flex-col items-center gap-1 py-3 text-[11px] text-muted-foreground",
+                  "relative flex min-h-12 flex-col items-center justify-center gap-1 py-2 text-[11px] text-muted-foreground",
                   active && "text-vault-brand",
                 )}
               >

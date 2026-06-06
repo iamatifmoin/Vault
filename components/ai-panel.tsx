@@ -1,10 +1,11 @@
+import { APPROACH_BADGE_TONES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { AIAnalysis } from "@/types";
 
 const tones = {
-  Optimal: "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
-  Optimized: "border-yellow-500/40 bg-yellow-500/10 text-yellow-300",
-  "Brute Force": "border-zinc-700 bg-zinc-900 text-zinc-300",
+  Optimal: APPROACH_BADGE_TONES.Optimal.className,
+  Optimized: APPROACH_BADGE_TONES.Optimized.className,
+  "Brute Force": APPROACH_BADGE_TONES["Brute Force"].className,
 } as const;
 
 export function AIPanel({

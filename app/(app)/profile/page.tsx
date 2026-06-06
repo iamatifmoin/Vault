@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ExternalLink } from "lucide-react";
+import { AnimatedMain } from "@/components/animated-main";
 import { ActivityHeatmap } from "@/components/activity-heatmap";
 import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
@@ -32,8 +33,8 @@ export default async function ProfilePage() {
     <div className="min-h-screen">
       <PageHeader title="Profile" streak={streak} />
 
-      <main className="flex justify-center p-container-padding">
-        <div className="w-full max-w-[680px] space-y-stack-lg pb-12">
+      <AnimatedMain className="flex justify-center p-container-padding">
+        <div className="stagger-children w-full max-w-[680px] space-y-stack-lg pb-12">
           <section className="flex flex-col items-center justify-center pt-8 text-center">
             <div className="mb-4 rounded-full bg-gradient-to-br from-emerald-500/60 via-vault-brand/30 to-transparent p-[2px]">
               <div className="h-24 w-24 overflow-hidden rounded-full border border-border bg-vault-raised p-1">
@@ -140,7 +141,7 @@ export default async function ProfilePage() {
             </div>
           </section>
         </div>
-      </main>
+      </AnimatedMain>
     </div>
   );
 }

@@ -1,3 +1,10 @@
+"use client";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 function tone(count: number) {
@@ -16,6 +23,29 @@ function tone(count: number) {
   return "bg-zinc-800";
 }
 
+function formatTooltip(date: string, count: number) {
+  const label = count === 1 ? "solve" : "solves";
+  return `${date}: ${count} ${label}`;
+}
+
+function HeatmapCell({ date, count }: { date: string; count: number }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        delay={0}
+        className={cn(
+          "h-3 w-3 rounded-[2px] transition-transform duration-150 hover:scale-125 hover:ring-1 hover:ring-vault-brand/40",
+          tone(count),
+        )}
+        aria-label={formatTooltip(date, count)}
+      />
+      <TooltipContent side="top" className="font-mono text-[11px]">
+        {formatTooltip(date, count)}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
 export function ActivityHeatmap({
   days,
 }: {
@@ -31,16 +61,12 @@ export function ActivityHeatmap({
         {columns.map((column, columnIndex) => (
           <div key={columnIndex} className="flex flex-col gap-1">
             {column.map((day) => (
-              <div
-                key={day.date}
-                title={`${day.date}: ${day.count} solves`}
-                className={cn("h-3 w-3 rounded-[2px]", tone(day.count))}
-              />
+              <HeatmapCell key={day.date} date={day.date} count={day.count} />
             ))}
           </div>
         ))}
       </div>
-      <div className="mt-4 flex items-center justify-end gap-2 font-mono text-[11px] text-zinc-500">
+      <div className="mt-4 flex items-center justify-end gap-2 font-mono text-[11px] text-muted-foreground">
         <span>Less</span>
         <div className="flex gap-1">
           <div className="h-3 w-3 rounded-[2px] bg-zinc-800" />

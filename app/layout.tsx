@@ -19,6 +19,10 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Vault",
   description: "A personal DSA practice tracker backed by your own GitHub.",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/icon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function RootLayout({
@@ -36,10 +40,11 @@ export default function RootLayout({
           <Toaster
             position="top-right"
             richColors
+            closeButton
             toastOptions={{
               classNames: {
                 toast:
-                  "border border-border bg-card text-foreground",
+                  "border border-border bg-card text-foreground !animate-[toast-slide-in_200ms_ease-out]",
                 title: "text-foreground",
                 description: "text-muted-foreground",
               },

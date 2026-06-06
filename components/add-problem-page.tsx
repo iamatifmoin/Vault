@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { AnimatedMain } from "@/components/animated-main";
 import { AIPanel } from "@/components/ai-panel";
+import { AppLogo } from "@/components/app-logo";
 import { CodeEditor } from "@/components/code-editor";
 import { PageHeader } from "@/components/page-header";
 import { PlatformIcon } from "@/components/platform-icon";
@@ -224,7 +226,7 @@ export function AddProblemPage({ streak }: { streak: number }) {
         </div>
       </nav>
 
-      <main className="p-container-padding">
+      <AnimatedMain className="p-container-padding">
         <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-gutter lg:grid-cols-12">
           <div ref={problemRef} className="flex scroll-mt-28 flex-col gap-gutter lg:col-span-5 lg:scroll-mt-20">
             <div className="surface-card p-4">
@@ -363,8 +365,11 @@ export function AddProblemPage({ streak }: { streak: number }) {
                 ) : problem ? (
                   <ProblemMarkdown content={problem.content} />
                 ) : (
-                  <div className="flex h-full min-h-[200px] items-center justify-center text-sm text-muted-foreground">
-                    Fetch a problem to populate this panel.
+                  <div className="flex h-full min-h-[200px] flex-col items-center justify-center px-6 text-center">
+                    <AppLogo size="lg" showWordmark={false} className="opacity-40" />
+                    <p className="mt-4 text-sm text-muted-foreground">
+                      Fetch a problem to populate this panel.
+                    </p>
                   </div>
                 )}
               </div>
@@ -468,7 +473,7 @@ export function AddProblemPage({ streak }: { streak: number }) {
             </div>
           </div>
         </div>
-      </main>
+      </AnimatedMain>
     </div>
   );
 }

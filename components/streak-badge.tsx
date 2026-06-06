@@ -11,7 +11,7 @@ export function StreakBadge({
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border border-vault-brand/25 bg-vault-brand-muted px-3 py-1 font-mono text-xs font-medium uppercase tracking-wider text-vault-brand",
+        "inline-flex items-center gap-1.5 rounded-full border border-vault-brand/25 bg-vault-brand-muted px-3 py-1 font-mono text-xs font-medium uppercase tracking-wider text-vault-brand shadow-brand-glow",
         className,
       )}
     >

@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
+import Link from "next/link";
+import { AnimatedMain } from "@/components/animated-main";
+import { EmptyState } from "@/components/empty-state";
 import { ProblemCard } from "@/components/problem-card";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -162,7 +165,7 @@ export function LibraryPageClient({
     <div className="min-h-screen">
       <PageHeader title="Library" streak={streak} />
 
-      <main className="mx-auto max-w-7xl p-container-padding">
+      <AnimatedMain className="mx-auto max-w-7xl p-container-padding">
         <div className="flex flex-col gap-3">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -214,32 +217,44 @@ export function LibraryPageClient({
           Showing {problems.length} of {initialIndex.length} problems
         </p>
 
-        <div className="mt-6 grid gap-gutter md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="stagger-children mt-6 grid gap-gutter md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {problems.map((problem) => (
             <ProblemCard key={problem.id} problem={problem} />
           ))}
         </div>
 
         {!problems.length ? (
-          <div className="surface-card mt-10 flex flex-col items-center border-dashed p-10 text-center">
-            <p className="text-sm text-muted-foreground">
-              {initialIndex.length
-                ? "No problems match the current filters."
-                : "Your library is empty. Add a problem to get started."}
-            </p>
-            {hasActiveFilters ? (
-              <Button
-                type="button"
-                variant="outline"
-                className="mt-4"
-                onClick={() => clearFilters(filterSetters)}
-              >
-                Clear filters
-              </Button>
-            ) : null}
+          <div className="surface-card mt-10 border-dashed">
+            <EmptyState
+              description={
+                initialIndex.length
+                  ? "No problems match the current filters."
+                  : "Your library is empty. Add a problem to get started."
+              }
+              action={
+                hasActiveFilters ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="mt-6"
+                    onClick={() => clearFilters(filterSetters)}
+                  >
+                    Clear filters
+                  </Button>
+                ) : initialIndex.length === 0 ? (
+                  <Button
+                    nativeButton={false}
+                    render={<Link href="/add" />}
+                    className="mt-6"
+                  >
+                    Add a problem
+                  </Button>
+                ) : undefined
+              }
+            />
           </div>
         ) : null}
-      </main>
+      </AnimatedMain>
     </div>
   );
 }

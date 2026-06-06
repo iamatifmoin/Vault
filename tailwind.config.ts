@@ -89,6 +89,26 @@ const config: Config = {
       },
       boxShadow: {
         subtle: "0 0 0 1px rgba(63, 63, 70, 0.65)",
+        "brand-glow": "0 0 16px rgba(229, 255, 93, 0.15)",
+      },
+      keyframes: {
+        "page-enter": {
+          from: { opacity: "0", transform: "translateY(8px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "fade-in-up": {
+          from: { opacity: "0", transform: "translateY(6px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "pulse-dot": {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.45", transform: "scale(0.85)" },
+        },
+      },
+      animation: {
+        "page-enter": "page-enter 180ms ease-out both",
+        "fade-in-up": "fade-in-up 200ms ease-out both",
+        "pulse-dot": "pulse-dot 2s ease-in-out infinite",
       },
       typography: {
         invert: {

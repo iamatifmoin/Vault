@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { BookOpen, CalendarDays, Flame, Zap } from "lucide-react";
-import { AppLogo } from "@/components/app-logo";
+import { AnimatedMain } from "@/components/animated-main";
+import { EmptyState } from "@/components/empty-state";
 import { MiniActivityStrip } from "@/components/mini-activity-strip";
 import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
@@ -56,17 +57,24 @@ export default async function DashboardPage() {
         streak={streak}
       />
 
-      <main className="mx-auto max-w-6xl p-container-padding">
-        <div className="grid gap-gutter md:grid-cols-4">
+      <AnimatedMain className="mx-auto max-w-6xl p-container-padding" grid>
+        <div className="stagger-children grid gap-gutter md:grid-cols-4">
           {statConfig.map(({ label, key, icon: Icon, suffix }) => {
             const raw = stats[key];
             const value = suffix && typeof raw === "number" ? `${raw}${suffix}` : raw;
+            const isStreak = key === "currentStreak";
 
             return (
               <div key={label} className="surface-card p-6">
                 <div className="flex items-center justify-between">
                   <span className="text-micro-label">{label}</span>
-                  <Icon className="h-4 w-4 text-muted-foreground" strokeWidth={1.6} />
+                  <Icon
+                    className={cn(
+                      "h-4 w-4",
+                      isStreak ? "text-vault-brand" : "text-muted-foreground",
+                    )}
+                    strokeWidth={1.6}
+                  />
                 </div>
                 <div className="text-stat mt-2">{value}</div>
               </div>
@@ -125,23 +133,15 @@ export default async function DashboardPage() {
                 </Link>
               ))
             ) : (
-              <div className="flex flex-col items-center px-6 py-14 text-center">
-                <AppLogo size="lg" showWordmark={false} className="opacity-60" />
-                <p className="mt-6 max-w-sm text-sm leading-6 text-muted-foreground">
-                  No attempts yet. Fetch your first problem and start building your
-                  practice history.
-                </p>
-                <Link
-                  href="/add"
-                  className="mt-6 inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
-                >
-                  Add your first problem
-                </Link>
-              </div>
+              <EmptyState
+                description="No attempts yet. Fetch your first problem and start building your practice history."
+                actionHref="/add"
+                actionLabel="Add your first problem"
+              />
             )}
           </div>
         </section>
-      </main>
+      </AnimatedMain>
     </div>
   );
 }

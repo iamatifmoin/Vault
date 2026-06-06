@@ -15,7 +15,7 @@ export function LoginButton() {
         setLoading(true);
         void signIn("github", { callbackUrl: "/dashboard" });
       }}
-      className="h-12 w-full bg-primary text-primary-foreground hover:bg-primary/90"
+      className="h-12 w-full bg-vault-brand text-vault-brand-foreground shadow-brand-glow hover:bg-vault-brand/90"
       disabled={loading}
     >
       {loading ? (
