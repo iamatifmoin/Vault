@@ -34,10 +34,16 @@ export default async function LoginPage() {
 
   return (
     <main className="min-h-screen bg-background text-foreground md:flex">
-      <section className="flex w-full flex-col justify-between border-b border-border bg-vault-surface px-8 py-8 md:w-[55%] md:border-b-0 md:border-r md:px-16 md:py-16">
-        <AppLogo size="md" />
+      <section className="relative flex w-full flex-col justify-between overflow-hidden border-b border-border bg-vault-surface px-8 py-8 md:w-[55%] md:border-b-0 md:border-r md:px-16 md:py-16">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(34,197,94,0.08),transparent_55%)]"
+        />
+        <div className="relative">
+          <AppLogo size="md" />
+        </div>
 
-        <div className="my-auto max-w-lg space-y-12 py-16 md:py-0">
+        <div className="relative my-auto max-w-lg space-y-12 py-16 md:py-0">
           <h1 className="text-balance text-4xl font-semibold leading-tight tracking-tight text-foreground md:text-[40px]">
             Your DSA practice,
             <br />
@@ -48,8 +54,8 @@ export default async function LoginPage() {
             {features.map((feature) => {
               const Icon = feature.icon;
               return (
-                <div key={feature.title} className="flex items-start gap-4">
-                  <div className="rounded-md border border-border bg-vault-raised p-2 text-muted-foreground">
+                <div key={feature.title} className="group flex items-start gap-4">
+                  <div className="rounded-md border border-border bg-vault-raised p-2.5 text-muted-foreground transition-transform duration-150 group-hover:-translate-y-px">
                     <Icon className="h-5 w-5" strokeWidth={1.6} />
                   </div>
                   <div>
@@ -64,7 +70,7 @@ export default async function LoginPage() {
           </div>
         </div>
 
-        <p className="text-micro-label">Own the repo. Own the history.</p>
+        <p className="relative text-micro-label">Own the repo. Own the history.</p>
       </section>
 
       <section className="flex w-full items-center justify-center px-8 py-16 md:w-[45%] md:px-16">

@@ -1,26 +1,47 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { AIPanel } from "@/components/ai-panel";
 import { CodeEditor } from "@/components/code-editor";
-import { ProblemMarkdown } from "@/components/problem-markdown";
 import { PageHeader } from "@/components/page-header";
+import { PlatformIcon } from "@/components/platform-icon";
+import { ProblemMarkdown } from "@/components/problem-markdown";
+import { WindowChrome } from "@/components/window-chrome";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VaultSelect } from "@/components/vault-select";
+import { cn } from "@/lib/utils";
 import { SHEETS } from "@/lib/sheets";
 import type { AIAnalysis, FetchedProblem, Language, Platform, ProblemIndex, Sheet } from "@/types";
 
 const platforms: Platform[] = ["leetcode", "codeforces", "codechef"];
 const languages: Language[] = ["cpp", "python", "java"];
 
+const platformLabels: Record<Platform, string> = {
+  leetcode: "LeetCode",
+  codeforces: "Codeforces",
+  codechef: "CodeChef",
+};
+
+type Section = "problem" | "code" | "analysis";
+
+const sectionTabs: Array<{ id: Section; label: string }> = [
+  { id: "problem", label: "Problem" },
+  { id: "code", label: "Code" },
+  { id: "analysis", label: "Analysis" },
+];
+
 export function AddProblemPage({ streak }: { streak: number }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const problemRef = useRef<HTMLDivElement>(null);
+  const codeRef = useRef<HTMLDivElement>(null);
+  const analysisRef = useRef<HTMLDivElement>(null);
+  const [activeSection, setActiveSection] = useState<Section>("problem");
   const [platform, setPlatform] = useState<Platform>(
     (searchParams.get("platform") as Platform) || "leetcode",
   );
@@ -49,6 +70,17 @@ export function AddProblemPage({ streak }: { streak: number }) {
       setQuery(nextNumber);
     }
   }, [searchParams]);
+
+  function scrollToSection(section: Section) {
+    setActiveSection(section);
+    const target =
+      section === "problem"
+        ? problemRef.current
+        : section === "code"
+          ? codeRef.current
+          : analysisRef.current;
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   async function loadExistingProblem(nextProblem: FetchedProblem, nextPlatform: Platform) {
     const response = await fetch("/api/problems/list");
@@ -112,6 +144,7 @@ export function AddProblemPage({ streak }: { streak: number }) {
       }
 
       setAnalysis(payload.analysis);
+      scrollToSection("analysis");
     } catch (error) {
       const message =
         error instanceof Error
@@ -171,9 +204,29 @@ export function AddProblemPage({ streak }: { streak: number }) {
     <div className="min-h-screen">
       <PageHeader title="Add Problem" streak={streak} />
 
+      <nav className="sticky top-14 z-20 border-b border-border bg-background/95 backdrop-blur lg:hidden">
+        <div className="flex">
+          {sectionTabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => scrollToSection(tab.id)}
+              className={cn(
+                "flex-1 border-b-2 py-3 text-sm font-medium transition-colors",
+                activeSection === tab.id
+                  ? "border-vault-brand text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </nav>
+
       <main className="p-container-padding">
         <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-gutter lg:grid-cols-12">
-          <div className="flex flex-col gap-gutter lg:col-span-5">
+          <div ref={problemRef} className="flex scroll-mt-28 flex-col gap-gutter lg:col-span-5 lg:scroll-mt-20">
             <div className="surface-card p-4">
               <div className="flex flex-col gap-4">
                 <div>
@@ -183,18 +236,19 @@ export function AddProblemPage({ streak }: { streak: number }) {
                       <button
                         key={item}
                         type="button"
-                        className={
+                        className={cn(
+                          "flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-sm transition-colors",
                           item === platform
-                            ? "flex-1 rounded-md border border-border bg-vault-raised px-3 py-1.5 text-sm text-foreground"
-                            : "flex-1 rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground"
-                        }
+                            ? "border border-border bg-vault-raised text-foreground"
+                            : "text-muted-foreground hover:text-foreground",
+                        )}
                         onClick={() => setPlatform(item)}
                       >
-                        {item === "leetcode"
-                          ? "LeetCode"
-                          : item === "codeforces"
-                            ? "Codeforces"
-                            : "CodeChef"}
+                        <PlatformIcon
+                          platform={item}
+                          className={item === platform ? "text-foreground" : undefined}
+                        />
+                        <span className="hidden sm:inline">{platformLabels[item]}</span>
                       </button>
                     ))}
                   </div>
@@ -247,7 +301,10 @@ export function AddProblemPage({ streak }: { streak: number }) {
               </div>
             </div>
 
-            <div className="surface-card flex min-h-[420px] flex-1 flex-col overflow-hidden">
+            <WindowChrome
+              title={problem ? `${problem.number}. ${problem.title}` : "Problem Preview"}
+              className="flex min-h-[420px] flex-1 flex-col"
+            >
               <div className="border-b border-border p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -306,96 +363,109 @@ export function AddProblemPage({ streak }: { streak: number }) {
                 ) : problem ? (
                   <ProblemMarkdown content={problem.content} />
                 ) : (
-                  <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                  <div className="flex h-full min-h-[200px] items-center justify-center text-sm text-muted-foreground">
                     Fetch a problem to populate this panel.
                   </div>
                 )}
               </div>
-            </div>
+            </WindowChrome>
           </div>
 
           <div className="flex flex-col gap-gutter lg:col-span-7">
-            <div className="flex flex-wrap gap-2">
-              {languages.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  className={
-                    item === language
-                      ? "rounded-md border border-border bg-vault-raised px-3 py-1 font-mono text-[11px] uppercase text-foreground"
-                      : "rounded-md border border-transparent px-3 py-1 font-mono text-[11px] uppercase text-muted-foreground hover:border-border hover:bg-vault-raised hover:text-foreground"
-                  }
-                  onClick={() => {
-                    setLanguage(item);
-                    if (problem) {
-                      setCode(problem.boilerplate[item]);
-                    }
-                  }}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
+            <div ref={codeRef} className="scroll-mt-28 space-y-gutter lg:scroll-mt-20">
+              <div className="flex gap-0 border-b border-border">
+                {languages.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    className={cn(
+                      "border-b-2 px-4 py-2 font-mono text-[11px] uppercase transition-colors",
+                      item === language
+                        ? "border-vault-brand text-foreground"
+                        : "border-transparent text-muted-foreground hover:text-foreground",
+                    )}
+                    onClick={() => {
+                      setLanguage(item);
+                      if (problem) {
+                        setCode(problem.boilerplate[item]);
+                      }
+                    }}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
 
-            <div className="min-h-[520px]">
-              <CodeEditor value={code} onChange={setCode} language={language} />
-            </div>
+              <div className="min-h-[520px]">
+                <CodeEditor value={code} onChange={setCode} language={language} />
+              </div>
 
-            <div className="flex flex-wrap gap-3">
-              <Button
-                type="button"
-                onClick={() => void handleAnalyze()}
-                disabled={!problem || isAnalyzing || !code.trim()}
-              >
-                {isAnalyzing ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Sparkles className="mr-2 h-4 w-4" />
-                )}
-                Analyze with AI
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => void handleSave(null)}
-                disabled={!problem || isSaving || isAnalyzing}
-              >
-                {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Save without Analysis
-              </Button>
-              {analysis ? (
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                  <Button
+                    type="button"
+                    className="w-full sm:w-auto"
+                    onClick={() => void handleAnalyze()}
+                    disabled={!problem || isAnalyzing || !code.trim()}
+                  >
+                    {isAnalyzing ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Sparkles className="mr-2 h-4 w-4" />
+                    )}
+                    Analyze with AI
+                  </Button>
+                  {analysis ? (
+                    <Button
+                      type="button"
+                      className="w-full bg-emerald-500 text-zinc-950 hover:bg-emerald-400 sm:w-auto"
+                      onClick={() => void handleSave(analysis)}
+                      disabled={isSaving}
+                    >
+                      {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      Save to Vault
+                    </Button>
+                  ) : null}
+                </div>
                 <Button
                   type="button"
-                  onClick={() => void handleSave(analysis)}
-                  disabled={isSaving}
-                  className="bg-emerald-500 text-zinc-950 hover:bg-emerald-400"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={() => void handleSave(null)}
+                  disabled={!problem || isSaving || isAnalyzing}
                 >
                   {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Save to Vault
+                  Save without Analysis
                 </Button>
-              ) : null}
+              </div>
             </div>
 
-            {analysisError ? (
-              <p className="text-sm text-muted-foreground">{analysisError}</p>
-            ) : null}
+            <div ref={analysisRef} className="scroll-mt-28 lg:scroll-mt-20">
+              {analysisError ? (
+                <p className="mb-3 text-sm text-muted-foreground">{analysisError}</p>
+              ) : null}
 
-            {isAnalyzing ? (
-              <div className="surface-card p-6">
-                <Skeleton className="h-8 w-40 bg-zinc-800" />
-                <div className="mt-6 space-y-3">
-                  <Skeleton className="h-16 w-full bg-zinc-800" />
-                  <Skeleton className="h-16 w-full bg-zinc-800" />
-                  <Skeleton className="h-16 w-full bg-zinc-800" />
+              {isAnalyzing ? (
+                <div className="surface-card p-6">
+                  <Skeleton className="h-8 w-40 bg-zinc-800" />
+                  <div className="mt-6 space-y-3">
+                    <Skeleton className="h-16 w-full bg-zinc-800" />
+                    <Skeleton className="h-16 w-full bg-zinc-800" />
+                    <Skeleton className="h-16 w-full bg-zinc-800" />
+                  </div>
                 </div>
-              </div>
-            ) : analysis ? (
-              <AIPanel analysis={analysis} />
-            ) : (
-              <div className="surface-card p-6 text-sm text-muted-foreground">
-                Run analysis to populate the coaching panel, or save the attempt directly to GitHub.
-              </div>
-            )}
+              ) : analysis ? (
+                <AIPanel analysis={analysis} />
+              ) : (
+                <div className="flex flex-col items-center rounded-md border border-dashed border-border bg-vault-surface/50 px-6 py-12 text-center">
+                  <Sparkles className="h-8 w-8 text-muted-foreground/60" strokeWidth={1.4} />
+                  <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">
+                    Run analysis to populate the coaching panel, or save the attempt
+                    directly to GitHub.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </main>

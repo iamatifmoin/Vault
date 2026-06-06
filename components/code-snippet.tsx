@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { codeToHtml } from "shiki";
+import { cn } from "@/lib/utils";
 import type { Language } from "@/types";
 
 const languageMap: Record<Language, string> = {
@@ -20,11 +21,14 @@ function escapeHtml(input: string) {
 export function CodeSnippet({
   code,
   language,
+  showLineNumbers = true,
 }: {
   code: string;
   language: Language;
+  showLineNumbers?: boolean;
 }) {
   const [highlighted, setHighlighted] = useState("");
+  const lines = code.split("\n");
 
   useEffect(() => {
     let active = true;
@@ -53,10 +57,32 @@ export function CodeSnippet({
     };
   }, [code, language]);
 
+  if (!showLineNumbers) {
+    return (
+      <div
+        className="[&_.shiki]:!bg-transparent [&_.shiki]:!p-0"
+        dangerouslySetInnerHTML={{ __html: highlighted }}
+      />
+    );
+  }
+
   return (
-    <div
-      className="[&_.shiki]:!bg-transparent [&_.shiki]:!p-0"
-      dangerouslySetInnerHTML={{ __html: highlighted }}
-    />
+    <div className="flex gap-3">
+      <div
+        aria-hidden
+        className="select-none border-r border-border pr-3 text-right font-mono text-xs leading-[1.625rem] text-muted-foreground/60"
+      >
+        {lines.map((_, index) => (
+          <div key={index}>{index + 1}</div>
+        ))}
+      </div>
+      <div
+        className={cn(
+          "min-w-0 flex-1 [&_.shiki]:!bg-transparent [&_.shiki]:!p-0",
+          "[&_pre]:!leading-[1.625rem]",
+        )}
+        dangerouslySetInnerHTML={{ __html: highlighted }}
+      />
+    </div>
   );
 }

@@ -5,14 +5,16 @@ import { cn } from "@/lib/utils";
 
 export function VaultSelect({
   className,
+  fullWidth = true,
   children,
   ...props
-}: React.SelectHTMLAttributes<HTMLSelectElement>) {
+}: React.SelectHTMLAttributes<HTMLSelectElement> & { fullWidth?: boolean }) {
   return (
-    <div className="relative w-full">
+    <div className={cn("relative", fullWidth && "w-full")}>
       <select
         className={cn(
-          "h-10 w-full appearance-none rounded-md border border-input bg-vault-surface py-2 pl-3 pr-10 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50",
+          "h-10 appearance-none rounded-md border border-input bg-vault-surface py-2 pl-3 pr-10 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50",
+          fullWidth ? "w-full" : "w-auto",
           className,
         )}
         {...props}

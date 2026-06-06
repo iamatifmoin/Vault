@@ -1,16 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { Search, SlidersHorizontal, X } from "lucide-react";
 import { ProblemCard } from "@/components/problem-card";
 import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { VaultSelect } from "@/components/vault-select";
+import { cn } from "@/lib/utils";
 import { DIFFICULTY_LABELS, LANGUAGE_LABELS, PLATFORM_LABELS } from "@/lib/constants";
 import { SHEETS } from "@/lib/sheets";
 import type { ProblemIndex } from "@/types";
 
 const filterSelectClassName =
-  "h-8 min-w-[148px] py-1 pl-3 pr-9 text-[11px] font-mono uppercase";
+  "h-8 w-full min-w-0 py-1 pl-3 pr-8 text-[11px] font-mono uppercase sm:w-auto sm:min-w-[132px]";
 
 const platformOptions = [
   { value: "all", label: "All Platforms" },
@@ -50,9 +53,10 @@ function FilterSelect({
 }) {
   return (
     <VaultSelect
+      fullWidth={false}
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      className={filterSelectClassName}
+      className={cn(filterSelectClassName, "bg-vault-bg")}
     >
       {options.map((option) => (
         <option key={option.value} value={option.value}>
@@ -61,6 +65,22 @@ function FilterSelect({
       ))}
     </VaultSelect>
   );
+}
+
+function clearFilters(setters: {
+  setSearch: (v: string) => void;
+  setPlatform: (v: string) => void;
+  setSheet: (v: string) => void;
+  setDifficulty: (v: string) => void;
+  setApproach: (v: string) => void;
+  setLanguage: (v: string) => void;
+}) {
+  setters.setSearch("");
+  setters.setPlatform("all");
+  setters.setSheet("all");
+  setters.setDifficulty("all");
+  setters.setApproach("all");
+  setters.setLanguage("all");
 }
 
 export function LibraryPageClient({
@@ -76,6 +96,15 @@ export function LibraryPageClient({
   const [difficulty, setDifficulty] = useState("all");
   const [approach, setApproach] = useState("all");
   const [language, setLanguage] = useState("all");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const hasActiveFilters =
+    search !== "" ||
+    platform !== "all" ||
+    sheet !== "all" ||
+    difficulty !== "all" ||
+    approach !== "all" ||
+    language !== "all";
 
   const problems = initialIndex.filter((problem) => {
     const matchesSearch =
@@ -101,40 +130,83 @@ export function LibraryPageClient({
     );
   });
 
+  const filterSetters = {
+    setSearch,
+    setPlatform,
+    setSheet,
+    setDifficulty,
+    setApproach,
+    setLanguage,
+  };
+
+  const filterControls = (
+    <>
+      <FilterSelect value={platform} onChange={setPlatform} options={platformOptions} />
+      <FilterSelect value={sheet} onChange={setSheet} options={sheetOptions} />
+      <FilterSelect value={difficulty} onChange={setDifficulty} options={difficultyOptions} />
+      <FilterSelect value={approach} onChange={setApproach} options={approachOptions} />
+      <FilterSelect value={language} onChange={setLanguage} options={languageOptions} />
+      {hasActiveFilters ? (
+        <button
+          type="button"
+          className="text-micro-label col-span-2 h-8 shrink-0 px-3 hover:text-foreground sm:col-span-1"
+          onClick={() => clearFilters(filterSetters)}
+        >
+          Clear All
+        </button>
+      ) : null}
+    </>
+  );
+
   return (
     <div className="min-h-screen">
       <PageHeader title="Library" streak={streak} />
 
       <main className="mx-auto max-w-7xl p-container-padding">
-        <div className="flex flex-col gap-4">
-          <Input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            className="bg-vault-surface"
-            placeholder="Search problems, topics, or languages..."
-          />
+        <div className="flex flex-col gap-3">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              className="bg-vault-surface pl-9 pr-9"
+              placeholder="Search problems, topics, or languages..."
+            />
+            {search ? (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                aria-label="Clear search"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            ) : null}
+          </div>
 
-          <div className="flex flex-wrap gap-2">
-            <FilterSelect value={platform} onChange={setPlatform} options={platformOptions} />
-            <FilterSelect value={sheet} onChange={setSheet} options={sheetOptions} />
-            <FilterSelect value={difficulty} onChange={setDifficulty} options={difficultyOptions} />
-            <FilterSelect value={approach} onChange={setApproach} options={approachOptions} />
-            <FilterSelect value={language} onChange={setLanguage} options={languageOptions} />
+          <button
+            type="button"
+            className={cn(
+              "flex h-9 items-center justify-center gap-2 rounded-md border border-border text-sm text-muted-foreground transition-colors hover:text-foreground md:hidden",
+              filtersOpen && "border-vault-brand/40 text-foreground",
+            )}
+            onClick={() => setFiltersOpen((open) => !open)}
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            Filters
+            {hasActiveFilters ? (
+              <span className="h-1.5 w-1.5 rounded-full bg-vault-brand" />
+            ) : null}
+          </button>
 
-            <button
-              type="button"
-              className="text-micro-label h-8 px-3 hover:text-foreground"
-              onClick={() => {
-                setSearch("");
-                setPlatform("all");
-                setSheet("all");
-                setDifficulty("all");
-                setApproach("all");
-                setLanguage("all");
-              }}
-            >
-              Clear All
-            </button>
+          <div
+            className={cn(
+              "surface-card items-center gap-2 p-2",
+              filtersOpen ? "grid grid-cols-2 sm:flex sm:flex-wrap" : "hidden",
+              "md:flex md:flex-wrap",
+            )}
+          >
+            {filterControls}
           </div>
         </div>
 
@@ -142,15 +214,29 @@ export function LibraryPageClient({
           Showing {problems.length} of {initialIndex.length} problems
         </p>
 
-        <div className="mt-6 grid gap-gutter md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-gutter md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {problems.map((problem) => (
             <ProblemCard key={problem.id} problem={problem} />
           ))}
         </div>
 
         {!problems.length ? (
-          <div className="surface-card mt-10 border-dashed p-8 text-sm text-muted-foreground">
-            No problems match the current filters.
+          <div className="surface-card mt-10 flex flex-col items-center border-dashed p-10 text-center">
+            <p className="text-sm text-muted-foreground">
+              {initialIndex.length
+                ? "No problems match the current filters."
+                : "Your library is empty. Add a problem to get started."}
+            </p>
+            {hasActiveFilters ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-4"
+                onClick={() => clearFilters(filterSetters)}
+              >
+                Clear filters
+              </Button>
+            ) : null}
           </div>
         ) : null}
       </main>

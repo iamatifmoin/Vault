@@ -1,11 +1,39 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { BookOpen, CalendarDays, Flame, Zap } from "lucide-react";
+import { AppLogo } from "@/components/app-logo";
+import { MiniActivityStrip } from "@/components/mini-activity-strip";
 import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
-import { APPROACH_BADGE_TONES, DIFFICULTY_LABELS, PLATFORM_LABELS } from "@/lib/constants";
+import {
+  APPROACH_BADGE_TONES,
+  DIFFICULTY_BADGE_TONES,
+  DIFFICULTY_LABELS,
+  PLATFORM_LABELS,
+} from "@/lib/constants";
 import { getIndex } from "@/lib/github";
-import { computeDashboardStats, computeCurrentStreak, formatRelativeDate, getRecentProblems } from "@/lib/stats";
+import {
+  buildHeatmap,
+  computeDashboardStats,
+  computeCurrentStreak,
+  formatRelativeDate,
+  getRecentProblems,
+} from "@/lib/stats";
 import { cn } from "@/lib/utils";
+
+function getGreeting(name?: string | null) {
+  const hour = new Date().getHours();
+  const time =
+    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  return name ? `${time}, ${name.split(" ")[0]}` : time;
+}
+
+const statConfig = [
+  { label: "Total Solved", key: "totalSolved" as const, icon: BookOpen },
+  { label: "This Week", key: "thisWeek" as const, icon: CalendarDays },
+  { label: "Streak", key: "currentStreak" as const, icon: Flame, suffix: " days" },
+  { label: "Optimal", key: "optimal" as const, icon: Zap },
+];
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -18,25 +46,39 @@ export default async function DashboardPage() {
   const stats = computeDashboardStats(index);
   const recent = getRecentProblems(index, 6);
   const streak = computeCurrentStreak(index);
+  const heatmap = buildHeatmap(index);
 
   return (
     <div className="min-h-screen">
-      <PageHeader title="Dashboard" streak={streak} />
+      <PageHeader
+        title="Dashboard"
+        subtitle={getGreeting(session.user?.name)}
+        streak={streak}
+      />
 
       <main className="mx-auto max-w-6xl p-container-padding">
         <div className="grid gap-gutter md:grid-cols-4">
-          {[
-            ["Total Solved", stats.totalSolved],
-            ["This Week", stats.thisWeek],
-            ["Streak", `${stats.currentStreak} days`],
-            ["Optimal", stats.optimal],
-          ].map(([label, value]) => (
-            <div key={label} className="surface-card p-6">
-              <div className="text-micro-label">{label}</div>
-              <div className="text-stat mt-2">{value}</div>
-            </div>
-          ))}
+          {statConfig.map(({ label, key, icon: Icon, suffix }) => {
+            const raw = stats[key];
+            const value = suffix && typeof raw === "number" ? `${raw}${suffix}` : raw;
+
+            return (
+              <div key={label} className="surface-card p-6">
+                <div className="flex items-center justify-between">
+                  <span className="text-micro-label">{label}</span>
+                  <Icon className="h-4 w-4 text-muted-foreground" strokeWidth={1.6} />
+                </div>
+                <div className="text-stat mt-2">{value}</div>
+              </div>
+            );
+          })}
         </div>
+
+        {index.length > 0 ? (
+          <div className="mt-6">
+            <MiniActivityStrip days={heatmap} />
+          </div>
+        ) : null}
 
         <section className="surface-card mt-6 overflow-hidden">
           <div className="border-b border-border bg-vault-bg/60 px-6 py-4">
@@ -61,7 +103,12 @@ export default async function DashboardPage() {
                     <span className="rounded-full border border-border px-2 py-1 font-mono text-[11px] uppercase text-muted-foreground">
                       {PLATFORM_LABELS[problem.platform]}
                     </span>
-                    <span className="rounded-full border border-border px-2 py-1 font-mono text-[11px] uppercase text-foreground">
+                    <span
+                      className={cn(
+                        "rounded-full border px-2 py-1 font-mono text-[11px] uppercase",
+                        DIFFICULTY_BADGE_TONES[problem.difficulty],
+                      )}
+                    >
                       {DIFFICULTY_LABELS[problem.difficulty]}
                     </span>
                     {problem.latest_approach ? (
@@ -78,14 +125,18 @@ export default async function DashboardPage() {
                 </Link>
               ))
             ) : (
-              <div className="px-6 py-10 text-sm text-muted-foreground">
-                No attempts yet. Head to
-                {" "}
-                <Link href="/add" className="text-foreground underline underline-offset-4">
-                  Add Problem
+              <div className="flex flex-col items-center px-6 py-14 text-center">
+                <AppLogo size="lg" showWordmark={false} className="opacity-60" />
+                <p className="mt-6 max-w-sm text-sm leading-6 text-muted-foreground">
+                  No attempts yet. Fetch your first problem and start building your
+                  practice history.
+                </p>
+                <Link
+                  href="/add"
+                  className="mt-6 inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
+                >
+                  Add your first problem
                 </Link>
-                {" "}
-                to start the tracker.
               </div>
             )}
           </div>

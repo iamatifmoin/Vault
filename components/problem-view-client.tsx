@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { Check, ChevronRight, Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { AIPanel } from "@/components/ai-panel";
 import { AttemptTimeline } from "@/components/attempt-timeline";
@@ -36,6 +36,7 @@ export function ProblemViewClient({
     initialProblem.attempts.at(-1)?.number ?? 1,
   );
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [copied, setCopied] = useState(false);
   const selectedAttempt =
     problem.attempts.find((attempt) => attempt.number === selectedAttemptNumber) ??
     problem.attempts[problem.attempts.length - 1];
@@ -161,13 +162,36 @@ export function ProblemViewClient({
         </div>
 
         <div className="surface-card mt-8 overflow-hidden bg-vault-inset">
-          <div className="flex items-center justify-between border-b border-border bg-vault-surface px-4 py-2">
+          <div className="flex items-center justify-between gap-3 border-b border-border bg-vault-surface px-4 py-2">
             <span className="text-micro-label">
               Solution.{selectedAttempt.language}
             </span>
-            <span className="text-micro-label">
-              Attempt {selectedAttempt.number}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-micro-label">
+                Attempt {selectedAttempt.number}
+              </span>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-vault-raised hover:text-foreground"
+                onClick={() => {
+                  void navigator.clipboard.writeText(selectedAttempt.code);
+                  setCopied(true);
+                  window.setTimeout(() => setCopied(false), 2000);
+                }}
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-3.5 w-3.5" />
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3.5 w-3.5" />
+                    Copy
+                  </>
+                )}
+              </button>
+            </div>
           </div>
           <div className="overflow-x-auto p-4 text-sm">
             <CodeSnippet code={selectedAttempt.code} language={selectedAttempt.language} />

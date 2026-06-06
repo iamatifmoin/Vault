@@ -13,7 +13,7 @@ export function ProblemCard({ problem }: { problem: ProblemIndex }) {
   return (
     <Link
       href={`/library/${problem.id}`}
-      className="group surface-card flex flex-col gap-stack-md p-4 transition-colors hover:border-muted"
+      className="group surface-card flex flex-col gap-stack-md p-4 transition-all hover:border-muted hover:shadow-subtle"
     >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
