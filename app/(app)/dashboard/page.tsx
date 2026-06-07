@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BookOpen } from "lucide-react";
 import { redirect } from "next/navigation";
 import { AnimatedMain } from "@/components/animated-main";
 import { DashboardStats } from "@/components/dashboard-stats";
@@ -148,9 +149,10 @@ export default async function DashboardPage() {
               ))
             ) : (
               <EmptyState
+                icon={BookOpen}
+                title="No recent activity"
                 description="No attempts yet. Fetch your first problem and start building your practice history."
-                actionHref="/add"
-                actionLabel="Add your first problem"
+                action={{ label: "Add your first problem", href: "/add" }}
               />
             )}
           </div>

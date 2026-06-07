@@ -479,21 +479,22 @@ export default function StudyPlanPage() {
                 </p>
               </div>
             ) : (
-              <EmptyState
-                title="Generate Your Study Plan"
-                description="Get a week-by-week DSA roadmap tailored to your target companies, weak topics, and placement timeline — powered by Claude."
-                action={
-                  <div className="mt-6 flex flex-col items-center gap-3">
-                    <Button type="button" onClick={() => void handleGenerate()}>
-                      <Sparkles className="h-4 w-4" />
-                      Generate Your Study Plan
-                    </Button>
-                    {error ? (
-                      <p className="max-w-sm text-sm text-red-500">{error}</p>
-                    ) : null}
-                  </div>
-                }
-              />
+              <>
+                <EmptyState
+                  icon={Sparkles}
+                  title="Generate Your Study Plan"
+                  description="Get a week-by-week DSA roadmap tailored to your target companies, weak topics, and placement timeline — powered by Claude."
+                  action={{
+                    label: "Generate Your Study Plan",
+                    onClick: () => void handleGenerate(),
+                  }}
+                />
+                {error ? (
+                  <p className="mx-auto -mt-8 max-w-sm px-6 pb-8 text-center text-sm text-red-500">
+                    {error}
+                  </p>
+                ) : null}
+              </>
             )}
           </div>
         ) : (
