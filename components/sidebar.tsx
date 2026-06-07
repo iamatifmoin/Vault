@@ -7,7 +7,6 @@ import {
   Building2,
   LayoutDashboard,
   Map,
-  Mic,
   Share2,
   UserRound,
 } from "lucide-react";
@@ -28,11 +27,6 @@ const navigation = [
     href: "/library",
     label: "Library",
     icon: BookOpen,
-  },
-  {
-    href: "/mock",
-    label: "Mock Interview",
-    icon: Mic,
   },
   {
     href: "/companies",
@@ -94,7 +88,7 @@ export function Sidebar({ profileHref = "/profile" }: SidebarProps) {
       </nav>
 
       <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-vault-bg/95 backdrop-blur md:hidden">
-        <div className="grid grid-cols-4 sm:grid-cols-8">
+        <div className="grid grid-cols-3 sm:grid-cols-6">
           {items.map((item) => {
             const active = pathname.startsWith(item.href);
             const Icon = item.icon;
