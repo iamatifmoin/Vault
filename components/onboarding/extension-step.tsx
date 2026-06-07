@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, Chrome, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CheckCircle2, Download, Puzzle } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export const VAULT_EXTENSION_INSTALLED_KEY = "vault_extension_installed";
@@ -72,7 +72,7 @@ export function ExtensionStep({ onNext, onSkip }: ExtensionStepProps) {
   return (
     <div className="flex flex-col items-center gap-5 py-6 text-center">
       <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-zinc-900 ring-1 ring-zinc-700">
-        <Chrome className="h-8 w-8 text-zinc-400" />
+        <Puzzle className="h-8 w-8 text-zinc-400" />
       </div>
       <div>
         <h2 className="mb-2 text-xl font-bold text-white">
@@ -85,33 +85,28 @@ export function ExtensionStep({ onNext, onSkip }: ExtensionStepProps) {
       </div>
 
       {storeUrl ? (
-        <Button
-          type="button"
-          size="lg"
-          asChild
+        <a
+          href={storeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           className={cn(
+            buttonVariants({ size: "lg" }),
             "gap-2 bg-emerald-500 text-white hover:bg-emerald-600",
           )}
+          onClick={() => {
+            const poll = window.setInterval(() => {
+              const stored = localStorage.getItem(VAULT_EXTENSION_INSTALLED_KEY);
+              if (stored === "true") {
+                window.clearInterval(poll);
+                window.location.reload();
+              }
+            }, 1500);
+            window.setTimeout(() => window.clearInterval(poll), 30_000);
+          }}
         >
-          <a
-            href={storeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => {
-              const poll = window.setInterval(() => {
-                const stored = localStorage.getItem(VAULT_EXTENSION_INSTALLED_KEY);
-                if (stored === "true") {
-                  window.clearInterval(poll);
-                  window.location.reload();
-                }
-              }, 1500);
-              window.setTimeout(() => window.clearInterval(poll), 30_000);
-            }}
-          >
-            <Download className="h-4 w-4" />
-            Install Chrome Extension
-          </a>
-        </Button>
+          <Download className="h-4 w-4" />
+          Install Chrome Extension
+        </a>
       ) : (
         <p className="text-sm text-zinc-500">
           Chrome Web Store link unavailable — install the unpacked extension locally.

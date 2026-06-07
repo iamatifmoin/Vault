@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Session } from "next-auth";
 import { LogoutButton } from "@/components/logout-button";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ProfileOwnerShell } from "@/components/profile/profile-owner-shell";
 
 interface ProfileOwnerEmptyProps {
@@ -38,9 +39,12 @@ export function ProfileOwnerEmpty({ session }: ProfileOwnerEmptyProps) {
           Your Vault profile is empty. Solve your first problem to get started.
         </p>
 
-        <Button asChild className="mt-6">
-          <Link href="/dashboard">Go to Dashboard</Link>
-        </Button>
+        <Link
+          href="/dashboard"
+          className={cn(buttonVariants(), "mt-6")}
+        >
+          Go to Dashboard
+        </Link>
 
         <LogoutButton />
       </main>

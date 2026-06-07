@@ -135,9 +135,9 @@ function DigestMessage({
   message: string;
   digest: WeeklyDigestData;
 }) {
-  const topics = [
-    ...new Set([...digest.strongTopics, ...digest.neglectedTopics]),
-  ];
+  const topics = Array.from(
+    new Set([...digest.strongTopics, ...digest.neglectedTopics]),
+  );
   const segments = tokenizeMessage(message, topics);
 
   return (

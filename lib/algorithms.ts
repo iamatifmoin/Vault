@@ -355,7 +355,10 @@ export function classifyApproach(
 
   // ── Optimal signals ──────────────────────────────────────────────────────
   // Hash-based O(1) lookup structures
-  const hasHashMap = /unordered_map|unordered_set|hashmap|hashset|dict\[|\.get\(|new map\(\)|new set\(/.test(c);
+  const hasHashMap =
+    /unordered_map|unordered_set|hashmap|hashset|dict\[|\.get\(|new map\(\)|new set\(/.test(c) ||
+    (language === "java" && /HashMap|HashSet|PriorityQueue/.test(code)) ||
+    (language === "python" && /defaultdict|Counter|heapq/.test(code));
   // Binary search
   const hasBinarySearch = /binary.?search|lo\s*[+\-]\s*hi|mid\s*=|left.*right.*mid|bsearch/.test(c);
   // Two-pointer (explicit variable naming)
