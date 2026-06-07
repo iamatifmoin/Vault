@@ -2,14 +2,14 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ExternalLink } from "lucide-react";
 import { AnimatedMain } from "@/components/animated-main";
-import { ActivityHeatmap } from "@/components/activity-heatmap";
+import { CombinedHeatmap } from "@/components/combined-heatmap";
 import { LogoutButton } from "@/components/logout-button";
 import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
 import { PLATFORM_LABELS } from "@/lib/constants";
 import { getIndex } from "@/lib/github";
+import { computeActivityMap } from "@/lib/algorithms";
 import {
-  buildHeatmap,
   computeBestStreak,
   computeCurrentStreak,
   computeDifficultyBreakdown,
@@ -26,7 +26,7 @@ export default async function ProfilePage() {
   const index = await getIndex(session.accessToken);
   const difficulty = computeDifficultyBreakdown(index);
   const platforms = computePlatformBreakdown(index);
-  const heatmap = buildHeatmap(index);
+  const activityMap = computeActivityMap(index);
   const streak = computeCurrentStreak(index);
   const login = session.user.login ?? "github";
 
@@ -138,7 +138,7 @@ export default async function ProfilePage() {
 
           <section className="surface-card p-container-padding">
             <h3 className="text-section-title mb-6 text-muted-foreground">Activity</h3>
-            <ActivityHeatmap days={heatmap} />
+            <CombinedHeatmap activityMap={activityMap} />
           </section>
         </div>
       </AnimatedMain>

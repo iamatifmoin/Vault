@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { BookOpen, CalendarDays, Flame, Zap } from "lucide-react";
 import { AnimatedMain } from "@/components/animated-main";
 import { EmptyState } from "@/components/empty-state";
+import { CombinedHeatmap } from "@/components/combined-heatmap";
 import { IRSWidget } from "@/components/irs-widget";
 import { RevisionQueue } from "@/components/revision-queue";
 import { MiniActivityStrip } from "@/components/mini-activity-strip";
@@ -14,6 +15,7 @@ import {
   DIFFICULTY_LABELS,
   PLATFORM_LABELS,
 } from "@/lib/constants";
+import { computeActivityMap } from "@/lib/algorithms";
 import { getIndex } from "@/lib/github";
 import {
   buildHeatmap,
@@ -49,6 +51,7 @@ export default async function DashboardPage() {
   const stats = computeDashboardStats(index);
   const recent = getRecentProblems(index, 6);
   const streak = computeCurrentStreak(index);
+  const activityMap = computeActivityMap(index);
   const heatmap = buildHeatmap(index);
 
   return (
@@ -64,6 +67,15 @@ export default async function DashboardPage() {
           problems={index}
           username={session.user?.login}
         />
+
+        {index.length > 0 ? (
+          <section className="surface-card mt-6 p-container-padding">
+            <h2 className="text-section-title mb-6 text-muted-foreground">
+              Activity
+            </h2>
+            <CombinedHeatmap activityMap={activityMap} />
+          </section>
+        ) : null}
 
         <RevisionQueue problems={index} />
 
