@@ -11,6 +11,7 @@ import { CodeSnippet } from "@/components/code-snippet";
 import { HintLadder } from "@/components/hint-ladder";
 import { PageHeader } from "@/components/page-header";
 import { ProblemMarkdown } from "@/components/problem-markdown";
+import { TeachMeButton } from "@/components/teach-dialog";
 import { Button } from "@/components/ui/button";
 import { DIFFICULTY_BADGE_TONES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -147,6 +148,13 @@ export function ProblemViewClient({
           >
             {problem.difficulty}
           </span>
+          <TeachMeButton
+            problem={{
+              title: problem.title,
+              difficulty: problem.difficulty,
+              topics: problem.topics,
+            }}
+          />
         </div>
 
         <div className="mt-6">
