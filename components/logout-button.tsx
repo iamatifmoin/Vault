@@ -5,7 +5,7 @@ import { Loader2, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 
-export function LogoutButton() {
+export function LogoutButton({ className }: { className?: string }) {
   const [loading, setLoading] = useState(false);
 
   return (
@@ -17,7 +17,7 @@ export function LogoutButton() {
         void signOut({ callbackUrl: "/" });
       }}
       disabled={loading}
-      className="mt-4"
+      className={className ?? "mt-4"}
     >
       {loading ? (
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
