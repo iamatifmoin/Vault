@@ -1,3 +1,4 @@
+import { classifyApproach } from "./algorithms";
 import type { CapturedProblem, IndexEntry } from "./types";
 
 const REPO_NAME = "Data-Structures-And-Algorithms";
@@ -80,6 +81,7 @@ function buildAttemptSection(
   solvedAt: string,
 ): string {
   const normalizedCode = normalizeCode(problem.code).trim();
+  const approach = classifyApproach(normalizedCode, problem.language);
   const codeSection = `\`\`\`${problem.language}\n${normalizedCode}\n\`\`\``;
 
   return [
@@ -87,7 +89,7 @@ function buildAttemptSection(
     `## Attempt ${attemptNumber} — ${formatAttemptDate(solvedAt)}`,
     "",
     `**Language:** ${problem.language}`,
-    "**Approach:** Brute Force",
+    `**Approach:** ${approach}`,
     "**Time Complexity:** TBD",
     "**Space Complexity:** TBD",
     "",
@@ -103,6 +105,7 @@ function buildNewProblemMarkdown(
   solvedAt: string,
   attemptNumber: number,
 ): string {
+  const approach = classifyApproach(normalizeCode(problem.code), problem.language);
   const frontmatter = [
     "---",
     `number: ${yamlScalar(problem.number)}`,
@@ -113,7 +116,7 @@ function buildNewProblemMarkdown(
     formatTopicsYaml(problem.topics),
     "sheets: []",
     `language: ${yamlString(problem.language)}`,
-    `latestApproach: ${yamlString("Brute Force")}`,
+    `latestApproach: ${yamlString(approach)}`,
     `attempts: ${attemptNumber}`,
     `firstSolvedDate: ${yamlString(solvedAt)}`,
     `lastSolvedDate: ${yamlString(solvedAt)}`,
@@ -173,10 +176,12 @@ function appendAttemptToMarkdown(
 ): string {
   const { frontmatter, body } = splitMarkdown(existingContent);
 
+  const approach = classifyApproach(normalizeCode(problem.code), problem.language);
+
   let nextFrontmatter = frontmatter;
   nextFrontmatter = updateFrontmatterField(nextFrontmatter, "attempts", attemptNumber);
   nextFrontmatter = updateFrontmatterField(nextFrontmatter, "lastSolvedDate", solvedAt);
-  nextFrontmatter = updateFrontmatterField(nextFrontmatter, "latestApproach", "Brute Force");
+  nextFrontmatter = updateFrontmatterField(nextFrontmatter, "latestApproach", approach);
   nextFrontmatter = updateFrontmatterField(nextFrontmatter, "language", problem.language);
 
   const trimmedBody = body.trimEnd();
@@ -191,6 +196,7 @@ function toIndexEntry(
   attempts: number,
   latestDate: string,
 ): IndexEntry {
+  const approach = classifyApproach(normalizeCode(problem.code), problem.language);
   return {
     number: problem.number,
     title: problem.title,
@@ -200,10 +206,11 @@ function toIndexEntry(
     topics: problem.topics,
     sheets: [],
     attempts,
-    latestApproach: "Brute Force",
+    latestApproach: approach,
     latestDate,
     filePath,
     language: problem.language,
+    approachVerified: false,
   };
 }
 

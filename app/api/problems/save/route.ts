@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { classifyApproach } from "@/lib/algorithms";
 import { auth } from "@/lib/auth";
 import { getFile, getIndex, getOrCreateRepo, getProblemFile, saveFile, saveIndex } from "@/lib/github";
 import {
@@ -20,12 +21,15 @@ function today() {
 }
 
 function defaultAttempt(payload: SaveProblemPayload, attemptNumber: number): Attempt {
+  const code = normalizeCode(payload.code);
   return {
     number: attemptNumber,
     date: today(),
     language: payload.language,
-    code: normalizeCode(payload.code),
-    approach: payload.analysis?.classification ?? "Brute Force",
+    code,
+    approach:
+      payload.analysis?.classification ??
+      classifyApproach(code, payload.language),
     time_complexity: payload.analysis?.time_complexity ?? "Not analyzed",
     space_complexity: payload.analysis?.space_complexity ?? "Not analyzed",
     analysis: payload.analysis,

@@ -31,4 +31,5 @@ export interface IndexEntry {
   latestDate: string;
   filePath: string;
   language: CapturedProblem["language"];
+  approachVerified?: boolean;
 }

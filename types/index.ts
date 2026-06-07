@@ -88,6 +88,7 @@ export interface ProblemIndex {
   latest_date: string;
   latest_language: Language;
   file_path: string;
+  approach_verified?: boolean;
 }
 
 export interface RepoStats {

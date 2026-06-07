@@ -391,5 +391,6 @@ export function toProblemIndex(problem: Problem): ProblemIndex {
     latest_date: latestAttempt?.date ?? problem.date_created,
     latest_language: latestAttempt?.language ?? "python",
     file_path: problem.file_path,
+    approach_verified: latestAttempt?.analysis != null,
   };
 }

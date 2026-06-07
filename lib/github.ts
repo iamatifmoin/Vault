@@ -72,6 +72,12 @@ function normalizeIndexEntry(raw: Record<string, unknown>): ProblemIndex {
     latest_date: latestDate,
     latest_language: normalizeLanguage(raw.language ?? raw.latest_language),
     file_path: filePath,
+    approach_verified:
+      typeof raw.approachVerified === "boolean"
+        ? raw.approachVerified
+        : typeof raw.approach_verified === "boolean"
+          ? raw.approach_verified
+          : undefined,
   };
 }
 
