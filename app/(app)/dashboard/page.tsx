@@ -24,6 +24,8 @@ import {
   formatRelativeDate,
   getRecentProblems,
 } from "@/lib/stats";
+import { MilestoneTrigger } from "@/components/milestone-trigger";
+import { buildShareableCardData } from "@/lib/share-cards";
 import { cn } from "@/lib/utils";
 
 function getGreeting(name?: string | null) {
@@ -53,9 +55,15 @@ export default async function DashboardPage() {
   const streak = computeCurrentStreak(index);
   const activityMap = computeActivityMap(index);
   const heatmap = buildHeatmap(index);
+  const username = session.user?.login ?? "user";
+  const cardData = buildShareableCardData(index, {
+    username,
+    avatarUrl: session.user?.image ?? "",
+  });
 
   return (
     <div className="min-h-screen">
+      <MilestoneTrigger totalSolved={index.length} cardData={cardData} />
       <PageHeader
         title="Dashboard"
         subtitle={getGreeting(session.user?.name)}

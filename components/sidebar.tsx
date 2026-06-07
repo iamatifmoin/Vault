@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Map,
   PlusSquare,
+  Share2,
   UserRound,
 } from "lucide-react";
 import { AppLogo } from "@/components/app-logo";
@@ -38,6 +39,11 @@ const navigation = [
     href: "/study-plan",
     label: "Study Plan",
     icon: Map,
+  },
+  {
+    href: "/share",
+    label: "Share",
+    icon: Share2,
   },
   {
     href: "/profile",
@@ -81,7 +87,7 @@ export function Sidebar() {
       </nav>
 
       <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-vault-bg/95 backdrop-blur md:hidden">
-        <div className="grid grid-cols-6">
+        <div className="grid grid-cols-7">
           {navigation.map((item) => {
             const active = pathname.startsWith(item.href);
             const Icon = item.icon;
