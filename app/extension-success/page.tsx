@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AppLogo } from "@/components/app-logo";
-import { notifyExtension } from "@/lib/extension";
+import { notifyExtension, queryExtensionStatus } from "@/lib/extension";
 
 interface ExtensionSession {
   accessToken?: string;
@@ -16,20 +18,24 @@ interface ExtensionSession {
 }
 
 export default function ExtensionSuccessPage() {
+  const router = useRouter();
   const [session, setSession] = useState<ExtensionSession | null>(null);
   const [extensionLinked, setExtensionLinked] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let closeTimer: number | undefined;
+    let redirectTimer: number | undefined;
 
     async function completeAuth() {
+      let signingIn = false;
+
       try {
         const response = await fetch("/api/auth/session");
         const data = (await response.json()) as ExtensionSession | null;
 
         if (!data?.accessToken) {
-          setSession(null);
+          signingIn = true;
+          void signIn("github", { callbackUrl: "/extension-success" });
           return;
         }
 
@@ -42,6 +48,16 @@ export default function ExtensionSuccessPage() {
           );
         }
 
+        const existingStatus = await queryExtensionStatus();
+        if (existingStatus.status === "connected") {
+          setExtensionLinked(true);
+          redirectTimer = window.setTimeout(() => {
+            window.close();
+            router.replace("/dashboard");
+          }, 1500);
+          return;
+        }
+
         const username =
           data.user?.login ?? data.user?.name ?? "vault-user";
 
@@ -49,25 +65,28 @@ export default function ExtensionSuccessPage() {
         setExtensionLinked(linked);
 
         if (linked) {
-          closeTimer = window.setTimeout(() => {
+          redirectTimer = window.setTimeout(() => {
             window.close();
+            router.replace("/dashboard");
           }, 2000);
         }
       } catch {
         setSession(null);
       } finally {
-        setLoading(false);
+        if (!signingIn) {
+          setLoading(false);
+        }
       }
     }
 
     void completeAuth();
 
     return () => {
-      if (closeTimer !== undefined) {
-        window.clearTimeout(closeTimer);
+      if (redirectTimer !== undefined) {
+        window.clearTimeout(redirectTimer);
       }
     };
-  }, []);
+  }, [router]);
 
   const displayName =
     session?.user?.login ?? session?.user?.name ?? "Vault user";
@@ -109,7 +128,7 @@ export default function ExtensionSuccessPage() {
             </div>
 
             <p className="text-sm text-muted-foreground">
-              This window will close automatically
+              Redirecting to your dashboard…
             </p>
           </div>
         ) : session?.accessToken ? (
