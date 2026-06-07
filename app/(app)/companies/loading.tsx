@@ -1,3 +1,5 @@
+import { AnimatedMain } from "@/components/animated-main";
+import { CompanyCardSkeleton } from "@/components/skeleton";
 import { PageHeader } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -8,33 +10,31 @@ export default function CompaniesLoading() {
         title="Company Tracker"
         subtitle="Know exactly where you stand"
       />
-      <main className="mx-auto max-w-6xl p-container-padding">
-        <div className="mb-4 flex items-center justify-between">
-          <Skeleton className="h-5 w-36" />
-          <Skeleton className="h-5 w-32" />
-        </div>
-        <div className="surface-card p-4">
-          <Skeleton className="h-8 w-full max-w-md" />
-          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+
+      <AnimatedMain className="mx-auto max-w-6xl p-container-padding">
+        <div className="mb-8">
+          <div className="flex gap-6 border-b border-zinc-800/80 pb-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton key={index} className="h-5 w-24" />
+            ))}
+          </div>
+          <Skeleton className="mt-5 h-3 w-28" />
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
             {Array.from({ length: 6 }).map((_, index) => (
-              <Skeleton key={index} className="h-9 w-full" />
+              <Skeleton key={index} className="h-7 w-24 rounded-full" />
             ))}
           </div>
         </div>
-        <div className="mt-8 grid gap-gutter md:grid-cols-2">
-          {Array.from({ length: 2 }).map((_, index) => (
-            <div key={index} className="surface-card p-6">
-              <Skeleton className="h-5 w-32" />
-              <Skeleton className="mt-4 h-12 w-24" />
-              <div className="mt-6 space-y-3">
-                {Array.from({ length: 5 }).map((__, row) => (
-                  <Skeleton key={row} className="h-3 w-full" />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </main>
+
+        <section>
+          <Skeleton className="mb-4 h-5 w-32" />
+          <div className="grid gap-4 md:grid-cols-2">
+            {Array.from({ length: 2 }).map((_, index) => (
+              <CompanyCardSkeleton key={index} />
+            ))}
+          </div>
+        </section>
+      </AnimatedMain>
     </div>
   );
 }
