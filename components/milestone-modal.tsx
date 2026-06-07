@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { Download, Loader2, PartyPopper, X } from "lucide-react";
 import { ShareableMilestone } from "@/components/share-cards/shareable-milestone";
 import { Button } from "@/components/ui/button";
@@ -98,10 +97,7 @@ export function MilestoneModal({ totalSolved, cardData }: MilestoneModalProps) {
               ) : (
                 <Download />
               )}
-              Share this!
-            </Button>
-            <Button variant="outline" nativeButton={false} render={<Link href="/share" />}>
-              View all share cards
+              Download card
             </Button>
           </div>
         </div>

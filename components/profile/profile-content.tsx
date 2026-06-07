@@ -96,15 +96,6 @@ export function ProfileContent({
               {targetTier ? ` · Targeting ${targetTier}` : null}
             </p>
 
-            {isOwner ? (
-              <Link
-                href="/share"
-                className="mt-2 inline-block text-xs text-zinc-500 transition-colors hover:text-zinc-300"
-              >
-                Share this profile →
-              </Link>
-            ) : null}
-
             <div className="mt-3 flex flex-wrap gap-2">
               {platformCounts.map(
                 ({ platform, count }) =>
