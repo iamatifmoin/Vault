@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { TopicPill } from "@/components/topic-pill";
 import { computeIRS, computeWeeklyDigest } from "@/lib/algorithms";
 import { cn } from "@/lib/utils";
 import type { ProblemIndex, WeeklyDigest as WeeklyDigestData } from "@/types";
@@ -9,6 +10,12 @@ interface WeeklyDigestProps {
   problems: ProblemIndex[];
   username?: string;
 }
+
+type MessageSegment =
+  | { type: "text"; value: string }
+  | { type: "topic"; value: string }
+  | { type: "number"; value: string }
+  | { type: "irs"; value: string };
 
 function getThisMondayKey(reference = new Date()): string {
   const date = new Date(
@@ -57,119 +64,120 @@ function formatDateRange(start: string, end: string): string {
   return `${startStr} – ${endStr}`;
 }
 
-function daysSinceTopic(problems: ProblemIndex[], topic: string): number | null {
-  const topicProblems = problems.filter((p) => p.topics.includes(topic));
-  if (topicProblems.length === 0) return null;
+function tokenizeMessage(message: string, topics: string[]): MessageSegment[] {
+  const segments: MessageSegment[] = [];
+  const irsMatch = message.match(/IRS moved \d+ → \d+\./);
 
-  const mostRecent = topicProblems.reduce((latest, p) =>
-    new Date(p.latest_date) > new Date(latest.latest_date) ? p : latest,
-  );
+  let mainMessage = message;
+  let irsSegment: MessageSegment | null = null;
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const target = new Date(mostRecent.latest_date);
-  target.setHours(0, 0, 0, 0);
-  return Math.floor(
-    (today.getTime() - target.getTime()) / (1000 * 60 * 60 * 24),
-  );
+  if (irsMatch && irsMatch.index !== undefined) {
+    mainMessage = message.slice(0, irsMatch.index).trimEnd();
+    irsSegment = { type: "irs", value: irsMatch[0] };
+  }
+
+  const sortedTopics = [...topics].sort((a, b) => b.length - a.length);
+  let pos = 0;
+
+  while (pos < mainMessage.length) {
+    let matchIndex = mainMessage.length;
+    let matchLength = 0;
+    let matchType: "topic" | "number" | null = null;
+    let matchValue = "";
+
+    for (const topic of sortedTopics) {
+      const idx = mainMessage.indexOf(topic, pos);
+      if (idx !== -1 && idx < matchIndex) {
+        matchIndex = idx;
+        matchLength = topic.length;
+        matchType = "topic";
+        matchValue = topic;
+      }
+    }
+
+    const numMatch = mainMessage.slice(pos).match(/\d+/);
+    if (numMatch && numMatch.index !== undefined) {
+      const idx = pos + numMatch.index;
+      if (idx < matchIndex) {
+        matchIndex = idx;
+        matchLength = numMatch[0].length;
+        matchType = "number";
+        matchValue = numMatch[0];
+      }
+    }
+
+    if (matchType && matchIndex < mainMessage.length) {
+      if (matchIndex > pos) {
+        segments.push({ type: "text", value: mainMessage.slice(pos, matchIndex) });
+      }
+      segments.push({ type: matchType, value: matchValue });
+      pos = matchIndex + matchLength;
+    } else {
+      segments.push({ type: "text", value: mainMessage.slice(pos) });
+      break;
+    }
+  }
+
+  if (irsSegment) {
+    if (segments.length > 0) {
+      segments.push({ type: "text", value: " " });
+    }
+    segments.push(irsSegment);
+  }
+
+  return segments;
 }
 
-function DigestBody({
+function DigestMessage({
+  message,
   digest,
-  problems,
-  prevIRS,
-  currentIRS,
 }: {
+  message: string;
   digest: WeeklyDigestData;
-  problems: ProblemIndex[];
-  prevIRS: number;
-  currentIRS: number;
 }) {
-  const { problemsSolved, strongTopics, neglectedTopics, irsChange } = digest;
-  const closingTone = irsChange >= 0 ? "Great week!" : "Push harder.";
+  const topics = [
+    ...new Set([...digest.strongTopics, ...digest.neglectedTopics]),
+  ];
+  const segments = tokenizeMessage(message, topics);
 
   return (
-    <div className="space-y-3 text-sm leading-relaxed text-zinc-300">
-      <p>
-        {problemsSolved >= 7 ? (
-          <>
-            Strong week —{" "}
-            <span className="font-semibold text-emerald-500">
-              {problemsSolved}
-            </span>{" "}
-            problems solved.
-          </>
-        ) : problemsSolved > 0 ? (
-          <>
-            <span className="font-semibold text-emerald-500">
-              {problemsSolved}
-            </span>{" "}
-            problem{problemsSolved === 1 ? "" : "s"} solved this week.
-          </>
-        ) : (
-          "No problems solved this week yet."
-        )}
-      </p>
-
-      {strongTopics.length > 0 ? (
-        <p className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-          {strongTopics.map((topic, index) => (
-            <span key={topic} className="inline-flex items-center gap-1.5">
-              {index === 0 ? null : index === strongTopics.length - 1 ? (
-                <span className="text-zinc-500">and</span>
-              ) : (
-                <span className="text-zinc-500">,</span>
-              )}
-              <span className="rounded-full border border-zinc-700 bg-zinc-950 px-2.5 py-0.5 text-xs text-zinc-300">
-                {topic}
+    <p className="text-sm leading-relaxed text-zinc-300">
+      {segments.map((segment, index) => {
+        switch (segment.type) {
+          case "topic":
+            return (
+              <TopicPill
+                key={`${segment.type}-${index}`}
+                topic={segment.value}
+                className="mx-0.5 align-middle"
+              />
+            );
+          case "number":
+            return (
+              <span
+                key={`${segment.type}-${index}`}
+                className="font-medium text-white"
+              >
+                {segment.value}
               </span>
-            </span>
-          ))}
-          <span>looking solid.</span>
-        </p>
-      ) : null}
-
-      {neglectedTopics.length > 0 ? (
-        <p>
-          <span className="rounded-full border border-zinc-700 bg-zinc-950 px-2.5 py-0.5 text-xs text-zinc-300">
-            {neglectedTopics[0]}
-          </span>{" "}
-          {(() => {
-            const days = daysSinceTopic(problems, neglectedTopics[0]);
-            if (days === null) return "hasn't been started yet.";
-            return `hasn't been touched in ${days} days.`;
-          })()}
-        </p>
-      ) : null}
-
-      <p>
-        IRS moved{" "}
-        <span className="font-mono tabular-nums text-white">{prevIRS}</span>
-        {" → "}
-        <span className="font-mono tabular-nums text-white">{currentIRS}</span>
-        {irsChange !== 0 ? (
-          <span
-            className={cn(
-              "ml-1.5 font-mono text-xs font-medium",
-              irsChange > 0 ? "text-emerald-500" : "text-red-500",
-            )}
-          >
-            ({irsChange > 0 ? "+" : ""}
-            {irsChange})
-          </span>
-        ) : null}
-        .
-      </p>
-
-      <p
-        className={cn(
-          "font-medium",
-          irsChange >= 0 ? "text-emerald-500" : "text-red-500",
-        )}
-      >
-        {closingTone}
-      </p>
-    </div>
+            );
+          case "irs":
+            return (
+              <span
+                key={`${segment.type}-${index}`}
+                className={cn(
+                  "font-medium",
+                  digest.irsChange >= 0 ? "text-emerald-400" : "text-red-400",
+                )}
+              >
+                {segment.value}
+              </span>
+            );
+          default:
+            return <span key={`${segment.type}-${index}`}>{segment.value}</span>;
+        }
+      })}
+    </p>
   );
 }
 
@@ -177,8 +185,6 @@ export function WeeklyDigest({ problems, username = "user" }: WeeklyDigestProps)
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
   const [digest, setDigest] = useState<WeeklyDigestData | null>(null);
-  const [prevIRS, setPrevIRS] = useState(0);
-  const [currentIRS, setCurrentIRS] = useState(0);
 
   useEffect(() => {
     setMounted(true);
@@ -218,8 +224,6 @@ export function WeeklyDigest({ problems, username = "user" }: WeeklyDigestProps)
       current = computeIRS(problems).score;
     }
 
-    setPrevIRS(prev);
-    setCurrentIRS(current);
     setDigest(computeWeeklyDigest(problems, prev));
   }, [problems, username]);
 
@@ -237,16 +241,39 @@ export function WeeklyDigest({ problems, username = "user" }: WeeklyDigestProps)
     return null;
   }
 
+  const irsChipPositive = digest.irsChange >= 0;
+
   return (
-    <section className="mt-6 rounded-md border border-zinc-700 bg-zinc-900/60 p-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
-            This Week
-          </p>
-          <p className="mt-1 font-mono text-xs text-zinc-500">
-            {formatDateRange(digest.weekStart, digest.weekEnd)}
-          </p>
+    <section className="mt-6 rounded-xl border border-zinc-800 bg-vault-surface p-5">
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-medium uppercase tracking-widest text-zinc-500">
+          This Week
+        </p>
+        <p className="text-[11px] text-zinc-600">
+          {formatDateRange(digest.weekStart, digest.weekEnd)}
+        </p>
+      </div>
+
+      <div className="mt-4">
+        <DigestMessage message={digest.message} digest={digest} />
+      </div>
+
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-zinc-800 px-2.5 py-1 text-xs text-zinc-300">
+            {digest.problemsSolved} solved
+          </span>
+          <span
+            className={cn(
+              "rounded-full px-2.5 py-1 text-xs font-medium",
+              irsChipPositive
+                ? "bg-emerald-950/60 text-emerald-400"
+                : "bg-red-950/60 text-red-400",
+            )}
+          >
+            IRS {digest.irsChange >= 0 ? "+" : ""}
+            {digest.irsChange}
+          </span>
         </div>
         <button
           type="button"
@@ -255,24 +282,6 @@ export function WeeklyDigest({ problems, username = "user" }: WeeklyDigestProps)
         >
           Dismiss
         </button>
-      </div>
-
-      <div className="mt-5 border-l-2 border-emerald-500/40 pl-4">
-        <DigestBody
-          digest={digest}
-          problems={problems}
-          prevIRS={prevIRS}
-          currentIRS={currentIRS}
-        />
-      </div>
-
-      <div className="mt-5 flex flex-wrap gap-2 border-t border-zinc-700/60 pt-4">
-        <span className="rounded-full border border-zinc-700 bg-zinc-950 px-3 py-1 font-mono text-[11px] text-zinc-400">
-          {digest.problemsSolved} solved this week
-        </span>
-        <span className="rounded-full border border-zinc-700 bg-zinc-950 px-3 py-1 font-mono text-[11px] text-zinc-400">
-          IRS: {prevIRS} → {currentIRS}
-        </span>
       </div>
     </section>
   );
