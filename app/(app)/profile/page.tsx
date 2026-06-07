@@ -137,7 +137,9 @@ export default async function ProfilePage() {
           </section>
 
           <section className="surface-card p-container-padding">
-            <h3 className="text-section-title mb-6 text-muted-foreground">Activity</h3>
+            <h3 className="text-section-title mb-6 text-center text-muted-foreground">
+              Activity
+            </h3>
             <CombinedHeatmap activityMap={activityMap} />
           </section>
         </div>

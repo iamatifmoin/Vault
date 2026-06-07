@@ -29,22 +29,24 @@ export function MiniActivityStrip({
           {recent.reduce((sum, day) => sum + day.count, 0)} solves
         </span>
       </div>
-      <div className="mt-3 grid grid-cols-7 gap-1">
-        {recent.map((day) => (
-          <Tooltip key={day.date}>
-            <TooltipTrigger
-              delay={0}
-              className={cn(
-                "aspect-square rounded-[2px] transition-transform duration-150 hover:scale-110 hover:ring-1 hover:ring-vault-brand/30",
-                tone(day.count),
-              )}
-              aria-label={`${day.date}: ${day.count} solves`}
-            />
-            <TooltipContent side="top" className="font-mono text-[11px]">
-              {day.date}: {day.count} {day.count === 1 ? "solve" : "solves"}
-            </TooltipContent>
-          </Tooltip>
-        ))}
+      <div className="mt-3 flex justify-center">
+        <div className="grid grid-cols-7 gap-1">
+          {recent.map((day) => (
+            <Tooltip key={day.date}>
+              <TooltipTrigger
+                delay={0}
+                className={cn(
+                  "h-3 w-3 rounded-[2px] transition-transform duration-150 hover:scale-110 hover:ring-1 hover:ring-vault-brand/30",
+                  tone(day.count),
+                )}
+                aria-label={`${day.date}: ${day.count} solves`}
+              />
+              <TooltipContent side="top" className="font-mono text-[11px]">
+                {day.date}: {day.count} {day.count === 1 ? "solve" : "solves"}
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -8,7 +8,6 @@ import {
   LayoutDashboard,
   Map,
   Mic,
-  PlusSquare,
   Share2,
   UserRound,
 } from "lucide-react";
@@ -24,11 +23,6 @@ const navigation = [
     href: "/dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
-  },
-  {
-    href: "/add",
-    label: "Add Problem",
-    icon: PlusSquare,
   },
   {
     href: "/library",

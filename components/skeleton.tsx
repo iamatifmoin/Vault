@@ -29,15 +29,26 @@ export function StatCardSkeleton() {
 // Skeleton for a problem card row (used in Library)
 export function ProblemCardSkeleton() {
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3">
-      <div className="flex items-center gap-3">
-        <Skeleton className="h-3 w-8" />
-        <Skeleton className="h-3 w-48" />
-        <Skeleton className="h-4 w-12 ml-auto" />
-      </div>
-      <div className="mt-2 flex items-center gap-2">
-        <Skeleton className="h-4 w-8" />
-        <Skeleton className="h-4 w-20" />
+    <div className="flex overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/60">
+      <Skeleton className="w-[3px] flex-shrink-0 self-stretch rounded-none" />
+      <div className="flex flex-1 flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="flex items-start gap-2.5">
+            <Skeleton className="h-3 w-10" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-48" />
+              <div className="flex gap-1">
+                <Skeleton className="h-4 w-14" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Skeleton className="h-5 w-20" />
+          <Skeleton className="h-5 w-20" />
+          <Skeleton className="h-3 w-16" />
+        </div>
       </div>
     </div>
   );

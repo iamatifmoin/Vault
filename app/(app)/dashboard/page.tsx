@@ -6,8 +6,6 @@ import { DashboardStats } from "@/components/dashboard-stats";
 import { EmptyState } from "@/components/empty-state";
 import { CombinedHeatmap } from "@/components/combined-heatmap";
 import { IRSWidget } from "@/components/irs-widget";
-import { RevisionQueue } from "@/components/revision-queue";
-import { MiniActivityStrip } from "@/components/mini-activity-strip";
 import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
 import {
@@ -19,14 +17,12 @@ import {
 import { computeActivityMap } from "@/lib/algorithms";
 import { getIndex } from "@/lib/github";
 import {
-  buildHeatmap,
   computeDashboardStats,
   computeCurrentStreak,
   formatRelativeDate,
   getRecentProblems,
 } from "@/lib/stats";
 import { MilestoneTrigger } from "@/components/milestone-trigger";
-import { WeeklyDigest } from "@/components/weekly-digest";
 import { buildShareableCardData } from "@/lib/share-cards";
 import { cn } from "@/lib/utils";
 
@@ -49,7 +45,6 @@ export default async function DashboardPage() {
   const recent = getRecentProblems(index, 6);
   const streak = computeCurrentStreak(index);
   const activityMap = computeActivityMap(index);
-  const heatmap = buildHeatmap(index);
   const username = session.user?.login ?? "user";
   const cardData = buildShareableCardData(index, {
     username,
@@ -65,42 +60,32 @@ export default async function DashboardPage() {
       <MilestoneTrigger totalSolved={index.length} cardData={cardData} />
       <PageHeader
         title="Dashboard"
-        subtitle={getGreeting(session.user?.name)}
+        subtitle={getGreeting(session.user?.name)+"!"}
         streak={streak}
       />
 
       <AnimatedMain className="mx-auto max-w-6xl p-container-padding">
-        <WeeklyDigest problems={index} username={username} />
-
-        <IRSWidget
-          problems={index}
-          username={session.user?.login}
+        <DashboardStats
+          totalSolved={stats.totalSolved}
+          thisWeek={stats.thisWeek}
+          currentStreak={stats.currentStreak}
+          optimalPct={optimalPct}
         />
 
-        {index.length > 0 ? (
-          <section className="surface-card mt-6 p-container-padding">
-            <h2 className="text-section-title mb-6 text-muted-foreground">
-              Activity
-            </h2>
-            <CombinedHeatmap activityMap={activityMap} />
-          </section>
-        ) : null}
-
-        <RevisionQueue problems={index} />
-
         <div className="mt-6">
-          <DashboardStats
-            totalSolved={stats.totalSolved}
-            thisWeek={stats.thisWeek}
-            currentStreak={stats.currentStreak}
-            optimalPct={optimalPct}
+          <IRSWidget
+            problems={index}
+            username={session.user?.login}
           />
         </div>
 
         {index.length > 0 ? (
-          <div className="mt-6">
-            <MiniActivityStrip days={heatmap} />
-          </div>
+          <section className="surface-card mt-6 p-container-padding">
+            <h2 className="text-section-title mb-6 text-center text-muted-foreground">
+              Activity
+            </h2>
+            <CombinedHeatmap activityMap={activityMap} />
+          </section>
         ) : null}
 
         <section className="surface-card mt-6 overflow-hidden">

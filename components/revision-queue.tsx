@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { ApproachBadge } from "@/components/approach-badge";
 import { PlatformBadge } from "@/components/platform-badge";
@@ -30,15 +30,7 @@ export function RevisionQueue({ problems }: RevisionQueueProps) {
   const idByPath = buildIdByPath(problemList);
 
   if (queue.length === 0) {
-    return (
-      <div className="mt-6 rounded-xl border border-zinc-800 bg-vault-surface p-5">
-        <SectionHeader title="Revision Queue" count={0} />
-        <div className="flex items-center gap-3 pt-4 text-sm text-zinc-500">
-          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-          All caught up — keep solving.
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (

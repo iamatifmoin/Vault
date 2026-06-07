@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { BookOpen, Search, X } from "lucide-react";
+import Link from "next/link";
+import { BookOpen, PlusSquare, Search, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { AnimatedMain } from "@/components/animated-main";
 import { EmptyState } from "@/components/empty-state";
@@ -132,7 +133,17 @@ export function LibraryPageClient({
       <PageHeader title="Library" streak={streak} />
 
       <AnimatedMain className="mx-auto max-w-7xl p-container-padding">
-        <div className="mb-4 flex flex-wrap gap-2">
+        <div className="mb-3 flex justify-end">
+          <Link
+            href="/add"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-vault-brand/50 bg-vault-brand/10 px-3 py-1.5 text-xs font-medium text-vault-brand transition-all duration-150 hover:border-vault-brand/70 hover:bg-vault-brand/20"
+          >
+            <PlusSquare className="h-3 w-3" />
+            Add a problem
+          </Link>
+        </div>
+
+        <div className="mb-4 flex flex-wrap items-center gap-2">
           <div className="relative min-w-[200px] max-w-xs flex-1">
             <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500" />
             <input
@@ -227,7 +238,7 @@ export function LibraryPageClient({
             variants={staggerContainer}
             initial="initial"
             animate="animate"
-            className="mt-4 space-y-1.5"
+            className="mt-4 space-y-2"
           >
             {problems.map((problem) => (
               <ProblemCard

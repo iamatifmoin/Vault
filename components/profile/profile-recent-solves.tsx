@@ -17,7 +17,7 @@ export function ProfileRecentSolves({ problems }: ProfileRecentSolvesProps) {
   }
 
   return (
-    <div className="divide-y divide-zinc-800">
+    <div className="divide-y divide-border">
       {problems.map((problem) => (
         <ProblemCard key={problem.id} problem={problem} compact />
       ))}

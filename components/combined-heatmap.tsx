@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toDateKey } from "@/lib/stats";
 import { cn } from "@/lib/utils";
 
@@ -23,14 +28,8 @@ const MONTH_LABELS = [
   "Dec",
 ] as const;
 
-const DAY_LABELS = [
-  { label: "Mon", row: 1 },
-  { label: "Wed", row: 3 },
-  { label: "Fri", row: 5 },
-] as const;
-
-const CELL_SIZE = 12;
-const CELL_GAP = 2;
+const CELL_SIZE = 15;
+const CELL_GAP = 3;
 const CELL_STEP = CELL_SIZE + CELL_GAP;
 
 function normalizeDate(date: Date) {
@@ -172,11 +171,25 @@ function computeHeatmapStats(activityMap: Record<string, number>) {
   return { total, longestStreak, currentStreak };
 }
 
-function HeatmapCellView({ cell }: { cell: HeatmapCell }) {
+function getTooltipAlign(columnIndex: number, totalColumns: number) {
+  if (columnIndex >= totalColumns - 5) return "end";
+  if (columnIndex < 5) return "start";
+  return "center";
+}
+
+function HeatmapCellView({
+  cell,
+  columnIndex,
+  totalColumns,
+}: {
+  cell: HeatmapCell;
+  columnIndex: number;
+  totalColumns: number;
+}) {
   if (!cell.inRange) {
     return (
       <div
-        className="shrink-0 rounded-[2px] bg-transparent"
+        className="shrink-0 rounded-[3px] bg-transparent"
         style={{ width: CELL_SIZE, height: CELL_SIZE }}
         aria-hidden
       />
@@ -184,24 +197,26 @@ function HeatmapCellView({ cell }: { cell: HeatmapCell }) {
   }
 
   return (
-    <div
-      className="group relative shrink-0"
-      style={{ width: CELL_SIZE, height: CELL_SIZE }}
-    >
-      <div
+    <Tooltip>
+      <TooltipTrigger
+        delay={0}
         className={cn(
-          "h-full w-full rounded-[2px] transition-transform duration-150 group-hover:scale-110",
+          "shrink-0 rounded-[3px] transition-colors duration-150 hover:ring-1 hover:ring-inset hover:ring-emerald-500/50",
           cellColor(cell.count),
         )}
+        style={{ width: CELL_SIZE, height: CELL_SIZE }}
         aria-label={formatTooltip(cell.count, cell.date)}
       />
-      <div
-        className="pointer-events-none absolute bottom-[calc(100%+6px)] left-1/2 z-50 hidden -translate-x-1/2 whitespace-nowrap rounded border border-zinc-700 bg-zinc-900 px-2 py-1 font-mono text-[11px] text-zinc-200 shadow-lg group-hover:block"
-        role="tooltip"
+      <TooltipContent
+        side="top"
+        align={getTooltipAlign(columnIndex, totalColumns)}
+        collisionPadding={16}
+        showArrow={false}
+        className="border border-zinc-700 bg-zinc-900 font-mono text-[11px] text-zinc-200"
       >
         {formatTooltip(cell.count, cell.date)}
-      </div>
-    </div>
+      </TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -213,30 +228,14 @@ export function CombinedHeatmap({
   const monthLabels = getMonthLabelPositions(columns);
   const stats = computeHeatmapStats(activityMap);
   const gridWidth = columns.length * CELL_STEP - CELL_GAP;
-  const gridHeight = 7 * CELL_STEP - CELL_GAP;
 
   return (
     <div className={cn("w-full min-w-0", className)}>
-      <div className="overflow-x-auto pb-2 scrollbar-thin">
-        <div className="inline-flex min-w-max gap-2">
-          <div
-            className="relative shrink-0 font-mono text-[10px] text-zinc-400"
-            style={{ width: 28, height: gridHeight + 20, paddingTop: 20 }}
-          >
-            {DAY_LABELS.map(({ label, row }) => (
-              <span
-                key={label}
-                className="absolute left-0 leading-none"
-                style={{ top: 20 + row * CELL_STEP }}
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-
-          <div>
+      <div className="flex justify-center">
+        <div className="max-w-full overflow-x-auto pb-2 scrollbar-thin">
+          <div className="inline-flex min-w-max flex-col items-center px-1.5 py-px">
             <div
-              className="relative mb-1 font-mono text-[10px] text-zinc-400"
+              className="relative mb-2 font-mono text-[10px] text-zinc-400"
               style={{ width: gridWidth, height: 16 }}
             >
               {monthLabels.map(({ label, columnIndex }) => (
@@ -258,7 +257,12 @@ export function CombinedHeatmap({
                   style={{ gap: CELL_GAP }}
                 >
                   {column.map((cell) => (
-                    <HeatmapCellView key={cell.date} cell={cell} />
+                    <HeatmapCellView
+                      key={cell.date}
+                      cell={cell}
+                      columnIndex={columnIndex}
+                      totalColumns={columns.length}
+                    />
                   ))}
                 </div>
               ))}
@@ -267,7 +271,7 @@ export function CombinedHeatmap({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] text-zinc-400">
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 font-mono text-[11px] text-zinc-400">
         <span>
           365-day total:{" "}
           <span className="tabular-nums text-zinc-200">{stats.total}</span>{" "}

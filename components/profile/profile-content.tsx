@@ -126,43 +126,35 @@ export function ProfileContent({
           <MiniStatCard label="Best Streak" value={longestStreak} suffix="d" />
         </div>
 
-        {/* Main content — two columns */}
-        <div className="mt-6 flex flex-col gap-6 lg:flex-row">
-          {/* Left column */}
-          <div className="min-w-0 flex-1 space-y-6">
-            <IRSWidget problems={index} username={username} />
+        {/* Interview Readiness + Topic Mastery */}
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-stretch">
+          <IRSWidget problems={index} username={username} className="h-full" />
 
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
-              <h2 className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
-                Topic Mastery
-              </h2>
-              <div className="mt-4 flex justify-center">
-                <TopicRadar masteryData={masteryData} size={320} />
-              </div>
-            </div>
-          </div>
-
-          {/* Right column */}
-          <div className="min-w-0 flex-1 space-y-6">
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
-              <h2 className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
-                Activity
-              </h2>
-              <div className="mt-4">
-                <CombinedHeatmap activityMap={activityMap} />
-              </div>
-            </div>
-
-            <div className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/60">
-              <div className="border-b border-zinc-800 px-4 py-3">
-                <h2 className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
-                  Recent Solves
-                </h2>
-              </div>
-              <ProfileRecentSolves problems={recent} />
+          <div className="flex h-full flex-col rounded-xl border border-zinc-800 bg-zinc-900/60 p-6">
+            <h2 className="text-center text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+              Topic Mastery
+            </h2>
+            <div className="flex flex-1 items-center justify-center">
+              <TopicRadar masteryData={masteryData} size={280} />
             </div>
           </div>
         </div>
+
+        {index.length > 0 ? (
+          <section className="surface-card mt-6 p-container-padding">
+            <h2 className="text-section-title mb-6 text-center text-muted-foreground">
+              Activity
+            </h2>
+            <CombinedHeatmap activityMap={activityMap} />
+          </section>
+        ) : null}
+
+        <section className="surface-card mt-6 overflow-hidden">
+          <div className="border-b border-border bg-vault-bg/60 px-6 py-4">
+            <h2 className="text-section-title">Recent Solves</h2>
+          </div>
+          <ProfileRecentSolves problems={recent} />
+        </section>
       </main>
     </div>
   );
