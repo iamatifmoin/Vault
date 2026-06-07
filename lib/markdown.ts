@@ -14,6 +14,11 @@ import type {
 const ANALYSIS_COMMENT_PREFIX = "<!-- vault-analysis:";
 const ANALYSIS_COMMENT_SUFFIX = " -->";
 
+/** Normalize newlines — fixes JSON serialization escaping \\n → \n */
+export function normalizeCode(code: string) {
+  return code.replace(/\\n/g, "\n").replace(/\\t/g, "\t");
+}
+
 export function slugifyTitle(value: string) {
   return value
     .trim()
@@ -94,6 +99,8 @@ function renderAnalysisSummary(analysis: AIAnalysis | null) {
 
 function renderAttempt(attempt: Attempt) {
   const languageLabel = LANGUAGE_LABELS[attempt.language];
+  const normalizedCode = normalizeCode(attempt.code).trim();
+  const codeSection = `\`\`\`${attempt.language}\n${normalizedCode}\n\`\`\``;
 
   return [
     `### Attempt ${attempt.number} - ${attempt.approach}`,
@@ -102,9 +109,7 @@ function renderAttempt(attempt: Attempt) {
     `**Time:** ${attempt.time_complexity} | **Space:** ${attempt.space_complexity}`,
     `**Classification:** ${attempt.approach}`,
     "",
-    `\`\`\`${attempt.language}`,
-    attempt.code.trim(),
-    "```",
+    codeSection,
     "",
     renderAnalysisSummary(attempt.analysis),
   ].join("\n");
@@ -254,7 +259,7 @@ function parseExtensionAttempts(content: string) {
       number: Number(headingMatch[1]),
       date: parseExtensionDate(headingMatch[2]),
       language: normalizeLanguage(languageLine[1]),
-      code: codeMatch[2].trimEnd(),
+      code: normalizeCode(codeMatch[2]).trimEnd(),
       approach: normalizeApproach(approachLine?.[1] ?? "Brute Force"),
       time_complexity: timeLine?.[1]?.trim() ?? "TBD",
       space_complexity: spaceLine?.[1]?.trim() ?? "TBD",
@@ -321,7 +326,7 @@ function parseAttempts(block: string) {
       number: Number(headingMatch[1]),
       date: dateLine[1].trim(),
       language: normalizeLanguage(dateLine[2]),
-      code: codeMatch[2].trimEnd(),
+      code: normalizeCode(codeMatch[2]).trimEnd(),
       approach: classificationLine[1].trim() as Attempt["approach"],
       time_complexity: timeLine[1].trim(),
       space_complexity: timeLine[2].trim(),

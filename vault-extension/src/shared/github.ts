@@ -70,11 +70,18 @@ export function buildFilePath(problem: CapturedProblem): string {
   return `${problem.platform}/${topicSlug}/${paddedNumber}-${problem.titleSlug}.md`;
 }
 
+function normalizeCode(code: string) {
+  return code.replace(/\\n/g, "\n").replace(/\\t/g, "\t");
+}
+
 function buildAttemptSection(
   problem: CapturedProblem,
   attemptNumber: number,
   solvedAt: string,
 ): string {
+  const normalizedCode = normalizeCode(problem.code).trim();
+  const codeSection = `\`\`\`${problem.language}\n${normalizedCode}\n\`\`\``;
+
   return [
     "",
     `## Attempt ${attemptNumber} — ${formatAttemptDate(solvedAt)}`,
@@ -84,9 +91,7 @@ function buildAttemptSection(
     "**Time Complexity:** TBD",
     "**Space Complexity:** TBD",
     "",
-    `\`\`\`${problem.language}`,
-    problem.code.trim(),
-    "```",
+    codeSection,
     "",
     "---",
     "",

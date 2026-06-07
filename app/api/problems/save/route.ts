@@ -5,6 +5,7 @@ import {
   buildProblemFilePath,
   buildProblemId,
   generateProblemMarkdown,
+  normalizeCode,
   toProblemIndex,
 } from "@/lib/markdown";
 import type {
@@ -23,7 +24,7 @@ function defaultAttempt(payload: SaveProblemPayload, attemptNumber: number): Att
     number: attemptNumber,
     date: today(),
     language: payload.language,
-    code: payload.code,
+    code: normalizeCode(payload.code),
     approach: payload.analysis?.classification ?? "Brute Force",
     time_complexity: payload.analysis?.time_complexity ?? "Not analyzed",
     space_complexity: payload.analysis?.space_complexity ?? "Not analyzed",

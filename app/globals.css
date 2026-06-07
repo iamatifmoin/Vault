@@ -266,6 +266,15 @@ body::-webkit-scrollbar-thumb,
   color: #fafafa;
 }
 
+.prose pre {
+  white-space: pre !important;
+  overflow-x: auto;
+}
+
+.prose pre code {
+  white-space: pre !important;
+}
+
 .prose-vault pre {
   background: var(--vault-surface-0);
   border: 1px solid var(--border);

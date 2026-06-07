@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { codeToHtml } from "shiki";
+import { normalizeCode } from "@/lib/markdown";
 import { cn } from "@/lib/utils";
 import type { Language } from "@/types";
 
@@ -28,12 +29,13 @@ export function CodeSnippet({
   showLineNumbers?: boolean;
 }) {
   const [highlighted, setHighlighted] = useState("");
-  const lines = code.split("\n");
+  const normalizedCode = normalizeCode(code);
+  const lines = normalizedCode.split("\n");
 
   useEffect(() => {
     let active = true;
 
-    codeToHtml(code, {
+    codeToHtml(normalizedCode, {
       lang: languageMap[language],
       theme: "github-dark-default",
     })
@@ -46,7 +48,7 @@ export function CodeSnippet({
         if (active) {
           setHighlighted(
             `<pre class="shiki github-dark-default"><code>${escapeHtml(
-              code,
+              normalizedCode,
             )}</code></pre>`,
           );
         }
@@ -55,7 +57,7 @@ export function CodeSnippet({
     return () => {
       active = false;
     };
-  }, [code, language]);
+  }, [normalizedCode, language]);
 
   if (!showLineNumbers) {
     return (
