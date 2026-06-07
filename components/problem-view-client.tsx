@@ -11,8 +11,9 @@ import { HintLadder } from "@/components/hint-ladder";
 import { PageHeader } from "@/components/page-header";
 import { ProblemMarkdown } from "@/components/problem-markdown";
 import { TeachMeButton } from "@/components/teach-dialog";
+import { UpgradePathCard } from "@/components/upgrade-path-card";
 import { Button } from "@/components/ui/button";
-import { DIFFICULTY_BADGE_TONES } from "@/lib/constants";
+import { DIFFICULTY_BADGE_TONES, DIFFICULTY_LABELS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { AIAnalysis, Problem } from "@/types";
 
@@ -40,6 +41,7 @@ export function ProblemViewClient({
   const selectedAttempt =
     problem.attempts.find((attempt) => attempt.number === selectedAttemptNumber) ??
     problem.attempts[problem.attempts.length - 1];
+  const latestAttempt = problem.attempts[problem.attempts.length - 1];
 
   async function analyzeAttempt() {
     setIsAnalyzing(true);
@@ -155,13 +157,23 @@ export function ProblemViewClient({
           />
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 space-y-3">
           <AttemptTimeline
             attempts={problem.attempts}
             selectedAttempt={selectedAttemptNumber}
             onSelect={setSelectedAttemptNumber}
             addHref={`/add?platform=${problem.platform}&number=${problem.number}&attempt=true`}
           />
+          {latestAttempt.approach !== "Optimal" && (
+            <UpgradePathCard
+              problemTitle={problem.title}
+              difficulty={DIFFICULTY_LABELS[problem.difficulty]}
+              topics={problem.topics}
+              currentCode={latestAttempt.code}
+              currentApproach={latestAttempt.approach}
+              language={latestAttempt.language}
+            />
+          )}
         </div>
 
         <div className="surface-card mt-8 p-6">
