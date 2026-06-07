@@ -15,6 +15,10 @@ import {
 import { AppLogo } from "@/components/app-logo";
 import { cn } from "@/lib/utils";
 
+interface SidebarProps {
+  profileHref?: string;
+}
+
 const navigation = [
   {
     href: "/dashboard",
@@ -51,15 +55,18 @@ const navigation = [
     label: "Share",
     icon: Share2,
   },
-  {
-    href: "/profile",
-    label: "Profile",
-    icon: UserRound,
-  },
 ];
 
-export function Sidebar() {
+export function Sidebar({ profileHref = "/profile" }: SidebarProps) {
   const pathname = usePathname();
+  const items = [
+    ...navigation,
+    {
+      href: profileHref,
+      label: "My Profile",
+      icon: UserRound,
+    },
+  ];
 
   return (
     <>
@@ -69,13 +76,13 @@ export function Sidebar() {
         </div>
 
         <div className="flex flex-1 flex-col gap-1">
-          {navigation.map((item) => {
+          {items.map((item) => {
             const active = pathname.startsWith(item.href);
             const Icon = item.icon;
 
             return (
               <Link
-                key={item.href}
+                key={`${item.label}-${item.href}`}
                 href={item.href}
                 className={cn(
                   "flex h-9 items-center gap-3 border-l-2 px-4 text-sm text-muted-foreground transition-colors hover:bg-vault-surface hover:text-foreground",
@@ -94,13 +101,13 @@ export function Sidebar() {
 
       <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-vault-bg/95 backdrop-blur md:hidden">
         <div className="grid grid-cols-4 sm:grid-cols-8">
-          {navigation.map((item) => {
+          {items.map((item) => {
             const active = pathname.startsWith(item.href);
             const Icon = item.icon;
 
             return (
               <Link
-                key={item.href}
+                key={`${item.label}-${item.href}`}
                 href={item.href}
                 className={cn(
                   "relative flex min-h-12 flex-col items-center justify-center gap-1 py-2 text-[11px] text-muted-foreground",

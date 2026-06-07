@@ -17,7 +17,11 @@ export default async function AppLayout({
   return (
     <OnboardingGuard>
       <div className="vault-app-bg text-foreground">
-        <Sidebar />
+        <Sidebar
+          profileHref={
+            session.user?.login ? `/u/${session.user.login}` : "/profile"
+          }
+        />
         <div className="pb-20 md:pl-[220px] md:pb-0">{children}</div>
       </div>
     </OnboardingGuard>

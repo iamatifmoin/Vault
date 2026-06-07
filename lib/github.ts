@@ -1,7 +1,125 @@
 import { Octokit } from "@octokit/rest";
 import { REPO_NAME } from "@/lib/constants";
-import { parseProblemMarkdown } from "@/lib/markdown";
-import type { ProblemIndex, RepoStats } from "@/types";
+import { buildProblemId, parseProblemMarkdown } from "@/lib/markdown";
+import type {
+  ApproachType,
+  Difficulty,
+  Language,
+  Platform,
+  ProblemIndex,
+  RepoStats,
+} from "@/types";
+
+const GITHUB_API = "https://api.github.com";
+
+interface GitHubContentResponse {
+  content?: string;
+  encoding?: string;
+}
+
+function normalizeDifficulty(value: unknown): Difficulty {
+  const raw = String(value ?? "easy").toLowerCase();
+  if (raw === "medium") return "medium";
+  if (raw === "hard") return "hard";
+  return "easy";
+}
+
+function normalizePlatform(value: unknown): Platform {
+  const raw = String(value ?? "leetcode").toLowerCase();
+  if (raw === "codeforces") return "codeforces";
+  if (raw === "codechef") return "codechef";
+  if (raw === "gfg") return "gfg";
+  return "leetcode";
+}
+
+function normalizeApproach(value: unknown): ApproachType | null {
+  if (value === "Brute Force" || value === "Optimized" || value === "Optimal") {
+    return value;
+  }
+  return null;
+}
+
+function normalizeLanguage(value: unknown): Language {
+  const raw = String(value ?? "python").toLowerCase();
+  if (raw === "cpp") return "cpp";
+  if (raw === "java") return "java";
+  return "python";
+}
+
+function normalizeIndexEntry(raw: Record<string, unknown>): ProblemIndex {
+  const platform = normalizePlatform(raw.platform);
+  const number = String(raw.number ?? "");
+  const filePath = String(raw.filePath ?? raw.file_path ?? "");
+  const latestDate = String(raw.latestDate ?? raw.latest_date ?? "");
+  const attemptCount = Number(raw.attempts ?? raw.attempt_count ?? 0);
+  const id =
+    typeof raw.id === "string"
+      ? raw.id
+      : buildProblemId(platform, number);
+
+  return {
+    id,
+    number,
+    title: String(raw.title ?? ""),
+    platform,
+    difficulty: normalizeDifficulty(raw.difficulty),
+    topics: Array.isArray(raw.topics) ? raw.topics.map(String) : [],
+    sheets: Array.isArray(raw.sheets)
+      ? (raw.sheets as ProblemIndex["sheets"])
+      : [],
+    attempt_count: Number.isFinite(attemptCount) ? attemptCount : 0,
+    latest_approach: normalizeApproach(raw.latestApproach ?? raw.latest_approach),
+    latest_date: latestDate,
+    latest_language: normalizeLanguage(raw.language ?? raw.latest_language),
+    file_path: filePath,
+  };
+}
+
+export async function getPublicIndex(
+  username: string,
+): Promise<ProblemIndex[] | null> {
+  const encodedOwner = encodeURIComponent(username);
+  const encodedRepo = encodeURIComponent(REPO_NAME);
+  const url = `${GITHUB_API}/repos/${encodedOwner}/${encodedRepo}/contents/index.json`;
+
+  const response = await fetch(url, {
+    headers: {
+      Accept: "application/vnd.github+json",
+    },
+    next: { revalidate: 300 },
+  });
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch public index for ${username}`);
+  }
+
+  const data = (await response.json()) as GitHubContentResponse;
+
+  if (!data.content) {
+    return null;
+  }
+
+  try {
+    const decoded = Buffer.from(data.content.replace(/\n/g, ""), "base64").toString(
+      "utf8",
+    );
+    const parsed = JSON.parse(decoded) as unknown;
+
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.map((entry) =>
+      normalizeIndexEntry(entry as Record<string, unknown>),
+    );
+  } catch {
+    return [];
+  }
+}
 
 function createOctokit(token: string) {
   return new Octokit({

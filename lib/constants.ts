@@ -6,7 +6,15 @@ export const PLATFORM_LABELS: Record<Platform, string> = {
   leetcode: "LeetCode",
   codeforces: "Codeforces",
   codechef: "CodeChef",
+  gfg: "GFG",
 };
+
+export const PUBLIC_PLATFORMS: Platform[] = [
+  "leetcode",
+  "codeforces",
+  "codechef",
+  "gfg",
+];
 
 export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   easy: "Easy",

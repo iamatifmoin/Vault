@@ -1,4 +1,4 @@
-export type Platform = "leetcode" | "codeforces" | "codechef";
+export type Platform = "leetcode" | "codeforces" | "codechef" | "gfg";
 export type Difficulty = "easy" | "medium" | "hard";
 export type Language = "cpp" | "python" | "java";
 export type ApproachType = "Brute Force" | "Optimized" | "Optimal";
