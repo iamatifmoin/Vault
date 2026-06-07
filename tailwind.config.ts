@@ -104,11 +104,21 @@ const config: Config = {
           "0%, 100%": { opacity: "1", transform: "scale(1)" },
           "50%": { opacity: "0.45", transform: "scale(0.85)" },
         },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
       },
       animation: {
         "page-enter": "page-enter 180ms ease-out both",
         "fade-in-up": "fade-in-up 200ms ease-out both",
         "pulse-dot": "pulse-dot 2s ease-in-out infinite",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
       typography: {
         invert: {
