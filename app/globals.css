@@ -106,6 +106,25 @@
     background-position: center top;
   }
 
+  .vault-brand-bleed {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at top left,
+      rgba(229, 255, 93, 0.06),
+      transparent 55%
+    );
+  }
+
+  .vault-brand-bleed--subtle {
+    background: radial-gradient(
+      ellipse at top left,
+      rgba(229, 255, 93, 0.04),
+      transparent 55%
+    );
+  }
+
   .page-enter {
     animation: page-enter 180ms ease-out both;
   }

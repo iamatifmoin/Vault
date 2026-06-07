@@ -8,6 +8,7 @@ import {
 import { PUBLIC_PLATFORMS } from "@/lib/constants";
 import {
   computeBestStreak,
+  computeCurrentStreak,
   computeDashboardStats,
   computePlatformBreakdown,
   getRecentProblems,
@@ -17,6 +18,7 @@ import { IRSWidget } from "@/components/irs-widget";
 import { TopicRadar } from "@/components/topic-radar";
 import { CombinedHeatmap } from "@/components/combined-heatmap";
 import { AppLogo } from "@/components/app-logo";
+import { PageHeader } from "@/components/page-header";
 import { MiniStatCard } from "@/components/profile/mini-stat-card";
 import { OwnerMenu } from "@/components/profile/profile-owner-menu";
 import { PlatformChip } from "@/components/profile/platform-chip";
@@ -60,13 +62,15 @@ export function ProfileContent({
 
   const content = (
     <div className={isOwner ? "min-h-screen" : "min-h-screen bg-zinc-950 text-white"}>
-      {!isOwner ? (
+      {isOwner ? (
+        <PageHeader title="Profile" streak={computeCurrentStreak(index)} />
+      ) : (
         <header className="border-b border-zinc-800 px-6 py-4">
           <Link href="/">
             <AppLogo size="sm" />
           </Link>
         </header>
-      ) : null}
+      )}
 
       <main
         className={cn(

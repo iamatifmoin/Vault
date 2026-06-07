@@ -19,11 +19,12 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 flex min-h-14 items-center justify-between gap-4 border-b border-border bg-background/90 px-container-padding py-2.5 backdrop-blur",
+        "sticky top-0 z-30 flex min-h-14 items-center justify-between gap-4 overflow-hidden border-b border-border bg-background/90 px-container-padding py-2.5 backdrop-blur",
         className,
       )}
     >
-      <div className="min-w-0 truncate">
+      <div aria-hidden className="vault-brand-bleed vault-brand-bleed--subtle" />
+      <div className="relative min-w-0 truncate">
         {breadcrumb ??
           (title ? (
             <div>
@@ -34,7 +35,7 @@ export function PageHeader({
             </div>
           ) : null)}
       </div>
-      <div className="shrink-0">
+      <div className="relative shrink-0">
         {actions ?? (streak !== undefined ? <StreakBadge streak={streak} /> : null)}
       </div>
     </header>

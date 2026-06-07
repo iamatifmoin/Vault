@@ -52,12 +52,13 @@ export function Sidebar({ profileHref = "/profile" }: SidebarProps) {
 
   return (
     <>
-      <nav className="fixed left-0 top-0 z-40 hidden h-screen w-sidebar-width flex-col border-r border-border bg-vault-bg py-gutter md:flex">
-        <div className="px-container-padding pb-8">
+      <nav className="fixed left-0 top-0 z-40 hidden h-screen w-sidebar-width flex-col overflow-hidden border-r border-border bg-vault-bg py-gutter md:flex">
+        <div aria-hidden className="vault-brand-bleed" />
+        <div className="relative px-container-padding pb-8">
           <AppLogo size="md" />
         </div>
 
-        <div className="flex flex-1 flex-col gap-1">
+        <div className="relative flex flex-1 flex-col gap-1">
           {items.map((item) => {
             const active = pathname.startsWith(item.href);
             const Icon = item.icon;

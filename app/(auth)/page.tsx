@@ -35,10 +35,7 @@ export default async function LoginPage() {
   return (
     <main className="page-enter min-h-screen bg-background text-foreground md:flex">
       <section className="relative flex w-full flex-col justify-between overflow-hidden border-b border-border bg-vault-surface px-8 py-8 md:w-[55%] md:border-b-0 md:border-r md:px-16 md:py-16">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(229,255,93,0.06),transparent_55%)]"
-        />
+        <div aria-hidden className="vault-brand-bleed" />
         <div className="relative">
           <AppLogo size="md" />
         </div>

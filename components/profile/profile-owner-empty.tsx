@@ -3,6 +3,7 @@ import type { Session } from "next-auth";
 import { LogoutButton } from "@/components/logout-button";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/page-header";
 import { ProfileOwnerShell } from "@/components/profile/profile-owner-shell";
 
 interface ProfileOwnerEmptyProps {
@@ -14,7 +15,9 @@ export function ProfileOwnerEmpty({ session }: ProfileOwnerEmptyProps) {
 
   return (
     <ProfileOwnerShell login={login}>
-      <main className="mx-auto flex min-h-[70vh] max-w-2xl flex-col items-center justify-center px-6 py-10 text-center">
+      <div className="min-h-screen">
+        <PageHeader title="Profile" />
+        <main className="mx-auto flex min-h-[70vh] max-w-2xl flex-col items-center justify-center px-6 py-10 text-center">
         <div className="mb-4 h-24 w-24 overflow-hidden rounded-full border border-border bg-vault-raised">
           {session.user.image ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -47,7 +50,8 @@ export function ProfileOwnerEmpty({ session }: ProfileOwnerEmptyProps) {
         </Link>
 
         <LogoutButton />
-      </main>
+        </main>
+      </div>
     </ProfileOwnerShell>
   );
 }
