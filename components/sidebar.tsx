@@ -7,6 +7,7 @@ import {
   Building2,
   LayoutDashboard,
   Map,
+  Mic,
   PlusSquare,
   Share2,
   UserRound,
@@ -29,6 +30,11 @@ const navigation = [
     href: "/library",
     label: "Library",
     icon: BookOpen,
+  },
+  {
+    href: "/mock",
+    label: "Mock Interview",
+    icon: Mic,
   },
   {
     href: "/companies",
@@ -87,7 +93,7 @@ export function Sidebar() {
       </nav>
 
       <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-vault-bg/95 backdrop-blur md:hidden">
-        <div className="grid grid-cols-7">
+        <div className="grid grid-cols-4 sm:grid-cols-8">
           {navigation.map((item) => {
             const active = pathname.startsWith(item.href);
             const Icon = item.icon;
