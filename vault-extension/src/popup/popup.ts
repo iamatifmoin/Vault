@@ -1,10 +1,17 @@
+import { clearAuth } from "../shared/auth";
 import type { ExtensionAuthState } from "../shared/types";
 
-const VAULT_CONNECT_URL = "http://localhost:3000/extension-success";
-const VAULT_APP_URL = "http://localhost:3000/dashboard";
+const VAULT_CONNECT_URL = "https://vaultbyatif.vercel.app/extension-success";
+const VAULT_APP_URL = "https://vaultbyatif.vercel.app/dashboard";
 const AUTH_KEY = "vault_auth";
 
 type PopupState = "loading" | "connected" | "disconnected";
+
+interface RecentCapture {
+  title: string;
+  date: string;
+  platform: string;
+}
 
 async function verifyToken(token: string): Promise<boolean> {
   try {
@@ -15,6 +22,33 @@ async function verifyToken(token: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+function renderRecentCaptures(recent: RecentCapture[]): void {
+  const list = document.getElementById("recent-list");
+  if (!list) return;
+
+  list.innerHTML = "";
+
+  if (recent.length === 0) {
+    list.innerHTML =
+      '<li class="recent-item"><span class="recent-item-title recent-item-title--empty">No captures yet — solve a problem!</span></li>';
+    return;
+  }
+
+  recent.slice(0, 3).forEach((item) => {
+    const li = document.createElement("li");
+    li.className = "recent-item";
+    const date = new Date(item.date).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+    });
+    li.innerHTML = `
+      <span class="recent-item-title">${item.title}</span>
+      <span class="recent-item-date">${date}</span>
+    `;
+    list.appendChild(li);
+  });
 }
 
 function renderState(state: PopupState, auth?: ExtensionAuthState): void {
@@ -31,10 +65,22 @@ function renderState(state: PopupState, auth?: ExtensionAuthState): void {
     const usernameEl = document.getElementById("username");
     const captureCountEl = document.getElementById("capture-count");
     if (usernameEl) usernameEl.textContent = auth.githubUsername;
+
     if (captureCountEl) {
       void chrome.storage.local.get("vault_capture_count").then((res) => {
         captureCountEl.textContent = String(res.vault_capture_count ?? 0);
       });
+    }
+
+    void chrome.storage.local.get("vault_recent_captures").then((res) => {
+      const recent = (res.vault_recent_captures ?? []) as RecentCapture[];
+      renderRecentCaptures(recent);
+    });
+
+    const avatarEl = document.getElementById("user-avatar") as HTMLImageElement | null;
+    if (avatarEl && auth.githubUsername) {
+      avatarEl.src = `https://github.com/${auth.githubUsername}.png?size=72`;
+      avatarEl.alt = auth.githubUsername;
     }
   }
 }
@@ -63,12 +109,18 @@ async function initPopup(): Promise<void> {
 }
 
 function setupActions(): void {
-  document.getElementById("connect")?.addEventListener("click", () => {
+  document.getElementById("connect-btn")?.addEventListener("click", () => {
     void chrome.tabs.create({ url: VAULT_CONNECT_URL });
   });
 
-  document.getElementById("open-vault")?.addEventListener("click", () => {
+  document.getElementById("settings-btn")?.addEventListener("click", () => {
     void chrome.tabs.create({ url: VAULT_APP_URL });
+  });
+
+  document.getElementById("disconnect-btn")?.addEventListener("click", () => {
+    void clearAuth().then(() => {
+      renderState("disconnected");
+    });
   });
 }
 

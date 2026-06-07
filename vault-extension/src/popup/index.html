@@ -7,35 +7,86 @@
     <link rel="stylesheet" href="./popup.css" />
   </head>
   <body>
-    <main class="popup">
-      <h1 class="popup__title">Vault</h1>
+    <!-- Loading state -->
+    <div id="state-loading" class="state">
+      <div class="spinner"></div>
+    </div>
 
-      <section class="popup__state" id="state-loading">
-        <div class="popup__spinner" aria-hidden="true"></div>
-        <p class="popup__status">Checking connection…</p>
-      </section>
-
-      <section class="popup__state" id="state-connected" hidden>
-        <p class="popup__status">
-          Connected as <span id="username"></span>
-        </p>
-        <p class="popup__meta">
-          <span id="capture-count">0</span> problems captured
-        </p>
-        <button class="popup__action" id="open-vault" type="button">
-          Open Vault
+    <!-- Connected state -->
+    <div id="state-connected" class="state" hidden>
+      <div class="popup-header">
+        <div class="logo">
+          <div class="logo-mark"></div>
+          <span class="logo-text">Vault</span>
+        </div>
+        <button class="icon-btn" id="settings-btn" type="button" title="Settings">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
         </button>
-      </section>
+      </div>
 
-      <section class="popup__state" id="state-disconnected" hidden>
-        <p class="popup__status">
-          Not connected — sign in to Vault to link your account
+      <div class="user-row">
+        <img id="user-avatar" class="avatar" src="" alt="" />
+        <div class="user-info">
+          <span id="username" class="username"></span>
+          <div class="status-row">
+            <span class="status-dot"></span>
+            <span class="status-label">Connected</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="capture-card">
+        <span class="capture-label">Problems Captured</span>
+        <span id="capture-count" class="capture-number">0</span>
+      </div>
+
+      <div class="recent-section">
+        <span class="section-label">Recent Captures</span>
+        <ul id="recent-list" class="recent-list"></ul>
+      </div>
+
+      <a
+        id="open-vault-btn"
+        href="https://vaultbyatif.vercel.app/dashboard"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="cta-btn"
+      >
+        Open Vault →
+      </a>
+
+      <button id="disconnect-btn" class="disconnect-btn" type="button">
+        Disconnect
+      </button>
+    </div>
+
+    <!-- Disconnected state -->
+    <div id="state-disconnected" class="state" hidden>
+      <div class="popup-header">
+        <div class="logo">
+          <div class="logo-mark"></div>
+          <span class="logo-text">Vault</span>
+        </div>
+      </div>
+
+      <div class="connect-section">
+        <p class="connect-title">Track your DSA progress</p>
+        <p class="connect-desc">
+          Connect Vault to automatically save every accepted solution
+          to your GitHub repository.
         </p>
-        <button class="popup__connect" id="connect" type="button">
-          Connect to Vault
+        <button id="connect-btn" class="cta-btn" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          Connect with GitHub
         </button>
-      </section>
-    </main>
+      </div>
+    </div>
+
     <script type="module" src="./popup.ts"></script>
   </body>
 </html>
