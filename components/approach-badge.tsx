@@ -36,7 +36,6 @@ export function ApproachBadge({ approach, size = "sm", showDot = false, unverifi
         <span className={cn("h-1.5 w-1.5 rounded-full flex-shrink-0", DOT_STYLES[approach])} />
       )}
       {approach}
-      {unverified && <span className="opacity-60 text-[9px] ml-0.5">~</span>}
     </span>
   );
 }

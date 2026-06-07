@@ -84,12 +84,7 @@ export function ProfileContent({
           />
 
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-xl font-bold text-white">{username}</h1>
-              <span className="rounded-md border border-zinc-700 bg-zinc-800/60 px-2 py-0.5 text-xs text-zinc-400">
-                Vault Profile
-              </span>
-            </div>
+            <h1 className="text-xl font-bold text-white">{username}</h1>
 
             <p className="mt-1 text-sm text-zinc-400">
               {stats.totalSolved} problems solved · IRS {irsData.score}/100
