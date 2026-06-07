@@ -25,7 +25,10 @@
     {
       "matches": [
         "https://codeforces.com/problemset/problem/*/*",
-        "https://codeforces.com/contest/*/problem/*"
+        "https://codeforces.com/contest/*/problem/*",
+        "https://codeforces.com/problemset/status*",
+        "https://codeforces.com/contest/*/my*",
+        "https://codeforces.com/contest/*/status*"
       ],
       "js": ["dist/content/codeforces.js"],
       "run_at": "document_idle"

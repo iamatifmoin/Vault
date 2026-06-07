@@ -1,6 +1,6 @@
 export interface CapturedProblem {
   platform: "leetcode" | "codeforces" | "codechef" | "gfg";
-  number: number;
+  number: number | string;
   title: string;
   titleSlug: string;
   difficulty: "Easy" | "Medium" | "Hard";
