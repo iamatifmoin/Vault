@@ -1,9 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { Target } from "lucide-react";
 import { AnimatedMain } from "@/components/animated-main";
 import { CompanyCard } from "@/components/company-card";
+import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
+import { CompanyCardSkeleton } from "@/components/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,6 +16,7 @@ import {
   computeCompanyReadiness,
   getCompaniesByTier,
 } from "@/lib/company-data";
+import { staggerContainer } from "@/lib/motion";
 import { computeCurrentStreak } from "@/lib/stats";
 import { cn } from "@/lib/utils";
 import type { CompanyTier, ProblemIndex } from "@/types";
@@ -44,23 +49,6 @@ function CompanySelectorSkeleton() {
       <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, index) => (
           <Skeleton key={index} className="h-9 w-full" />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function CompanyCardSkeleton() {
-  return (
-    <div className="surface-card p-6">
-      <div className="flex items-start justify-between">
-        <Skeleton className="h-5 w-32" />
-        <Skeleton className="h-5 w-16" />
-      </div>
-      <Skeleton className="mt-4 h-12 w-24" />
-      <div className="mt-6 space-y-3">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <Skeleton key={index} className="h-3 w-full" />
         ))}
       </div>
     </div>
@@ -163,15 +151,18 @@ export default function CompaniesPage() {
               onValueChange={(value) => setActiveTier(value as CompanyTier)}
             >
               <TabsList className="h-auto w-full flex-wrap justify-start bg-vault-surface p-1 sm:w-fit">
-                {TIERS.map((tier) => (
-                  <TabsTrigger
-                    key={tier}
-                    value={tier}
-                    className="px-3 py-1.5 text-xs sm:text-sm"
-                  >
-                    {tier}
-                  </TabsTrigger>
-                ))}
+                {TIERS.map((tier) => {
+                  const count = getCompaniesByTier(tier).length;
+                  return (
+                    <TabsTrigger
+                      key={tier}
+                      value={tier}
+                      className="px-3 py-1.5 text-xs sm:text-sm"
+                    >
+                      {tier} ({count})
+                    </TabsTrigger>
+                  );
+                })}
               </TabsList>
 
               {TIERS.map((tier) => (
@@ -207,23 +198,24 @@ export default function CompaniesPage() {
 
         <section className="mt-8">
           {loading ? (
-            selectedIds.length > 0 ? (
-              <div className="stagger-children grid gap-gutter md:grid-cols-2">
-                {selectedIds.map((id) => (
-                  <CompanyCardSkeleton key={id} />
-                ))}
-              </div>
-            ) : (
-              <CompanySelectorSkeleton />
-            )
-          ) : selectedCompanies.length === 0 ? (
-            <div className="surface-card border-dashed p-10 text-center">
-              <p className="text-sm text-muted-foreground">
-                Select one or more companies above to see your readiness breakdown.
-              </p>
+            <div className="grid gap-gutter md:grid-cols-2">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <CompanyCardSkeleton key={index} />
+              ))}
             </div>
+          ) : selectedCompanies.length === 0 ? (
+            <EmptyState
+              icon={Target}
+              title="No companies selected"
+              description="Pick your target companies from the selector above"
+            />
           ) : (
-            <div className="stagger-children grid gap-gutter md:grid-cols-2">
+            <motion.div
+              variants={staggerContainer}
+              initial="initial"
+              animate="animate"
+              className="grid gap-gutter md:grid-cols-2"
+            >
               {selectedCompanies.map((company) => {
                 const readiness = readinessByCompany.get(company.id);
                 if (!readiness) return null;
@@ -236,7 +228,7 @@ export default function CompaniesPage() {
                   />
                 );
               })}
-            </div>
+            </motion.div>
           )}
         </section>
       </AnimatedMain>

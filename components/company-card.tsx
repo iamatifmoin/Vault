@@ -1,101 +1,95 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { ReadinessArc } from "@/components/readiness-arc";
+import { listItem } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import type { Company, CompanyReadiness } from "@/types";
+import { AlertTriangle } from "lucide-react";
+import { motion } from "framer-motion";
+
+const TIER_BADGE: Record<string, string> = {
+  "FAANG":           "bg-purple-950/70 text-purple-400 border border-purple-900/50",
+  "Indian Unicorn":  "bg-blue-950/70   text-blue-400   border border-blue-900/50",
+  "Service":         "bg-zinc-800/80   text-zinc-400   border border-zinc-700/50",
+};
 
 export interface CompanyCardProps {
   company: Company;
   readiness: CompanyReadiness;
 }
 
-function getReadinessTextColor(percent: number): string {
-  if (percent < 40) return "text-red-500";
-  if (percent < 70) return "text-yellow-400";
-  return "text-emerald-500";
-}
-
-function getBarColor(percent: number): string {
-  if (percent < 40) return "bg-red-500";
-  if (percent < 70) return "bg-yellow-400";
-  return "bg-emerald-500";
-}
-
 export function CompanyCard({ company, readiness }: CompanyCardProps) {
-  const topTopics = [...company.topics]
+  const topTopics = company.topics
     .sort((a, b) => b.weight - a.weight)
-    .slice(0, 6)
-    .map(({ topic }) => {
-      const data = readiness.topicReadiness.find((entry) => entry.topic === topic);
-      const solved = data?.solved ?? 0;
-      const total = data?.total ?? 0;
-      const percent = total > 0 ? Math.min((solved / total) * 100, 100) : 0;
-
-      return { topic, solved, total, percent };
-    });
-
-  const roundedPercent = Math.round(readiness.readinessPercent);
-  const libraryUrl = `/library?topics=${encodeURIComponent(readiness.weakestTopics.join(","))}`;
+    .slice(0, 4);
 
   return (
-    <div className="surface-card flex flex-col p-6">
-      <div className="flex items-start justify-between gap-3">
-        <h3 className="text-card-title">{company.name}</h3>
-        <Badge variant="outline" className="shrink-0 font-mono text-[10px] uppercase">
+    <motion.div
+      variants={listItem}
+      className="rounded-xl border border-zinc-800 bg-vault-surface p-5
+                 hover:border-zinc-700 transition-colors duration-200"
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between mb-3">
+        <h3 className="font-semibold text-zinc-100">{company.name}</h3>
+        <span className={cn(
+          "rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border",
+          TIER_BADGE[company.tier] ?? TIER_BADGE["Service"]
+        )}>
           {company.tier}
-        </Badge>
+        </span>
       </div>
 
-      <div
-        className={cn(
-          "mt-4 font-mono text-5xl font-bold leading-none tabular-nums",
-          getReadinessTextColor(roundedPercent),
-        )}
-      >
-        {roundedPercent}%
+      {/* Arc */}
+      <div className="flex justify-center mb-3">
+        <ReadinessArc percent={readiness.readinessPercent} />
       </div>
-      <p className="mt-1 text-xs text-muted-foreground">interview readiness</p>
 
-      <div className="mt-6 space-y-3">
-        {topTopics.map(({ topic, solved, total, percent }) => (
-          <div key={topic} className="flex items-center gap-3">
-            <span className="w-28 shrink-0 truncate text-xs text-zinc-400">{topic}</span>
-            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-700">
-              <div
-                className={cn("h-full rounded-full transition-all", getBarColor(percent))}
-                style={{ width: `${percent}%` }}
-              />
+      {/* Divider */}
+      <div className="my-3 border-t border-zinc-800" />
+
+      {/* Topic bars */}
+      <div className="space-y-2">
+        {topTopics.map(({ topic }) => {
+          const tr = readiness.topicReadiness.find(t => t.topic === topic);
+          const solved = tr?.solved ?? 0;
+          const total = tr?.total ?? 1;
+          const pct = Math.min((solved / total) * 100, 100);
+
+          return (
+            <div key={topic} className="flex items-center gap-2">
+              <span className="w-24 truncate text-[11px] text-zinc-500 flex-shrink-0">
+                {topic}
+              </span>
+              <div className="h-1.5 flex-1 rounded-full bg-zinc-800 overflow-hidden">
+                <motion.div
+                  className="h-full rounded-full bg-emerald-500/70"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${pct}%` }}
+                  transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
+                />
+              </div>
+              <span className="w-10 text-right text-[11px] font-mono text-zinc-600">
+                {solved}/{total}
+              </span>
             </div>
-            <span className="w-14 shrink-0 text-right font-mono text-xs tabular-nums text-zinc-400">
-              {solved}/{total}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      <div className="mt-6">
-        <p className="text-micro-label mb-2">Weak spots</p>
-        <div className="flex flex-wrap gap-2">
-          {readiness.weakestTopics.map((topic) => (
-            <span
-              key={topic}
-              className="rounded-full border border-red-500/25 bg-red-500/10 px-2.5 py-1 text-xs text-red-400"
-            >
-              {topic}
+      {/* Weak topics */}
+      {readiness.weakestTopics.length > 0 && (
+        <div className="mt-3 flex flex-wrap items-center gap-1.5">
+          <AlertTriangle className="h-3 w-3 text-yellow-500 flex-shrink-0" />
+          {readiness.weakestTopics.map(t => (
+            <span key={t}
+              className="rounded-md border border-yellow-900/40 bg-yellow-950/30
+                         px-1.5 py-0.5 text-[10px] text-yellow-500/80">
+              {t}
             </span>
           ))}
         </div>
-      </div>
-
-      <Link
-        href={libraryUrl}
-        className="mt-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-      >
-        Practice these topics
-        <ArrowRight className="h-4 w-4" />
-      </Link>
-    </div>
+      )}
+    </motion.div>
   );
 }
