@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { BookOpen, CalendarDays, Flame, Zap } from "lucide-react";
 import { AnimatedMain } from "@/components/animated-main";
+import { DashboardStats } from "@/components/dashboard-stats";
 import { EmptyState } from "@/components/empty-state";
 import { CombinedHeatmap } from "@/components/combined-heatmap";
 import { IRSWidget } from "@/components/irs-widget";
@@ -36,13 +36,6 @@ function getGreeting(name?: string | null) {
   return name ? `${time}, ${name.split(" ")[0]}` : time;
 }
 
-const statConfig = [
-  { label: "Total Solved", key: "totalSolved" as const, icon: BookOpen },
-  { label: "This Week", key: "thisWeek" as const, icon: CalendarDays },
-  { label: "Streak", key: "currentStreak" as const, icon: Flame, suffix: " days" },
-  { label: "Optimal", key: "optimal" as const, icon: Zap },
-];
-
 export default async function DashboardPage() {
   const session = await auth();
 
@@ -61,6 +54,10 @@ export default async function DashboardPage() {
     username,
     avatarUrl: session.user?.image ?? "",
   });
+  const optimalPct =
+    stats.totalSolved > 0
+      ? Math.round((stats.optimal / stats.totalSolved) * 100)
+      : 0;
 
   return (
     <div className="min-h-screen">
@@ -90,28 +87,13 @@ export default async function DashboardPage() {
 
         <RevisionQueue problems={index} />
 
-        <div className="stagger-children mt-6 grid gap-gutter md:grid-cols-4">
-          {statConfig.map(({ label, key, icon: Icon, suffix }) => {
-            const raw = stats[key];
-            const value = suffix && typeof raw === "number" ? `${raw}${suffix}` : raw;
-            const isStreak = key === "currentStreak";
-
-            return (
-              <div key={label} className="surface-card p-6">
-                <div className="flex items-center justify-between">
-                  <span className="text-micro-label">{label}</span>
-                  <Icon
-                    className={cn(
-                      "h-4 w-4",
-                      isStreak ? "text-vault-brand" : "text-muted-foreground",
-                    )}
-                    strokeWidth={1.6}
-                  />
-                </div>
-                <div className="text-stat mt-2">{value}</div>
-              </div>
-            );
-          })}
+        <div className="mt-6">
+          <DashboardStats
+            totalSolved={stats.totalSolved}
+            thisWeek={stats.thisWeek}
+            currentStreak={stats.currentStreak}
+            optimalPct={optimalPct}
+          />
         </div>
 
         {index.length > 0 ? (
