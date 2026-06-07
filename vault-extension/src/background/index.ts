@@ -217,6 +217,30 @@ chrome.runtime.onMessageExternal.addListener((message: AuthCompleteMessage, _sen
   return false;
 });
 
+const VAULT_APP_URL_PATTERNS = [
+  "http://localhost:3000/*",
+  "http://127.0.0.1:3000/*",
+  "https://vaultbyatif.vercel.app/*",
+];
+
+function markExtensionInstalledInVaultTabs(): void {
+  for (const url of VAULT_APP_URL_PATTERNS) {
+    chrome.tabs.query({ url }, (tabs) => {
+      tabs.forEach((tab) => {
+        if (!tab.id) return;
+
+        void chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          func: () => {
+            localStorage.setItem("vault_extension_installed", "true");
+          },
+        });
+      });
+    });
+  }
+}
+
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Vault extension installed");
+  markExtensionInstalledInVaultTabs();
 });

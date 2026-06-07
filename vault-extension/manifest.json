@@ -10,7 +10,10 @@
     "https://www.codechef.com/*",
     "https://practice.geeksforgeeks.org/*",
     "https://www.geeksforgeeks.org/*",
-    "https://api.github.com/*"
+    "https://api.github.com/*",
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*",
+    "https://vaultbyatif.vercel.app/*"
   ],
   "background": {
     "service_worker": "dist/background/index.js",
