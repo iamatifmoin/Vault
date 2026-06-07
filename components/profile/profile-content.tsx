@@ -151,7 +151,15 @@ export function ProfileContent({
 
   if (isOwner && session?.user?.login) {
     return (
-      <ProfileOwnerShell login={session.user.login}>{content}</ProfileOwnerShell>
+      <ProfileOwnerShell
+        login={session.user.login}
+        user={{
+          name: session.user.name,
+          image: session.user.image,
+        }}
+      >
+        {content}
+      </ProfileOwnerShell>
     );
   }
 

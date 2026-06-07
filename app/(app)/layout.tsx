@@ -21,6 +21,11 @@ export default async function AppLayout({
           profileHref={
             session.user?.login ? `/u/${session.user.login}` : "/profile"
           }
+          user={{
+            name: session.user?.name,
+            image: session.user?.image,
+            login: session.user?.login,
+          }}
         />
         <div className="pb-20 md:pl-[220px] md:pb-0">{children}</div>
       </div>

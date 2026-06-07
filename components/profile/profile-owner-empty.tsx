@@ -14,7 +14,13 @@ export function ProfileOwnerEmpty({ session }: ProfileOwnerEmptyProps) {
   const login = session.user.login ?? "github";
 
   return (
-    <ProfileOwnerShell login={login}>
+    <ProfileOwnerShell
+      login={login}
+      user={{
+        name: session.user.name,
+        image: session.user.image,
+      }}
+    >
       <div className="min-h-screen">
         <PageHeader title="Profile" />
         <main className="mx-auto flex min-h-[70vh] max-w-2xl flex-col items-center justify-center px-6 py-10 text-center">
