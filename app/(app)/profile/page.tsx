@@ -7,8 +7,12 @@ import { LogoutButton } from "@/components/logout-button";
 import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
 import { PLATFORM_LABELS } from "@/lib/constants";
+import { buildCombinedActivityMap } from "@/lib/algorithms";
+import {
+  getGitHubContributions,
+  hasGitHubActivity,
+} from "@/lib/github-contributions";
 import { getIndex } from "@/lib/github";
-import { computeActivityMap } from "@/lib/algorithms";
 import {
   computeBestStreak,
   computeCurrentStreak,
@@ -23,12 +27,15 @@ export default async function ProfilePage() {
     redirect("/");
   }
 
-  const index = await getIndex(session.accessToken);
+  const login = session.user.login ?? "github";
+  const [index, githubActivity] = await Promise.all([
+    getIndex(session.accessToken),
+    getGitHubContributions(login, session.accessToken),
+  ]);
   const difficulty = computeDifficultyBreakdown(index);
   const platforms = computePlatformBreakdown(index);
-  const activityMap = computeActivityMap(index);
+  const activityByDay = buildCombinedActivityMap(index, githubActivity);
   const streak = computeCurrentStreak(index);
-  const login = session.user.login ?? "github";
 
   return (
     <div className="min-h-screen">
@@ -136,12 +143,18 @@ export default async function ProfilePage() {
             ))}
           </section>
 
-          <section className="surface-card p-container-padding">
-            <h3 className="text-section-title mb-6 text-center text-muted-foreground">
-              Activity
-            </h3>
-            <CombinedHeatmap activityMap={activityMap} />
-          </section>
+          {(index.length > 0 || hasGitHubActivity(githubActivity)) && (
+            <section className="surface-card p-container-padding">
+              <h3 className="text-section-title mb-6 text-center text-muted-foreground">
+                Activity
+              </h3>
+              <CombinedHeatmap
+                activityByDay={activityByDay}
+                username={login}
+                canLinkToVault
+              />
+            </section>
+          )}
         </div>
       </AnimatedMain>
     </div>

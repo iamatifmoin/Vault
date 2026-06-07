@@ -1,4 +1,5 @@
 import type {
+  DayActivity,
   IRSData,
   IRSBreakdown,
   TopicMastery,
@@ -6,6 +7,8 @@ import type {
   WeeklyDigest,
   ProblemIndex,
 } from "@/types";
+import { PUBLIC_PLATFORMS, PLATFORM_LABELS } from "@/lib/constants";
+import type { GitHubContributionsData } from "@/lib/github-contributions";
 import { toDateKey } from "@/lib/stats";
 
 export const CORE_DSA_TOPICS = [
@@ -317,23 +320,131 @@ export function computeWeeklyDigest(
   };
 }
 
-export function computeActivityMap(
+function emptyDayActivity(): DayActivity {
+  return {
+    total: 0,
+    byPlatform: {},
+    entries: [],
+    githubContributionCount: 0,
+    githubContributions: [],
+  };
+}
+
+export function computeDetailedActivityMap(
   problems: ProblemIndex[],
-): Record<string, number> {
+): Record<string, DayActivity> {
   const end = normalizeDate(new Date());
   const start = normalizeDate(new Date(end));
   start.setDate(end.getDate() - 364);
 
-  const counts = problems.reduce<Record<string, number>>((acc, problem) => {
+  const map: Record<string, DayActivity> = {};
+
+  for (const problem of problems) {
     const key = toDateKey(problem.latest_date);
     const date = normalizeDate(new Date(key));
-    if (date >= start && date <= end) {
-      acc[key] = (acc[key] ?? 0) + 1;
+    if (date < start || date > end) {
+      continue;
     }
-    return acc;
-  }, {});
 
-  return counts;
+    if (!map[key]) {
+      map[key] = emptyDayActivity();
+    }
+
+    const day = map[key];
+    day.total += 1;
+    day.byPlatform[problem.platform] =
+      (day.byPlatform[problem.platform] ?? 0) + 1;
+    day.entries.push({
+      id: problem.id,
+      title: problem.title,
+      number: problem.number,
+      platform: problem.platform,
+      filePath: problem.file_path,
+    });
+  }
+
+  for (const day of Object.values(map)) {
+    day.entries.sort((a, b) => a.title.localeCompare(b.title));
+  }
+
+  return map;
+}
+
+export function buildCombinedActivityMap(
+  problems: ProblemIndex[],
+  github?: GitHubContributionsData | null,
+): Record<string, DayActivity> {
+  const map = computeDetailedActivityMap(problems);
+
+  if (!github) {
+    return map;
+  }
+
+  const end = normalizeDate(new Date());
+  const start = normalizeDate(new Date(end));
+  start.setDate(end.getDate() - 364);
+
+  for (const [dateKey, count] of Object.entries(github.calendar)) {
+    if (count <= 0) {
+      continue;
+    }
+
+    const date = normalizeDate(new Date(`${dateKey}T12:00:00`));
+    if (date < start || date > end) {
+      continue;
+    }
+
+    if (!map[dateKey]) {
+      map[dateKey] = emptyDayActivity();
+    }
+
+    const day = map[dateKey];
+    day.githubContributionCount = count;
+    day.githubContributions = github.detailsByDay[dateKey] ?? [];
+    day.total += count;
+  }
+
+  return map;
+}
+
+export function computeActivityMap(
+  problems: ProblemIndex[],
+): Record<string, number> {
+  const detailed = computeDetailedActivityMap(problems);
+  return Object.fromEntries(
+    Object.entries(detailed).map(([date, day]) => [date, day.total]),
+  );
+}
+
+export function formatDayActivitySummary(day: DayActivity): string[] {
+  const lines: string[] = [];
+  const githubCount = day.githubContributionCount;
+  const itemCount = day.entries.length + githubCount;
+
+  if (itemCount <= 3) {
+    for (const entry of day.entries) {
+      lines.push(entry.title);
+    }
+    if (githubCount > 0) {
+      const noun = githubCount === 1 ? "contribution" : "contributions";
+      lines.push(`GitHub (${githubCount} ${noun})`);
+    }
+    return lines;
+  }
+
+  for (const platform of PUBLIC_PLATFORMS) {
+    const count = day.byPlatform[platform];
+    if (count) {
+      lines.push(`${PLATFORM_LABELS[platform]}: ${count}`);
+    }
+  }
+
+  if (githubCount) {
+    const noun = githubCount === 1 ? "contribution" : "contributions";
+    lines.push(`GitHub: ${githubCount} ${noun}`);
+  }
+
+  return lines;
 }
 
 /**

@@ -1,15 +1,26 @@
 "use client";
 
+import { useState } from "react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ActivityDayDialog } from "@/components/activity-day-dialog";
+import { formatDayActivitySummary } from "@/lib/algorithms";
+import { PLATFORM_LABELS } from "@/lib/constants";
 import { toDateKey } from "@/lib/stats";
 import { cn } from "@/lib/utils";
+import type { DayActivity } from "@/types";
+
+function getDayItemCount(day: DayActivity) {
+  return day.entries.length + day.githubContributionCount;
+}
 
 export interface CombinedHeatmapProps {
-  activityMap: Record<string, number>;
+  activityByDay: Record<string, DayActivity>;
+  username?: string;
+  canLinkToVault?: boolean;
   className?: string;
 }
 
@@ -31,6 +42,7 @@ const MONTH_LABELS = [
 const CELL_SIZE = 15;
 const CELL_GAP = 3;
 const CELL_STEP = CELL_SIZE + CELL_GAP;
+const TOOLTIP_DETAIL_THRESHOLD = 3;
 
 function normalizeDate(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -52,18 +64,14 @@ function formatDateLabel(dateKey: string) {
   });
 }
 
-function formatTooltip(count: number, dateKey: string) {
-  const noun = count === 1 ? "problem" : "problems";
-  return `${count} ${noun} — ${formatDateLabel(dateKey)}`;
-}
-
 type HeatmapCell = {
   date: string;
   count: number;
   inRange: boolean;
+  activity: DayActivity | null;
 };
 
-function buildWeekColumns(activityMap: Record<string, number>) {
+function buildWeekColumns(activityByDay: Record<string, DayActivity>) {
   const end = normalizeDate(new Date());
   const rangeStart = normalizeDate(new Date(end));
   rangeStart.setDate(end.getDate() - 364);
@@ -80,11 +88,13 @@ function buildWeekColumns(activityMap: Record<string, number>) {
     for (let row = 0; row < 7; row += 1) {
       const key = toDateKey(cursor);
       const inRange = cursor >= rangeStart && cursor <= end;
+      const activity = inRange ? (activityByDay[key] ?? null) : null;
 
       column.push({
         date: key,
-        count: inRange ? (activityMap[key] ?? 0) : 0,
+        count: activity?.total ?? 0,
         inRange,
+        activity,
       });
 
       cursor.setDate(cursor.getDate() + 1);
@@ -133,7 +143,7 @@ function getMonthLabelPositions(columns: HeatmapCell[][]) {
   return positions;
 }
 
-function computeHeatmapStats(activityMap: Record<string, number>) {
+function computeHeatmapStats(activityByDay: Record<string, DayActivity>) {
   const end = normalizeDate(new Date());
   const start = normalizeDate(new Date(end));
   start.setDate(end.getDate() - 364);
@@ -142,7 +152,7 @@ function computeHeatmapStats(activityMap: Record<string, number>) {
   const cursor = new Date(start);
 
   while (cursor <= end) {
-    days.push(activityMap[toDateKey(cursor)] ?? 0);
+    days.push(activityByDay[toDateKey(cursor)]?.total ?? 0);
     cursor.setDate(cursor.getDate() + 1);
   }
 
@@ -177,14 +187,79 @@ function getTooltipAlign(columnIndex: number, totalColumns: number) {
   return "center";
 }
 
+function HeatmapTooltipContent({
+  cell,
+}: {
+  cell: HeatmapCell;
+}) {
+  if (!cell.activity || cell.count === 0) {
+    return (
+      <span className="text-zinc-400">{formatDateLabel(cell.date)} — no activity</span>
+    );
+  }
+
+  const summaryLines = formatDayActivitySummary(cell.activity);
+  const showClickHint = getDayItemCount(cell.activity) > TOOLTIP_DETAIL_THRESHOLD;
+  const activityLabel =
+    cell.count === 1 ? "activity" : "activities";
+
+  return (
+    <div className="space-y-1.5 text-left">
+      <p className="font-medium text-zinc-100">{formatDateLabel(cell.date)}</p>
+      <p className="text-zinc-400">
+        {cell.count} {activityLabel}
+      </p>
+      {getDayItemCount(cell.activity) <= TOOLTIP_DETAIL_THRESHOLD ? (
+        <ul className="space-y-0.5 text-zinc-300">
+          {cell.activity.entries.map((entry) => (
+            <li key={entry.id}>
+              {entry.title}{" "}
+              <span className="text-zinc-500">
+                ({PLATFORM_LABELS[entry.platform]})
+              </span>
+            </li>
+          ))}
+          {cell.activity.githubContributions.map((item) => (
+            <li key={item.id}>
+              {item.label}{" "}
+              <span className="text-zinc-500">({item.repository})</span>
+            </li>
+          ))}
+          {cell.activity.githubContributionCount > 0 &&
+          cell.activity.githubContributions.length === 0 ? (
+            <li>
+              GitHub ({cell.activity.githubContributionCount}{" "}
+              {cell.activity.githubContributionCount === 1
+                ? "contribution"
+                : "contributions"}
+              )
+            </li>
+          ) : null}
+        </ul>
+      ) : (
+        <ul className="space-y-0.5 text-zinc-300">
+          {summaryLines.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      )}
+      {showClickHint ? (
+        <p className="pt-0.5 text-[10px] text-zinc-500">Click for full details</p>
+      ) : null}
+    </div>
+  );
+}
+
 function HeatmapCellView({
   cell,
   columnIndex,
   totalColumns,
+  onSelect,
 }: {
   cell: HeatmapCell;
   columnIndex: number;
   totalColumns: number;
+  onSelect: (date: string, activity: DayActivity) => void;
 }) {
   if (!cell.inRange) {
     return (
@@ -196,38 +271,64 @@ function HeatmapCellView({
     );
   }
 
+  const isInteractive = cell.count > 0;
+
   return (
     <Tooltip>
       <TooltipTrigger
         delay={0}
+        onClick={() => {
+          if (cell.activity && cell.count > 0) {
+            onSelect(cell.date, cell.activity);
+          }
+        }}
         className={cn(
           "shrink-0 rounded-[3px] transition-colors duration-150 hover:ring-1 hover:ring-inset hover:ring-emerald-500/50",
           cellColor(cell.count),
+          isInteractive && "cursor-pointer",
         )}
         style={{ width: CELL_SIZE, height: CELL_SIZE }}
-        aria-label={formatTooltip(cell.count, cell.date)}
+        aria-label={
+          cell.count > 0
+            ? `${cell.count} activities on ${formatDateLabel(cell.date)}`
+            : `No activity on ${formatDateLabel(cell.date)}`
+        }
       />
       <TooltipContent
         side="top"
         align={getTooltipAlign(columnIndex, totalColumns)}
         collisionPadding={16}
         showArrow={false}
-        className="border border-zinc-700 bg-zinc-900 font-mono text-[11px] text-zinc-200"
+        className="max-w-[220px] border border-zinc-700 bg-zinc-900 px-3 py-2 font-mono text-[11px] text-zinc-200"
       >
-        {formatTooltip(cell.count, cell.date)}
+        <HeatmapTooltipContent cell={cell} />
       </TooltipContent>
     </Tooltip>
   );
 }
 
 export function CombinedHeatmap({
-  activityMap,
+  activityByDay,
+  username,
+  canLinkToVault = false,
   className,
 }: CombinedHeatmapProps) {
-  const columns = buildWeekColumns(activityMap);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedActivity, setSelectedActivity] = useState<DayActivity | null>(
+    null,
+  );
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const columns = buildWeekColumns(activityByDay);
   const monthLabels = getMonthLabelPositions(columns);
-  const stats = computeHeatmapStats(activityMap);
+  const stats = computeHeatmapStats(activityByDay);
   const gridWidth = columns.length * CELL_STEP - CELL_GAP;
+
+  function handleSelect(date: string, activity: DayActivity) {
+    setSelectedDate(date);
+    setSelectedActivity(activity);
+    setDialogOpen(true);
+  }
 
   return (
     <div className={cn("w-full min-w-0", className)}>
@@ -262,6 +363,7 @@ export function CombinedHeatmap({
                       cell={cell}
                       columnIndex={columnIndex}
                       totalColumns={columns.length}
+                      onSelect={handleSelect}
                     />
                   ))}
                 </div>
@@ -275,7 +377,7 @@ export function CombinedHeatmap({
         <span>
           365-day total:{" "}
           <span className="tabular-nums text-zinc-200">{stats.total}</span>{" "}
-          problems
+          activities
         </span>
         <span className="hidden text-zinc-700 sm:inline" aria-hidden>
           |
@@ -298,6 +400,15 @@ export function CombinedHeatmap({
           days
         </span>
       </div>
+
+      <ActivityDayDialog
+        date={selectedDate}
+        activity={selectedActivity}
+        username={username}
+        canLinkToVault={canLinkToVault}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </div>
   );
 }

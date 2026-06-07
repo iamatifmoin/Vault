@@ -5,6 +5,7 @@ import { ProfileOwnerEmpty } from "@/components/profile/profile-owner-empty";
 import { computeIRS } from "@/lib/algorithms";
 import { auth } from "@/lib/auth";
 import { getIndex, getPublicIndex } from "@/lib/github";
+import { getGitHubContributions } from "@/lib/github-contributions";
 import { SHARE_BASE_URL } from "@/lib/share-cards";
 import type { ProblemIndex } from "@/types";
 
@@ -66,11 +67,19 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
     session?.user?.login?.toLowerCase() === username.toLowerCase();
 
   let index: ProblemIndex[] | null;
+  let githubActivity: Awaited<ReturnType<typeof getGitHubContributions>> | null =
+    null;
 
   if (isOwner && session?.accessToken) {
-    index = await getIndex(session.accessToken);
+    [index, githubActivity] = await Promise.all([
+      getIndex(session.accessToken),
+      getGitHubContributions(username, session.accessToken),
+    ]);
   } else {
-    index = await getPublicIndex(username);
+    [index, githubActivity] = await Promise.all([
+      getPublicIndex(username),
+      getGitHubContributions(username),
+    ]);
   }
 
   if (index === null && !isOwner) {
@@ -87,6 +96,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
       username={username}
       session={session}
       isOwner={isOwner}
+      githubActivity={githubActivity}
     />
   );
 }

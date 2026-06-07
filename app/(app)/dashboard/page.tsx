@@ -14,7 +14,11 @@ import {
   DIFFICULTY_LABELS,
   PLATFORM_LABELS,
 } from "@/lib/constants";
-import { computeActivityMap } from "@/lib/algorithms";
+import { buildCombinedActivityMap } from "@/lib/algorithms";
+import {
+  getGitHubContributions,
+  hasGitHubActivity,
+} from "@/lib/github-contributions";
 import { getIndex } from "@/lib/github";
 import {
   computeDashboardStats,
@@ -40,12 +44,15 @@ export default async function DashboardPage() {
     redirect("/");
   }
 
-  const index = await getIndex(session.accessToken);
+  const username = session.user?.login ?? "user";
+  const [index, githubActivity] = await Promise.all([
+    getIndex(session.accessToken),
+    getGitHubContributions(username, session.accessToken),
+  ]);
   const stats = computeDashboardStats(index);
   const recent = getRecentProblems(index, 6);
   const streak = computeCurrentStreak(index);
-  const activityMap = computeActivityMap(index);
-  const username = session.user?.login ?? "user";
+  const activityByDay = buildCombinedActivityMap(index, githubActivity);
   const cardData = buildShareableCardData(index, {
     username,
     avatarUrl: session.user?.image ?? "",
@@ -79,12 +86,16 @@ export default async function DashboardPage() {
           />
         </div>
 
-        {index.length > 0 ? (
+        {index.length > 0 || hasGitHubActivity(githubActivity) ? (
           <section className="surface-card mt-6 p-container-padding">
             <h2 className="text-section-title mb-6 text-center text-muted-foreground">
               Activity
             </h2>
-            <CombinedHeatmap activityMap={activityMap} />
+            <CombinedHeatmap
+              activityByDay={activityByDay}
+              username={username}
+              canLinkToVault
+            />
           </section>
         ) : null}
 

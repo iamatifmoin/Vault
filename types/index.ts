@@ -253,3 +253,36 @@ export interface WeeklyDigest {
   onTrack: boolean;
   message: string;
 }
+
+// ─── Activity Heatmap ─────────────────────────────────────────────────────────
+export interface ActivityEntry {
+  id: string;
+  title: string;
+  number: string;
+  platform: Platform;
+  filePath: string;
+}
+
+export type GitHubContributionKind =
+  | "commit"
+  | "pull_request"
+  | "issue"
+  | "review";
+
+export interface GitHubContributionActivity {
+  id: string;
+  kind: GitHubContributionKind;
+  label: string;
+  repository: string;
+  repositoryUrl: string;
+  count: number;
+  url?: string;
+}
+
+export interface DayActivity {
+  total: number;
+  byPlatform: Partial<Record<Platform, number>>;
+  entries: ActivityEntry[];
+  githubContributionCount: number;
+  githubContributions: GitHubContributionActivity[];
+}

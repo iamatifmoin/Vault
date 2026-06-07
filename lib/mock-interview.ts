@@ -62,27 +62,7 @@ export function getTimerColor(remainingSeconds: number): string {
   return "text-white";
 }
 
-export function buildPlatformProblemUrl(
-  platform: Platform,
-  number: string,
-  title: string,
-): string {
-  const titleSlug = slugifyTitle(title);
-
-  if (platform === "leetcode") {
-    return `https://leetcode.com/problems/${titleSlug}/`;
-  }
-
-  if (platform === "codeforces") {
-    const match = number.match(/^(\d+)([A-Za-z]\d*)$/);
-    if (match) {
-      return `https://codeforces.com/problemset/problem/${match[1]}/${match[2]}`;
-    }
-    return "https://codeforces.com/problemset";
-  }
-
-  return `https://www.codechef.com/problems/${number.toUpperCase()}`;
-}
+export { buildPlatformProblemUrl } from "@/lib/problem-urls";
 
 export function getBoilerplate(platform: Platform, language: Language): string {
   return platform === "leetcode"

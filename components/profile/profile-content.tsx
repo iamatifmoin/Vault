@@ -1,10 +1,14 @@
 import type { Session } from "next-auth";
 import Link from "next/link";
 import {
-  computeActivityMap,
+  buildCombinedActivityMap,
   computeIRS,
   computeTopicMastery,
 } from "@/lib/algorithms";
+import {
+  hasGitHubActivity,
+  type GitHubContributionsData,
+} from "@/lib/github-contributions";
 import { PUBLIC_PLATFORMS } from "@/lib/constants";
 import {
   computeBestStreak,
@@ -31,6 +35,7 @@ interface ProfileContentProps {
   username: string;
   session: Session | null;
   isOwner: boolean;
+  githubActivity?: GitHubContributionsData | null;
 }
 
 export function ProfileContent({
@@ -38,10 +43,11 @@ export function ProfileContent({
   username,
   session,
   isOwner,
+  githubActivity = null,
 }: ProfileContentProps) {
   const stats = computeDashboardStats(index);
   const platformBreakdown = computePlatformBreakdown(index);
-  const activityMap = computeActivityMap(index);
+  const activityByDay = buildCombinedActivityMap(index, githubActivity);
   const masteryData = computeTopicMastery(index);
   const recent = getRecentProblems(index, 8);
   const irsData = computeIRS(index);
@@ -130,12 +136,16 @@ export function ProfileContent({
           </div>
         </div>
 
-        {index.length > 0 ? (
+        {index.length > 0 || hasGitHubActivity(githubActivity) ? (
           <section className="surface-card mt-6 p-container-padding">
             <h2 className="text-section-title mb-6 text-center text-muted-foreground">
               Activity
             </h2>
-            <CombinedHeatmap activityMap={activityMap} />
+            <CombinedHeatmap
+              activityByDay={activityByDay}
+              username={username}
+              canLinkToVault={isOwner}
+            />
           </section>
         ) : null}
 
