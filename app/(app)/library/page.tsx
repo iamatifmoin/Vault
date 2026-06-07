@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { LibraryPageClient } from "@/components/library-page-client";
 import { auth } from "@/lib/auth";
@@ -13,5 +14,9 @@ export default async function LibraryPage() {
 
   const index = await getIndex(session.accessToken);
 
-  return <LibraryPageClient initialIndex={index} streak={computeCurrentStreak(index)} />;
+  return (
+    <Suspense fallback={null}>
+      <LibraryPageClient initialIndex={index} streak={computeCurrentStreak(index)} />
+    </Suspense>
+  );
 }

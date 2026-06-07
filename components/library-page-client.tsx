@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
 import { AnimatedMain } from "@/components/animated-main";
@@ -72,6 +73,7 @@ function FilterSelect({
 
 function clearFilters(setters: {
   setSearch: (v: string) => void;
+  setTopicFilter: (v: string[]) => void;
   setPlatform: (v: string) => void;
   setSheet: (v: string) => void;
   setDifficulty: (v: string) => void;
@@ -79,6 +81,7 @@ function clearFilters(setters: {
   setLanguage: (v: string) => void;
 }) {
   setters.setSearch("");
+  setters.setTopicFilter([]);
   setters.setPlatform("all");
   setters.setSheet("all");
   setters.setDifficulty("all");
@@ -93,7 +96,12 @@ export function LibraryPageClient({
   initialIndex: ProblemIndex[];
   streak: number;
 }) {
+  const searchParams = useSearchParams();
+  const initialTopics =
+    searchParams.get("topics")?.split(",").filter(Boolean) ?? [];
+
   const [search, setSearch] = useState("");
+  const [topicFilter, setTopicFilter] = useState<string[]>(initialTopics);
   const [platform, setPlatform] = useState("all");
   const [sheet, setSheet] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
@@ -103,6 +111,7 @@ export function LibraryPageClient({
 
   const hasActiveFilters =
     search !== "" ||
+    topicFilter.length > 0 ||
     platform !== "all" ||
     sheet !== "all" ||
     difficulty !== "all" ||
@@ -114,6 +123,9 @@ export function LibraryPageClient({
       !search ||
       problem.title.toLowerCase().includes(search.toLowerCase()) ||
       problem.topics.some((topic) => topic.toLowerCase().includes(search.toLowerCase()));
+    const matchesTopics =
+      topicFilter.length === 0 ||
+      topicFilter.some((topic) => problem.topics.includes(topic));
     const matchesPlatform = platform === "all" || problem.platform === platform;
     const matchesSheet =
       sheet === "all" || problem.sheets.includes(sheet as ProblemIndex["sheets"][number]);
@@ -125,6 +137,7 @@ export function LibraryPageClient({
 
     return (
       matchesSearch &&
+      matchesTopics &&
       matchesPlatform &&
       matchesSheet &&
       matchesDifficulty &&
@@ -135,6 +148,7 @@ export function LibraryPageClient({
 
   const filterSetters = {
     setSearch,
+    setTopicFilter,
     setPlatform,
     setSheet,
     setDifficulty,
@@ -186,6 +200,34 @@ export function LibraryPageClient({
               </button>
             ) : null}
           </div>
+
+          {topicFilter.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-micro-label normal-case tracking-normal">
+                Topics:
+              </span>
+              {topicFilter.map((topic) => (
+                <button
+                  key={topic}
+                  type="button"
+                  onClick={() =>
+                    setTopicFilter((current) => current.filter((entry) => entry !== topic))
+                  }
+                  className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {topic}
+                  <X className="h-3 w-3" />
+                </button>
+              ))}
+              <button
+                type="button"
+                className="text-micro-label normal-case tracking-normal hover:text-foreground"
+                onClick={() => setTopicFilter([])}
+              >
+                Clear topics
+              </button>
+            </div>
+          ) : null}
 
           <button
             type="button"
