@@ -1,73 +1,76 @@
-import Link from "next/link";
-import { ArrowUpRight, GitCommitHorizontal } from "lucide-react";
-import { APPROACH_BADGE_TONES, DIFFICULTY_BADGE_TONES, DIFFICULTY_LABELS, PLATFORM_LABELS } from "@/lib/constants";
-import { SHEETS } from "@/lib/sheets";
-import { cn } from "@/lib/utils";
-import type { ProblemIndex } from "@/types";
+"use client";
 
-export function ProblemCard({ problem }: { problem: ProblemIndex }) {
-  const sheet = problem.sheets[0];
-  const latestApproach =
-    problem.latest_approach && APPROACH_BADGE_TONES[problem.latest_approach];
+import { motion } from "framer-motion";
+import { ApproachBadge } from "@/components/approach-badge";
+import { DifficultyBadge } from "@/components/difficulty-badge";
+import { PlatformBadge } from "@/components/platform-badge";
+import { DIFFICULTY_LABELS } from "@/lib/constants";
+import { listItem } from "@/lib/motion";
+import { cn } from "@/lib/utils";
+import type { ApproachType, Difficulty, Platform, ProblemIndex } from "@/types";
+
+const APPROACH_ACCENT: Record<ApproachType, string> = {
+  Optimal: "bg-emerald-500",
+  Optimized: "bg-yellow-400",
+  "Brute Force": "bg-red-500",
+};
+
+type DifficultyLabel = "Easy" | "Medium" | "Hard";
+
+interface ProblemCardProps {
+  problem: ProblemIndex;
+  onClick: () => void;
+}
+
+export function ProblemCard({ problem, onClick }: ProblemCardProps) {
+  const formattedDate = new Date(problem.latest_date).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  const difficultyLabel = DIFFICULTY_LABELS[problem.difficulty] as DifficultyLabel;
 
   return (
-    <Link
-      href={`/library/${problem.id}`}
-      className="group surface-card-interactive flex flex-col gap-stack-md p-4 hover:shadow-subtle"
+    <motion.div
+      variants={listItem}
+      onClick={onClick}
+      className="group relative flex cursor-pointer items-center gap-0 overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/60 transition-all duration-150 hover:border-zinc-700 hover:bg-zinc-900"
     >
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-2">
-          <span
-            className={cn(
-              "rounded-full border px-1.5 py-0.5 font-mono text-[11px] uppercase",
-              DIFFICULTY_BADGE_TONES[problem.difficulty],
-            )}
-          >
-            {DIFFICULTY_LABELS[problem.difficulty]}
+      <div
+        className={cn(
+          "absolute inset-y-0 left-0 w-[3px] flex-shrink-0 transition-opacity",
+          problem.latest_approach
+            ? APPROACH_ACCENT[problem.latest_approach]
+            : "bg-zinc-700",
+        )}
+      />
+
+      <div className="min-w-0 flex-1 px-4 py-3 pl-5">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="flex-shrink-0 font-mono text-[11px] text-zinc-600">
+            {problem.number.padStart(4, "0")}
           </span>
-          <span className="font-mono text-[11px] text-muted-foreground">
-            {sheet ? SHEETS[sheet].label : PLATFORM_LABELS[problem.platform]}
+          <span className="truncate text-sm font-medium text-zinc-200 transition-colors group-hover:text-white">
+            {problem.title}
           </span>
+          <DifficultyBadge difficulty={difficultyLabel} />
         </div>
-        <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-foreground" />
-      </div>
 
-      <div>
-        <h3 className="text-card-title">{problem.title}</h3>
-      </div>
-
-      <div className="mt-auto flex flex-wrap gap-2">
-        {problem.topics.slice(0, 3).map((topic) => (
-          <span
-            key={topic}
-            className="rounded-full border border-border px-2 py-0.5 font-mono text-[11px] uppercase text-muted-foreground"
-          >
-            {topic}
-          </span>
-        ))}
-      </div>
-
-      <div className="mt-2 flex items-center justify-between border-t border-border pt-2">
-        <div className="flex items-center gap-2">
-          {latestApproach ? (
-            <span
-              className={cn(
-                "rounded-full border px-2 py-0.5 font-mono text-[11px]",
-                latestApproach.className,
-              )}
-            >
-              {latestApproach.label}
-            </span>
+        <div className="mt-1.5 flex flex-wrap items-center gap-2">
+          <PlatformBadge platform={problem.platform as Platform} />
+          {problem.latest_approach ? (
+            <ApproachBadge
+              approach={problem.latest_approach}
+              unverified={!problem.approach_verified}
+            />
           ) : null}
-          <span className="rounded-md bg-vault-raised px-1.5 py-0.5 font-mono text-[11px] text-foreground">
-            {problem.latest_language.toUpperCase()}
-          </span>
-        </div>
-        <div className="flex items-center gap-1 font-mono text-[11px] text-muted-foreground">
-          <GitCommitHorizontal className="h-3.5 w-3.5" />
-          <span>{problem.attempt_count}</span>
+          {problem.attempt_count > 1 ? (
+            <span className="text-[11px] text-zinc-600">{problem.attempt_count} attempts</span>
+          ) : null}
+          <span className="ml-auto text-[11px] text-zinc-600">{formattedDate}</span>
         </div>
       </div>
-    </Link>
+    </motion.div>
   );
 }
