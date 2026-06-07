@@ -1,0 +1,20 @@
+.popup {
+  width: 280px;
+  padding: 16px;
+  background: #09090b;
+  color: #ffffff;
+  font-family: system-ui, sans-serif;
+}
+
+.popup__title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #22c55e;
+}
+
+.popup__status {
+  margin: 0;
+  font-size: 13px;
+  color: #a1a1aa;
+}

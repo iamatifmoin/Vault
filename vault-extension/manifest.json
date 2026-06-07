@@ -1,0 +1,61 @@
+{
+  "manifest_version": 3,
+  "name": "Vault",
+  "version": "1.0.0",
+  "description": "Automatically capture your DSA solutions to Vault",
+  "permissions": ["storage", "tabs", "notifications", "activeTab", "scripting"],
+  "host_permissions": [
+    "https://leetcode.com/*",
+    "https://codeforces.com/*",
+    "https://www.codechef.com/*",
+    "https://practice.geeksforgeeks.org/*",
+    "https://www.geeksforgeeks.org/*",
+    "https://api.github.com/*"
+  ],
+  "background": {
+    "service_worker": "dist/background/index.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://leetcode.com/problems/*"],
+      "js": ["dist/content/leetcode.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://codeforces.com/problemset/problem/*/*",
+        "https://codeforces.com/contest/*/problem/*"
+      ],
+      "js": ["dist/content/codeforces.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.codechef.com/problems/*"],
+      "js": ["dist/content/codechef.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://practice.geeksforgeeks.org/problems/*",
+        "https://www.geeksforgeeks.org/problems/*"
+      ],
+      "js": ["dist/content/gfg.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/index.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["notification/notification.html"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
