@@ -171,6 +171,22 @@
   .animate-pulse-dot {
     animation: pulse-dot 2s ease-in-out infinite;
   }
+
+  .onboarding-range {
+    @apply h-2 cursor-pointer appearance-none rounded-full bg-zinc-900;
+  }
+
+  .onboarding-range::-webkit-slider-thumb {
+    @apply h-4 w-4 appearance-none rounded-full bg-emerald-500;
+  }
+
+  .onboarding-range::-moz-range-thumb {
+    @apply h-4 w-4 rounded-full border-0 bg-emerald-500;
+  }
+
+  .onboarding-range::-moz-range-track {
+    @apply h-2 rounded-full bg-zinc-900;
+  }
 }
 
 @keyframes page-enter {

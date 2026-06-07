@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { OnboardingGuard } from "@/components/onboarding-guard";
 import { Sidebar } from "@/components/sidebar";
+import { auth } from "@/lib/auth";
 
 export default async function AppLayout({
   children,
@@ -14,9 +15,11 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="vault-app-bg text-foreground">
-      <Sidebar />
-      <div className="pb-20 md:pl-[220px] md:pb-0">{children}</div>
-    </div>
+    <OnboardingGuard>
+      <div className="vault-app-bg text-foreground">
+        <Sidebar />
+        <div className="pb-20 md:pl-[220px] md:pb-0">{children}</div>
+      </div>
+    </OnboardingGuard>
   );
 }
