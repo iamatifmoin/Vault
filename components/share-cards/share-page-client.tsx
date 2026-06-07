@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { Check, Copy, Download, Loader2, Share2 } from "lucide-react";
+import { Check, Copy, Share2 } from "lucide-react";
 import { ShareableMilestone } from "@/components/share-cards/shareable-milestone";
 import { ShareableReadiness } from "@/components/share-cards/shareable-readiness";
 import { ShareableYearReview } from "@/components/share-cards/shareable-year-review";

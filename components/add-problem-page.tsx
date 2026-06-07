@@ -16,17 +16,11 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VaultSelect } from "@/components/vault-select";
 import { cn } from "@/lib/utils";
+import { PLATFORM_LABELS, PUBLIC_PLATFORMS } from "@/lib/constants";
 import { SHEETS } from "@/lib/sheets";
 import type { AIAnalysis, FetchedProblem, Language, Platform, ProblemIndex, Sheet } from "@/types";
 
-const platforms: Platform[] = ["leetcode", "codeforces", "codechef"];
 const languages: Language[] = ["cpp", "python", "java"];
-
-const platformLabels: Record<Platform, string> = {
-  leetcode: "LeetCode",
-  codeforces: "Codeforces",
-  codechef: "CodeChef",
-};
 
 type Section = "problem" | "code" | "analysis";
 
@@ -233,7 +227,7 @@ export function AddProblemPage({ streak }: { streak: number }) {
                 <div>
                   <label className="text-micro-label">Platform</label>
                   <div className="mt-2 flex rounded-md border border-border bg-background p-1">
-                    {platforms.map((item) => (
+                    {PUBLIC_PLATFORMS.map((item) => (
                       <button
                         key={item}
                         type="button"
@@ -245,7 +239,7 @@ export function AddProblemPage({ streak }: { streak: number }) {
                         )}
                         onClick={() => setPlatform(item)}
                       >
-                        {platformLabels[item]}
+                        {PLATFORM_LABELS[item]}
                       </button>
                     ))}
                   </div>

@@ -67,7 +67,6 @@ export function buildShareableCardData(
   targetTier: CompanyTierTarget = "FAANG",
 ): ShareableCardData {
   const irs = computeIRS(problems, targetTier);
-  const year = new Date().getFullYear();
 
   return {
     type: "year-review",
@@ -152,7 +151,7 @@ export async function downloadElementAsPng(
     scale: 2,
     useCORS: true,
     logging: false,
-  });
+  } as Parameters<typeof html2canvas>[1] & { scale: number });
 
   const link = document.createElement("a");
   link.download = filename;

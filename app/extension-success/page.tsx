@@ -53,7 +53,7 @@ export default function ExtensionSuccessPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let closeTimer: ReturnType<typeof setTimeout> | undefined;
+    let closeTimer: number | undefined;
 
     async function completeAuth() {
       try {

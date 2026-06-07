@@ -20,7 +20,7 @@ const BREAKDOWN_ROWS: {
 ];
 
 interface IRSWidgetProps {
-  problems: any[];
+  problems: ProblemIndex[];
   targetTier?: "FAANG" | "Indian Unicorn" | "Service";
   username?: string;
 }

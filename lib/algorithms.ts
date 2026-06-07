@@ -230,7 +230,10 @@ export function computeRevisionQueue(problems: ProblemIndex[]): RevisionItem[] {
     .filter((item) => item.days >= 7)
     .sort((a, b) => b.priorityScore - a.priorityScore)
     .slice(0, 20)
-    .map(({ days: _, ...item }) => item);
+    .map(({ days, ...item }) => {
+      void days;
+      return item;
+    });
 }
 
 export function computeWeeklyDigest(

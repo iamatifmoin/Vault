@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import type { Difficulty, Platform, ProblemIndex } from "@/types";
 
 interface RevisionQueueProps {
-  problems: any[];
+  problems: ProblemIndex[];
 }
 
 const APPROACH_BADGE_CLASSES: Record<string, string> = {
