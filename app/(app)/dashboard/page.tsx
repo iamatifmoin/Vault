@@ -4,6 +4,7 @@ import { BookOpen, CalendarDays, Flame, Zap } from "lucide-react";
 import { AnimatedMain } from "@/components/animated-main";
 import { EmptyState } from "@/components/empty-state";
 import { IRSWidget } from "@/components/irs-widget";
+import { RevisionQueue } from "@/components/revision-queue";
 import { MiniActivityStrip } from "@/components/mini-activity-strip";
 import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
@@ -63,6 +64,8 @@ export default async function DashboardPage() {
           problems={index}
           username={session.user?.login}
         />
+
+        <RevisionQueue problems={index} />
 
         <div className="stagger-children mt-6 grid gap-gutter md:grid-cols-4">
           {statConfig.map(({ label, key, icon: Icon, suffix }) => {
