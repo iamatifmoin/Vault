@@ -6,6 +6,7 @@ import {
   BookOpen,
   Building2,
   LayoutDashboard,
+  Map,
   PlusSquare,
   UserRound,
 } from "lucide-react";
@@ -32,6 +33,11 @@ const navigation = [
     href: "/companies",
     label: "Companies",
     icon: Building2,
+  },
+  {
+    href: "/study-plan",
+    label: "Study Plan",
+    icon: Map,
   },
   {
     href: "/profile",
@@ -75,7 +81,7 @@ export function Sidebar() {
       </nav>
 
       <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-vault-bg/95 backdrop-blur md:hidden">
-        <div className="grid grid-cols-5">
+        <div className="grid grid-cols-6">
           {navigation.map((item) => {
             const active = pathname.startsWith(item.href);
             const Icon = item.icon;

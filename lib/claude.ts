@@ -1,6 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { ANALYSIS_SYSTEM_PROMPT } from "@/lib/constants";
-import type { AIAnalysis, FetchedProblem, Language, Platform } from "@/types";
+import type {
+  AIAnalysis,
+  CompanyTierTarget,
+  FetchedProblem,
+  Language,
+  Platform,
+  StudyPlanWeek,
+} from "@/types";
 
 function numberCodeLines(code: string) {
   return code
@@ -129,4 +136,119 @@ export async function analyzeSolution(input: {
 
 export function getHintLevel(analysis: AIAnalysis, level: 1 | 2 | 3 | 4 | 5) {
   return analysis.hints[`level_${level}` as keyof AIAnalysis["hints"]];
+}
+
+function parsePlanResponse(raw: string) {
+  try {
+    return JSON.parse(raw) as { weeks: StudyPlanWeek[] };
+  } catch {
+    const firstBrace = raw.indexOf("{");
+    const lastBrace = raw.lastIndexOf("}");
+
+    if (firstBrace !== -1 && lastBrace !== -1) {
+      return JSON.parse(raw.slice(firstBrace, lastBrace + 1)) as {
+        weeks: StudyPlanWeek[];
+      };
+    }
+
+    throw new Error("Claude did not return valid JSON.");
+  }
+}
+
+function buildStudyPlanPrompt(input: {
+  targetTier: CompanyTierTarget;
+  targetCompanies: string[];
+  dailyHours: number;
+  placementDate: string;
+  sheetFollowed: string;
+  weakTopics: string[];
+  problemsSolvedCount: number;
+}) {
+  const today = new Date().toISOString().slice(0, 10);
+
+  return `Generate a week-by-week DSA study plan for an Indian CS student.
+
+Student profile:
+- Target tier: ${input.targetTier}
+- Target companies: ${input.targetCompanies.join(", ") || "Not specified"}
+- Daily study hours: ${input.dailyHours}
+- Placement date: ${input.placementDate}
+- Sheet followed: ${input.sheetFollowed}
+- Weak topics (prioritize these): ${input.weakTopics.join(", ") || "None identified yet"}
+- Problems already solved: ${input.problemsSolvedCount}
+- Today: ${today}
+
+Calculate the number of weeks from today (${today}) to placement date (${input.placementDate}). Cap at 20 weeks maximum.
+Weight focusTopics toward weak topics and toward topics critical for the target companies/tier.
+Adjust targetProblems per week based on dailyHours (roughly dailyHours * 5 to dailyHours * 7 problems per week).
+
+Return ONLY valid JSON — no markdown, no explanation.
+
+JSON shape:
+{
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "startDate": "YYYY-MM-DD",
+      "endDate": "YYYY-MM-DD",
+      "focusTopics": ["Arrays", "Strings"],
+      "targetProblems": 12,
+      "completedProblems": 0,
+      "notes": "Start with NeetCode 150 Array problems. Focus on two-pointer patterns."
+    }
+  ]
+}`;
+}
+
+export async function generateStudyPlan(input: {
+  targetTier: CompanyTierTarget;
+  targetCompanies: string[];
+  dailyHours: number;
+  placementDate: string;
+  sheetFollowed: string;
+  weakTopics: string[];
+  problemsSolvedCount: number;
+}) {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    throw new Error("ANTHROPIC_API_KEY is not configured.");
+  }
+
+  const client = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY,
+  });
+
+  const response = await client.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 2000,
+    messages: [
+      {
+        role: "user",
+        content: buildStudyPlanPrompt(input),
+      },
+    ],
+  });
+
+  const text = response.content
+    .filter((block): block is Anthropic.TextBlock => block.type === "text")
+    .map((block) => block.text)
+    .join("\n")
+    .trim();
+
+  const parsed = parsePlanResponse(text);
+
+  if (!Array.isArray(parsed.weeks) || parsed.weeks.length === 0) {
+    throw new Error("Claude returned an invalid study plan.");
+  }
+
+  return {
+    weeks: parsed.weeks.map((week) => ({
+      weekNumber: week.weekNumber,
+      startDate: week.startDate,
+      endDate: week.endDate,
+      focusTopics: week.focusTopics ?? [],
+      targetProblems: week.targetProblems,
+      completedProblems: week.completedProblems ?? 0,
+      notes: week.notes ?? "",
+    })),
+  };
 }
