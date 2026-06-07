@@ -1,8 +1,16 @@
+import * as esbuild from "esbuild";
 import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { defineConfig, type Plugin } from "vite";
 import { crx } from "@crxjs/vite-plugin";
 import manifest from "./manifest.json";
+
+const CONTENT_SCRIPT_PLATFORMS = [
+  "leetcode",
+  "codeforces",
+  "codechef",
+  "gfg",
+] as const;
 
 /** crxjs bundles from source paths; root manifest.json keeps dist paths for reference */
 const crxManifest = {
@@ -48,8 +56,32 @@ const crxManifest = {
 function entryFileName(chunkInfo: { name?: string }): string {
   const name = chunkInfo.name ?? "";
   if (name === "background") return "background/index.js";
-  if (name.startsWith("content/")) return `${name}.js`;
   return "assets/[name]-[hash].js";
+}
+
+/** Self-contained IIFE bundles — content scripts cannot use bare ESM imports. */
+function bundleContentScriptsIife(): Plugin {
+  return {
+    name: "bundle-content-scripts-iife",
+    async closeBundle() {
+      const distDir = resolve(__dirname, "dist");
+      mkdirSync(resolve(distDir, "content"), { recursive: true });
+
+      await Promise.all(
+        CONTENT_SCRIPT_PLATFORMS.map((platform) =>
+          esbuild.build({
+            entryPoints: [resolve(__dirname, `src/content/${platform}.ts`)],
+            outfile: resolve(distDir, `content/${platform}.js`),
+            bundle: true,
+            format: "iife",
+            platform: "browser",
+            target: "chrome100",
+            minify: true,
+          }),
+        ),
+      );
+    },
+  };
 }
 
 /** Rewrite manifest + relocate HTML for Load Unpacked from dist/ */
@@ -71,13 +103,10 @@ function normalizeDistManifest(): Plugin {
 
       builtManifest.content_scripts = (
         builtManifest.content_scripts as Array<Record<string, unknown>>
-      ).map((script, index) => {
-        const platforms = ["leetcode", "codeforces", "codechef", "gfg"] as const;
-        return {
-          ...script,
-          js: [`content/${platforms[index]}.js`],
-        };
-      });
+      ).map((script, index) => ({
+        ...script,
+        js: [`content/${CONTENT_SCRIPT_PLATFORMS[index]}.js`],
+      }));
 
       builtManifest.action = {
         ...(builtManifest.action as Record<string, unknown>),
@@ -115,17 +144,13 @@ function normalizeDistManifest(): Plugin {
 
 export default defineConfig({
   base: "./",
-  plugins: [crx({ manifest: crxManifest }), normalizeDistManifest()],
+  plugins: [normalizeDistManifest(), bundleContentScriptsIife(), crx({ manifest: crxManifest })],
   build: {
     outDir: "dist",
     emptyOutDir: true,
     rollupOptions: {
       input: {
         background: "src/background/index.ts",
-        "content/leetcode": "src/content/leetcode.ts",
-        "content/codeforces": "src/content/codeforces.ts",
-        "content/codechef": "src/content/codechef.ts",
-        "content/gfg": "src/content/gfg.ts",
         popup: "src/popup/index.html",
         notification: "src/notification/notification.html",
       },
