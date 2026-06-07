@@ -1,6 +1,7 @@
+import { classifyApproach } from "../shared/algorithms";
 import { getAuthState, setAuthState } from "../shared/auth";
 import { getAuthenticatedUser, saveProblemToGitHub } from "../shared/github";
-import type { CapturedProblem, ExtensionAuthState } from "../shared/types";
+import type { ApproachType, CapturedProblem, ExtensionAuthState } from "../shared/types";
 
 console.log("Vault: background service worker started");
 
@@ -29,9 +30,24 @@ function showChromeNotification(title: string, message: string): void {
   });
 }
 
-async function showInPageNotification(tabId: number, message: string): Promise<void> {
+interface InPageNotificationData {
+  title: string;
+  titleSlug: string;
+  approach: ApproachType;
+}
+
+async function showInPageNotification(
+  tabId: number,
+  data: InPageNotificationData,
+): Promise<void> {
+  const params = new URLSearchParams({
+    title: data.title,
+    titleSlug: data.titleSlug,
+    approach: data.approach,
+  });
+
   const notificationUrl = chrome.runtime.getURL(
-    `notification/notification.html?message=${encodeURIComponent(message)}`,
+    `notification/notification.html?${params.toString()}`,
   );
 
   await chrome.scripting.executeScript({
@@ -45,30 +61,37 @@ async function showInPageNotification(tabId: number, message: string): Promise<v
       iframe.src = url;
       iframe.style.cssText = [
         "position: fixed",
-        "top: 16px",
-        "right: 16px",
-        "width: 320px",
-        "height: 64px",
+        "bottom: 24px",
+        "right: 24px",
+        "width: 280px",
+        "height: 150px",
         "border: none",
         "z-index: 2147483647",
         "background: transparent",
-        "pointer-events: none",
+        "pointer-events: auto",
+        "overflow: hidden",
       ].join(";");
 
       document.body.appendChild(iframe);
-      window.setTimeout(() => iframe.remove(), 4000);
+
+      const removeFrame = () => {
+        iframe.remove();
+        window.removeEventListener("message", onDismiss);
+      };
+
+      const onDismiss = (event: MessageEvent) => {
+        if (event.data?.type === "VAULT_NOTIFICATION_DISMISS") {
+          removeFrame();
+        }
+      };
+
+      window.addEventListener("message", onDismiss);
+      iframe.onload = () => {
+        window.setTimeout(removeFrame, 4300);
+      };
     },
     args: [notificationUrl],
   });
-
-  try {
-    await chrome.tabs.sendMessage(tabId, {
-      type: "VAULT_NOTIFICATION",
-      data: { message },
-    });
-  } catch {
-    // Content scripts are not required to handle this message.
-  }
 }
 
 function captureKey(problem: CapturedProblem): string {
@@ -125,7 +148,11 @@ async function handleCapture(
 
     console.log("Vault:", result.message);
     if (tabId !== undefined) {
-      await showInPageNotification(tabId, result.message);
+      await showInPageNotification(tabId, {
+        title: problem.title,
+        titleSlug: problem.titleSlug,
+        approach: classifyApproach(problem.code, problem.language),
+      });
     }
     return { ok: true, message: result.message };
   }

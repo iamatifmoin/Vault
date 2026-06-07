@@ -1,14 +1,172 @@
-.notification {
-  padding: 12px 16px;
-  background: #18181b;
-  border: 1px solid #3f3f46;
-  border-radius: 8px;
-  color: #ffffff;
-  font-family: system-ui, sans-serif;
-  font-size: 13px;
+/* Injected into the page — use high specificity, scoped class names */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
 }
 
-.notification__message {
-  margin: 0;
+.vault-notif {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999999;
+  width: 280px;
+  background: #18181b;
+  border: 1px solid #3f3f46;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04);
+
+  /* Enter animation */
+  animation: vault-slide-in 0.3s cubic-bezier(0.21, 1.02, 0.73, 1) both;
+
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.vault-notif.vault-exiting {
+  animation: vault-slide-out 0.25s ease-in both;
+}
+
+@keyframes vault-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes vault-slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(20px) scale(0.96);
+  }
+}
+
+.vault-notif-bar {
+  height: 3px;
+  background: #22c55e;
+  /* Animate as a progress bar (auto-dismiss timer) */
+  animation: vault-progress 4s linear both;
+  transform-origin: left;
+}
+
+@keyframes vault-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.vault-notif-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px 8px;
+}
+
+.vault-notif-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #052e16;
+  border: 1px solid #166534;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   color: #22c55e;
+}
+
+.vault-notif-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.vault-notif-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fafafa;
+  margin: 0 0 2px;
+}
+
+.vault-notif-subtitle {
+  font-size: 12px;
+  color: #71717a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.vault-notif-close {
+  background: none;
+  border: none;
+  color: #52525b;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.vault-notif-close:hover {
+  color: #a1a1aa;
+}
+
+.vault-notif-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px 12px;
+}
+
+.vault-notif-cta {
+  font-size: 12px;
+  font-weight: 600;
+  color: #22c55e;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.vault-notif-cta:hover {
+  color: #4ade80;
+}
+
+.vault-notif-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+}
+
+.vault-notif-badge.optimal {
+  background: #052e16;
+  color: #22c55e;
+  border: 1px solid #14532d;
+}
+
+.vault-notif-badge.optimized {
+  background: #422006;
+  color: #facc15;
+  border: 1px solid #713f12;
+}
+
+.vault-notif-badge.brute-force {
+  background: #450a0a;
+  color: #f87171;
+  border: 1px solid #7f1d1d;
 }

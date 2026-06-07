@@ -7,8 +7,38 @@
     <link rel="stylesheet" href="./notification.css" />
   </head>
   <body>
-    <div class="notification" id="notification">
-      <p class="notification__message" id="message">Solution saved to Vault</p>
+    <div id="vault-notification" class="vault-notif">
+      <div class="vault-notif-bar"></div>
+      <div class="vault-notif-body">
+        <div class="vault-notif-icon">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="vault-notif-content">
+          <p class="vault-notif-title">Saved to Vault</p>
+          <p id="vault-notif-problem" class="vault-notif-subtitle"></p>
+        </div>
+        <button id="vault-notif-close" class="vault-notif-close" type="button" aria-label="Dismiss">
+          ×
+        </button>
+      </div>
+      <div class="vault-notif-footer">
+        <a id="vault-notif-analyze" href="#" class="vault-notif-cta" target="_blank" rel="noopener noreferrer">
+          Analyze →
+        </a>
+        <span id="vault-notif-approach" class="vault-notif-badge"></span>
+      </div>
     </div>
     <script type="module" src="./notification.ts"></script>
   </body>
