@@ -1,47 +1,51 @@
-import Link from "next/link";
-import { AppLogo } from "@/components/app-logo";
-import { Button } from "@/components/ui/button";
+import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function EmptyState({
-  title,
-  description,
-  action,
-  actionHref,
-  actionLabel,
-  className,
-}: {
-  title?: string;
+interface EmptyStateProps {
+  icon: LucideIcon;
+  title: string;
   description: string;
-  action?: React.ReactNode;
-  actionHref?: string;
-  actionLabel?: string;
+  action?: {
+    label: string;
+    href?: string;
+    onClick?: () => void;
+  };
   className?: string;
-}) {
+}
+
+export function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
   return (
-    <div
-      className={cn(
-        "flex flex-col items-center px-6 py-14 text-center",
-        className,
-      )}
-    >
-      <AppLogo size="lg" showWordmark={false} className="opacity-50" />
-      {title ? (
-        <h3 className="text-section-title mt-6">{title}</h3>
-      ) : null}
-      <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">
-        {description}
-      </p>
-      {action ??
-        (actionHref && actionLabel ? (
-          <Button
-            nativeButton={false}
-            render={<Link href={actionHref} />}
-            className="mt-6"
+    <div className={cn(
+      "flex flex-col items-center justify-center py-16 px-6 text-center",
+      className
+    )}>
+      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl
+                      border border-zinc-700/50 bg-zinc-900">
+        <Icon className="h-6 w-6 text-zinc-500" strokeWidth={1.5} />
+      </div>
+      <h3 className="mb-1.5 text-sm font-medium text-zinc-200">{title}</h3>
+      <p className="mb-5 text-sm text-zinc-500 max-w-xs leading-relaxed">{description}</p>
+      {action && (
+        action.href ? (
+          <a
+            href={action.href}
+            className="inline-flex items-center gap-2 rounded-lg bg-zinc-800 hover:bg-zinc-700
+                       border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200
+                       transition-colors duration-150"
           >
-            {actionLabel}
-          </Button>
-        ) : null)}
+            {action.label}
+          </a>
+        ) : (
+          <button
+            onClick={action.onClick}
+            className="inline-flex items-center gap-2 rounded-lg bg-zinc-800 hover:bg-zinc-700
+                       border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200
+                       transition-colors duration-150"
+          >
+            {action.label}
+          </button>
+        )
+      )}
     </div>
   );
 }
