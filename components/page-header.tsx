@@ -1,3 +1,4 @@
+import { ExtensionStatusBadge } from "@/components/extension-status-badge";
 import { StreakBadge } from "@/components/streak-badge";
 import { cn } from "@/lib/utils";
 
@@ -24,19 +25,23 @@ export function PageHeader({
       )}
     >
       <div aria-hidden className="vault-brand-bleed vault-brand-bleed--subtle" />
-      <div className="relative min-w-0 truncate">
-        {breadcrumb ??
-          (title ? (
-            <div>
-              <h1 className="text-page-title truncate">{title}</h1>
-              {subtitle ? (
-                <p className="truncate text-sm text-muted-foreground">{subtitle}</p>
-              ) : null}
-            </div>
-          ) : null)}
+      <div className="relative flex min-w-0 items-center gap-3">
+        <div className="min-w-0 truncate">
+          {breadcrumb ??
+            (title ? (
+              <div>
+                <h1 className="text-page-title truncate">{title}</h1>
+                {subtitle ? (
+                  <p className="truncate text-sm text-muted-foreground">{subtitle}</p>
+                ) : null}
+              </div>
+            ) : null)}
+        </div>
+        {streak !== undefined ? <StreakBadge className="shrink-0" streak={streak} /> : null}
       </div>
-      <div className="relative shrink-0">
-        {actions ?? (streak !== undefined ? <StreakBadge streak={streak} /> : null)}
+      <div className="relative flex shrink-0 items-center gap-2">
+        <ExtensionStatusBadge />
+        {actions ?? null}
       </div>
     </header>
   );

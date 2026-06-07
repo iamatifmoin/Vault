@@ -19,7 +19,14 @@ interface AuthCompleteMessage {
   username: string;
 }
 
-type BackgroundMessage = ProblemCapturedMessage | AuthCompleteMessage;
+interface GetStatusMessage {
+  type: "GET_STATUS";
+}
+
+type BackgroundMessage =
+  | ProblemCapturedMessage
+  | AuthCompleteMessage
+  | GetStatusMessage;
 
 function showChromeNotification(title: string, message: string): void {
   chrome.notifications.create({
@@ -194,6 +201,23 @@ function handleAuthCompleteMessage(
   return true;
 }
 
+function handleGetStatusMessage(
+  sendResponse: (response: {
+    ok: boolean;
+    connected: boolean;
+    username: string | null;
+  }) => void,
+): boolean {
+  void getAuthState().then((auth) => {
+    sendResponse({
+      ok: true,
+      connected: Boolean(auth.githubToken && auth.vaultConnected),
+      username: auth.githubUsername,
+    });
+  });
+  return true;
+}
+
 chrome.runtime.onMessage.addListener((message: BackgroundMessage, sender, sendResponse) => {
   if (message.type === "PROBLEM_CAPTURED") {
     void handleCapture(message.data, sender.tab?.id).then((result) => {
@@ -206,16 +230,26 @@ chrome.runtime.onMessage.addListener((message: BackgroundMessage, sender, sendRe
     return handleAuthCompleteMessage(message, sendResponse);
   }
 
-  return false;
-});
-
-chrome.runtime.onMessageExternal.addListener((message: AuthCompleteMessage, _sender, sendResponse) => {
-  if (message.type === "AUTH_COMPLETE") {
-    return handleAuthCompleteMessage(message, sendResponse);
+  if (message.type === "GET_STATUS") {
+    return handleGetStatusMessage(sendResponse);
   }
 
   return false;
 });
+
+chrome.runtime.onMessageExternal.addListener(
+  (message: AuthCompleteMessage | GetStatusMessage, _sender, sendResponse) => {
+    if (message.type === "AUTH_COMPLETE") {
+      return handleAuthCompleteMessage(message, sendResponse);
+    }
+
+    if (message.type === "GET_STATUS") {
+      return handleGetStatusMessage(sendResponse);
+    }
+
+    return false;
+  },
+);
 
 const VAULT_APP_URL_PATTERNS = [
   "http://localhost:3000/*",

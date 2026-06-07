@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AppLogo } from "@/components/app-logo";
+import { notifyExtension } from "@/lib/extension";
 
 interface ExtensionSession {
   accessToken?: string;
@@ -12,59 +13,6 @@ interface ExtensionSession {
     login?: string;
     image?: string | null;
   };
-}
-
-interface ChromeRuntime {
-  sendMessage: (
-    extensionId: string,
-    message: unknown,
-    responseCallback?: (response: unknown) => void,
-  ) => void;
-  lastError?: { message?: string };
-}
-
-function getChromeRuntime(): ChromeRuntime | undefined {
-  if (typeof window === "undefined") return undefined;
-  return (window as Window & { chrome?: { runtime?: ChromeRuntime } }).chrome
-    ?.runtime;
-}
-
-function notifyExtension(token: string, username: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    const runtime = getChromeRuntime();
-    const extensionId = process.env.NEXT_PUBLIC_CHROME_EXTENSION_ID;
-
-    if (!runtime?.sendMessage) {
-      resolve(false);
-      return;
-    }
-
-    if (!extensionId) {
-      console.error(
-        "[extension-success] NEXT_PUBLIC_CHROME_EXTENSION_ID is not set.",
-      );
-      resolve(false);
-      return;
-    }
-
-    try {
-      runtime.sendMessage(
-        extensionId,
-        { type: "AUTH_COMPLETE", token, username },
-        (response) => {
-          if (runtime.lastError?.message) {
-            console.error("[extension-success]", runtime.lastError.message);
-            resolve(false);
-            return;
-          }
-
-          resolve(Boolean((response as { ok?: boolean } | undefined)?.ok));
-        },
-      );
-    } catch {
-      resolve(false);
-    }
-  });
 }
 
 export default function ExtensionSuccessPage() {
