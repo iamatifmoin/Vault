@@ -18,3 +18,21 @@
   font-size: 13px;
   color: #a1a1aa;
 }
+
+.popup__connect {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #22c55e;
+  color: #052e16;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.popup__connect:hover {
+  background: #16a34a;
+}

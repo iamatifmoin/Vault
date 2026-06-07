@@ -4,6 +4,7 @@ import { DIFFICULTY_LABELS, LANGUAGE_LABELS, PLATFORM_LABELS } from "@/lib/const
 import type {
   AIAnalysis,
   Attempt,
+  Difficulty,
   Language,
   Problem,
   ProblemIndex,
@@ -171,6 +172,134 @@ function parseAnalysis(section: string): AIAnalysis | null {
   }
 }
 
+function normalizeDifficulty(value: unknown): Difficulty {
+  const raw = String(value ?? "easy").toLowerCase();
+  if (raw === "medium") {
+    return "medium";
+  }
+  if (raw === "hard") {
+    return "hard";
+  }
+  return "easy";
+}
+
+function normalizePlatform(value: unknown): Platform {
+  const raw = String(value ?? "leetcode").toLowerCase();
+  if (raw === "codeforces") {
+    return "codeforces";
+  }
+  if (raw === "codechef") {
+    return "codechef";
+  }
+  if (raw === "gfg") {
+    return "gfg";
+  }
+  return "leetcode";
+}
+
+function normalizeApproach(value: string): Attempt["approach"] {
+  const trimmed = value.trim();
+  if (trimmed === "Optimized" || trimmed === "Optimal") {
+    return trimmed;
+  }
+  return "Brute Force";
+}
+
+function parseExtensionDate(value: string) {
+  const trimmed = value.trim();
+  const isoMatch = trimmed.match(/^\d{4}-\d{2}-\d{2}/);
+
+  if (isoMatch) {
+    return isoMatch[0];
+  }
+
+  const parsed = new Date(trimmed);
+
+  if (!Number.isNaN(parsed.getTime())) {
+    return parsed.toISOString().slice(0, 10);
+  }
+
+  return trimmed;
+}
+
+function isVaultAppMarkdown(content: string) {
+  return (
+    content.includes("## Problem Statement") && content.includes("## Attempts")
+  );
+}
+
+function parseExtensionAttempts(content: string) {
+  const sections = content
+    .split(/\n(?=## Attempt \d+ [—-] )/)
+    .map((section) => section.trim())
+    .filter((section) => /^## Attempt \d+ [—-] /m.test(section));
+
+  if (!sections.length) {
+    throw new Error("Unable to parse the saved markdown structure.");
+  }
+
+  return sections.map<Attempt>((section) => {
+    const headingMatch = section.match(/^## Attempt (\d+) [—-] (.+)$/m);
+    const languageLine = section.match(/\*\*Language:\*\* ([^\n]+)/m);
+    const approachLine = section.match(/\*\*Approach:\*\* ([^\n]+)/m);
+    const timeLine = section.match(/\*\*Time Complexity:\*\* ([^\n]+)/m);
+    const spaceLine = section.match(/\*\*Space Complexity:\*\* ([^\n]+)/m);
+    const codeMatch = section.match(/```(\w+)\n([\s\S]*?)```/m);
+
+    if (!headingMatch || !languageLine || !codeMatch) {
+      throw new Error("Unable to parse attempt from markdown file.");
+    }
+
+    return {
+      number: Number(headingMatch[1]),
+      date: parseExtensionDate(headingMatch[2]),
+      language: normalizeLanguage(languageLine[1]),
+      code: codeMatch[2].trimEnd(),
+      approach: normalizeApproach(approachLine?.[1] ?? "Brute Force"),
+      time_complexity: timeLine?.[1]?.trim() ?? "TBD",
+      space_complexity: spaceLine?.[1]?.trim() ?? "TBD",
+      analysis: null,
+    };
+  });
+}
+
+function parseExtensionProblemMarkdown(
+  parsed: ReturnType<typeof matter>,
+  filePath: string,
+) {
+  const data = parsed.data as Record<string, unknown>;
+  const attempts = parseExtensionAttempts(parsed.content);
+  const platform = normalizePlatform(data.platform);
+  const number = String(data.number ?? "");
+  const id =
+    typeof data.id === "string" && data.id
+      ? data.id
+      : buildProblemId(platform, number);
+  const dateCreated = data.firstSolvedDate
+    ? parseExtensionDate(String(data.firstSolvedDate))
+    : (attempts[0]?.date ?? new Date().toISOString().slice(0, 10));
+
+  const problem: Problem = {
+    id,
+    number,
+    title: String(data.title ?? ""),
+    platform,
+    difficulty: normalizeDifficulty(data.difficulty),
+    topics: Array.isArray(data.topics) ? data.topics.map(String) : [],
+    sheets: Array.isArray(data.sheets)
+      ? data.sheets.map((item) => String(item) as Problem["sheets"][number])
+      : [],
+    attempts,
+    file_path: filePath,
+    date_created: dateCreated,
+  };
+
+  return {
+    problem,
+    problemStatement: "",
+  };
+}
+
 function parseAttempts(block: string) {
   const sections = block
     .split(/\n(?=### Attempt \d+ - )/)
@@ -203,6 +332,11 @@ function parseAttempts(block: string) {
 
 export function parseProblemMarkdown(fileContent: string, filePath = "") {
   const parsed = matter(fileContent);
+
+  if (!isVaultAppMarkdown(parsed.content)) {
+    return parseExtensionProblemMarkdown(parsed, filePath);
+  }
+
   const problemStatementMatch = parsed.content.match(
     /## Problem Statement\s+([\s\S]*?)\s+## Attempts/,
   );

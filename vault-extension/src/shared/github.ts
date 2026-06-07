@@ -1,7 +1,13 @@
 import type { CapturedProblem, IndexEntry } from "./types";
 
-const REPO_NAME = "Data Structures & Algorithms";
+const REPO_NAME = "Data-Structures-And-Algorithms";
+const REPO_DESCRIPTION = "Personal DSA practice history managed by Vault.";
 const API_BASE = "https://api.github.com";
+
+interface VaultRepoContext {
+  username: string;
+  repoName: string;
+}
 
 interface GitHubFileContent {
   content: string;
@@ -218,9 +224,9 @@ async function githubRequest<T>(
   if (!response.ok) {
     const message =
       typeof data === "object" &&
-      data !== null &&
-      "message" in data &&
-      typeof (data as { message?: unknown }).message === "string"
+        data !== null &&
+        "message" in data &&
+        typeof (data as { message?: unknown }).message === "string"
         ? (data as { message: string }).message
         : `GitHub API error: ${response.status}`;
     const error = new Error(message) as Error & { status?: number };
@@ -231,35 +237,59 @@ async function githubRequest<T>(
   return { data, status: response.status };
 }
 
-async function ensureRepo(token: string, username: string): Promise<void> {
+export async function getAuthenticatedUser(token: string): Promise<string> {
+  const { data } = await githubRequest<{ login?: string }>("/user", token);
+  if (!data.login) {
+    throw new Error("Unable to resolve GitHub username.");
+  }
+  return data.login;
+}
+
+async function ensureRepo(token: string): Promise<VaultRepoContext> {
+  const username = await getAuthenticatedUser(token);
   const encodedOwner = encodeURIComponent(username);
   const encodedRepo = encodeURIComponent(REPO_NAME);
 
   try {
     await githubRequest(`/repos/${encodedOwner}/${encodedRepo}`, token);
+    return { username, repoName: REPO_NAME };
   } catch (error) {
     const status = (error as { status?: number }).status;
     if (status !== 404) {
       throw error;
     }
+  }
 
+  try {
     await githubRequest("/user/repos", token, {
       method: "POST",
       body: JSON.stringify({
         name: REPO_NAME,
-        private: false,
+        private: true,
+        auto_init: true,
+        description: REPO_DESCRIPTION,
       }),
     });
+  } catch (createError) {
+    const createStatus = (createError as { status?: number }).status;
+    if (createStatus === 422) {
+      await githubRequest(`/repos/${encodedOwner}/${encodedRepo}`, token);
+      return { username, repoName: REPO_NAME };
+    }
+    throw createError;
   }
+
+  return { username, repoName: REPO_NAME };
 }
 
 async function getFile(
   token: string,
   username: string,
+  repoName: string,
   path: string,
 ): Promise<GitHubFileContent | null> {
   const encodedOwner = encodeURIComponent(username);
-  const encodedRepo = encodeURIComponent(REPO_NAME);
+  const encodedRepo = encodeURIComponent(repoName);
 
   try {
     const { data } = await githubRequest<{
@@ -287,12 +317,13 @@ async function getFile(
 async function saveFile(
   token: string,
   username: string,
+  repoName: string,
   path: string,
   content: string,
   sha?: string,
 ): Promise<void> {
   const encodedOwner = encodeURIComponent(username);
-  const encodedRepo = encodeURIComponent(REPO_NAME);
+  const encodedRepo = encodeURIComponent(repoName);
 
   await githubRequest(`/repos/${encodedOwner}/${encodedRepo}/contents/${encodePath(path)}`, token, {
     method: "PUT",
@@ -304,8 +335,12 @@ async function saveFile(
   });
 }
 
-async function getIndex(token: string, username: string): Promise<IndexEntry[]> {
-  const file = await getFile(token, username, "index.json");
+async function getIndex(
+  token: string,
+  username: string,
+  repoName: string,
+): Promise<IndexEntry[]> {
+  const file = await getFile(token, username, repoName, "index.json");
   if (!file) {
     return [];
   }
@@ -321,14 +356,16 @@ async function getIndex(token: string, username: string): Promise<IndexEntry[]> 
 async function saveIndex(
   token: string,
   username: string,
+  repoName: string,
   index: IndexEntry[],
 ): Promise<void> {
-  const existing = await getFile(token, username, "index.json");
+  const existing = await getFile(token, username, repoName, "index.json");
   const sorted = [...index].sort((a, b) => a.title.localeCompare(b.title));
 
   await saveFile(
     token,
     username,
+    repoName,
     "index.json",
     `${JSON.stringify(sorted, null, 2)}\n`,
     existing?.sha,
@@ -338,14 +375,13 @@ async function saveIndex(
 export async function saveProblemToGitHub(
   problem: CapturedProblem,
   githubToken: string,
-  githubUsername: string,
-): Promise<{ success: boolean; message: string }> {
+): Promise<{ success: boolean; message: string; username?: string }> {
   try {
-    await ensureRepo(githubToken, githubUsername);
+    const { username, repoName } = await ensureRepo(githubToken);
 
     const solvedAt = problem.submittedAt || new Date().toISOString();
     const filePath = buildFilePath(problem);
-    const index = await getIndex(githubToken, githubUsername);
+    const index = await getIndex(githubToken, username, repoName);
 
     const existingEntry = index.find(
       (entry) =>
@@ -355,7 +391,7 @@ export async function saveProblemToGitHub(
     if (existingEntry) {
       const attemptNumber = existingEntry.attempts + 1;
       const targetPath = existingEntry.filePath || filePath;
-      const existingFile = await getFile(githubToken, githubUsername, targetPath);
+      const existingFile = await getFile(githubToken, username, repoName, targetPath);
 
       const markdown = existingFile
         ? appendAttemptToMarkdown(existingFile.content, problem, attemptNumber, solvedAt)
@@ -363,7 +399,8 @@ export async function saveProblemToGitHub(
 
       await saveFile(
         githubToken,
-        githubUsername,
+        username,
+        repoName,
         targetPath,
         markdown,
         existingFile?.sha,
@@ -385,23 +422,25 @@ export async function saveProblemToGitHub(
           : entry,
       );
 
-      await saveIndex(githubToken, githubUsername, nextIndex);
+      await saveIndex(githubToken, username, repoName, nextIndex);
 
       return {
         success: true,
         message: `Saved attempt ${attemptNumber} for ${problem.title}`,
+        username,
       };
     }
 
     const markdown = buildNewProblemMarkdown(problem, solvedAt, 1);
-    await saveFile(githubToken, githubUsername, filePath, markdown);
+    await saveFile(githubToken, username, repoName, filePath, markdown);
 
     const nextIndex = [...index, toIndexEntry(problem, filePath, 1, solvedAt)];
-    await saveIndex(githubToken, githubUsername, nextIndex);
+    await saveIndex(githubToken, username, repoName, nextIndex);
 
     return {
       success: true,
       message: `Saved ${problem.title} to Vault`,
+      username,
     };
   } catch (error) {
     return {

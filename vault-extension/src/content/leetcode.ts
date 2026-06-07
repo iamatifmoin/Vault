@@ -1,29 +1,34 @@
 import { getAuthState } from "../shared/auth";
+import { fetchProblemBySlug, getTitleSlugFromUrl } from "../shared/leetcode";
 import type { CapturedProblem } from "../shared/types";
 
 console.log("Vault: LeetCode content script loaded");
 
-const RESULT_SELECTOR = '[data-e2e-locator="submission-result"]';
+const RESULT_SELECTORS = [
+  '[data-e2e-locator="submission-result"]',
+  '[data-cy="submission-result"]',
+  '[class*="submission-result"]',
+  '[class*="text-green"]',
+  '[class*="text-success"]',
+];
 
-interface LeetCodeTopicTag {
-  name: string;
-  slug: string;
-}
+const CAPTURE_COOLDOWN_MS = 15_000;
 
 interface LeetCodeQuestion {
   questionId: string;
   title: string;
   titleSlug: string;
   difficulty: string;
-  topicTags: LeetCodeTopicTag[];
+  topicTags?: Array<{ name: string }>;
 }
 
-interface MonacoModel {
+interface MonacoEditorInstance {
   getValue(): string;
 }
 
-interface MonacoEditor {
-  getModels(): MonacoModel[];
+interface MonacoEditorApi {
+  getModels(): MonacoEditorInstance[];
+  getEditors?(): MonacoEditorInstance[];
 }
 
 declare global {
@@ -40,29 +45,29 @@ declare global {
               };
             }>;
           };
+          question?: LeetCodeQuestion;
         };
       };
     };
     monaco?: {
-      editor?: MonacoEditor;
+      editor?: MonacoEditorApi;
     };
   }
 }
+
+let captureInFlight = false;
+let lastCaptureAt = 0;
 
 function normalizeDifficulty(value: string): CapturedProblem["difficulty"] {
   if (value === "Medium" || value === "Hard") return value;
   return "Easy";
 }
 
-function extractProblemData(): Partial<CapturedProblem> | null {
-  const question =
-    window.__NEXT_DATA__?.props?.pageProps?.dehydratedState?.queries?.[0]?.state
-      ?.data?.question;
-
-  if (!question) return null;
-
+function mapQuestion(question: LeetCodeQuestion): Partial<CapturedProblem> {
   const number = Number.parseInt(question.questionId, 10);
-  if (Number.isNaN(number)) return null;
+  if (Number.isNaN(number)) {
+    return {};
+  }
 
   return {
     platform: "leetcode",
@@ -74,89 +79,202 @@ function extractProblemData(): Partial<CapturedProblem> | null {
   };
 }
 
+function extractProblemDataFromPage(): Partial<CapturedProblem> | null {
+  const directQuestion = window.__NEXT_DATA__?.props?.pageProps?.question;
+  if (directQuestion?.questionId) {
+    const mapped = mapQuestion(directQuestion);
+    if (mapped.number) return mapped;
+  }
+
+  const queries =
+    window.__NEXT_DATA__?.props?.pageProps?.dehydratedState?.queries ?? [];
+
+  for (const query of queries) {
+    const question = query?.state?.data?.question;
+    if (question?.questionId) {
+      const mapped = mapQuestion(question);
+      if (mapped.number) return mapped;
+    }
+  }
+
+  return null;
+}
+
+async function resolveProblemData(): Promise<Partial<CapturedProblem> | null> {
+  const fromPage = extractProblemDataFromPage();
+  if (
+    fromPage?.number &&
+    fromPage.title &&
+    fromPage.titleSlug &&
+    fromPage.difficulty
+  ) {
+    return fromPage;
+  }
+
+  const titleSlug = getTitleSlugFromUrl();
+  if (!titleSlug) {
+    return null;
+  }
+
+  return fetchProblemBySlug(titleSlug);
+}
+
 function extractCode(): string {
-  const model = window.monaco?.editor?.getModels()?.[0];
-  const code = model?.getValue();
-  if (code) return code;
+  const editorApi = window.monaco?.editor;
+
+  const editors = editorApi?.getEditors?.();
+  const editorValue = editors?.[0]?.getValue();
+  if (editorValue) return editorValue;
+
+  const modelValue = editorApi?.getModels()?.[0]?.getValue();
+  if (modelValue) return modelValue;
 
   const editorEl =
     document.querySelector('[data-cy="code-editor"] .view-lines') ??
-    document.querySelector(".monaco-editor .view-lines");
+    document.querySelector(".monaco-editor .view-lines") ??
+    document.querySelector(".view-lines");
 
   return editorEl?.textContent ?? "";
 }
 
 function extractLanguage(): CapturedProblem["language"] {
-  const langEl = document.querySelector('[data-cy="lang-select"]');
-  const text = langEl?.textContent?.trim() ?? "";
+  const selectors = [
+    '[data-cy="lang-select"]',
+    '[data-e2e-locator="lang-select"]',
+    'button[id*="language"]',
+  ];
 
-  if (text.includes("Python")) return "python";
-  if (text.includes("Java") && !text.includes("JavaScript")) return "java";
-  if (text.includes("C++")) return "cpp";
+  for (const selector of selectors) {
+    const text = document.querySelector(selector)?.textContent?.trim() ?? "";
+    if (!text) continue;
+    if (text.includes("Python")) return "python";
+    if (text.includes("Java") && !text.includes("JavaScript")) return "java";
+    if (text.includes("C++") || text.includes("Cpp")) return "cpp";
+  }
 
   return "cpp";
 }
 
 function isAcceptedResult(el: HTMLElement): boolean {
-  const text = el.textContent ?? "";
-  return text.includes("Accepted") && !text.includes("Not Accepted");
+  const text = el.textContent?.trim() ?? "";
+  if (!text) return false;
+  if (text.includes("Not Accepted")) return false;
+  return text === "Accepted" || /^Accepted\b/.test(text);
 }
 
-async function onAcceptedDetected(): Promise<void> {
-  const auth = await getAuthState();
-  if (!auth.githubToken) return;
-
-  const problemData = extractProblemData();
-  if (
-    !problemData?.number ||
-    !problemData.title ||
-    !problemData.titleSlug ||
-    !problemData.difficulty
-  ) {
-    return;
+function isSubmissionContext(el: HTMLElement): boolean {
+  if (el.closest('[data-e2e-locator*="submission"], [data-cy*="submission"]')) {
+    return true;
   }
 
-  const code = extractCode();
-  if (!code.trim()) return;
-
-  const captured: CapturedProblem = {
-    platform: "leetcode",
-    number: problemData.number,
-    title: problemData.title,
-    titleSlug: problemData.titleSlug,
-    difficulty: problemData.difficulty,
-    topics: problemData.topics ?? [],
-    code,
-    language: extractLanguage(),
-    submittedAt: new Date().toISOString(),
-  };
-
-  try {
-    chrome.runtime.sendMessage({ type: "PROBLEM_CAPTURED", data: captured });
-  } catch {
-    // silent failure
-  }
+  const className = el.className?.toString() ?? "";
+  return /submit|submission|result|verdict|status/i.test(className);
 }
 
-const config: MutationObserverInit = { childList: true, subtree: true };
-
-const observer = new MutationObserver((mutations) => {
-  for (const mutation of mutations) {
-    for (const node of mutation.addedNodes) {
-      if (!(node instanceof HTMLElement)) continue;
-
-      const resultEl =
-        (node.matches(RESULT_SELECTOR) ? node : null) ??
-        node.querySelector<HTMLElement>(RESULT_SELECTOR);
-
-      if (resultEl && isAcceptedResult(resultEl)) {
-        observer.disconnect();
-        void onAcceptedDetected();
-        setTimeout(() => observer.observe(document.body, config), 3000);
-        return;
+function findAcceptedElement(): HTMLElement | null {
+  for (const selector of RESULT_SELECTORS) {
+    for (const el of document.querySelectorAll<HTMLElement>(selector)) {
+      if (isAcceptedResult(el)) {
+        return el;
       }
     }
   }
+
+  for (const el of document.querySelectorAll<HTMLElement>("span, div, p, td")) {
+    if (!isAcceptedResult(el)) continue;
+    if (!isSubmissionContext(el) && el.closest('[class*="flexlayout"]') === null) {
+      continue;
+    }
+    return el;
+  }
+
+  return null;
+}
+
+async function onAcceptedDetected(): Promise<void> {
+  if (captureInFlight || Date.now() - lastCaptureAt < CAPTURE_COOLDOWN_MS) {
+    return;
+  }
+
+  captureInFlight = true;
+
+  try {
+    const auth = await getAuthState();
+    if (!auth.githubToken) {
+      console.warn(
+        "Vault: submission accepted, but extension is not connected. Open the Vault popup and click Connect to Vault.",
+      );
+      return;
+    }
+
+    const problemData = await resolveProblemData();
+    if (
+      !problemData?.number ||
+      !problemData.title ||
+      !problemData.titleSlug ||
+      !problemData.difficulty
+    ) {
+      console.warn("Vault: could not read LeetCode problem metadata.");
+      return;
+    }
+
+    const code = extractCode();
+    if (!code.trim()) {
+      console.warn("Vault: accepted submission detected, but no editor code was found.");
+      return;
+    }
+
+    const captured: CapturedProblem = {
+      platform: "leetcode",
+      number: problemData.number,
+      title: problemData.title,
+      titleSlug: problemData.titleSlug,
+      difficulty: problemData.difficulty,
+      topics: problemData.topics ?? [],
+      code,
+      language: extractLanguage(),
+      submittedAt: new Date().toISOString(),
+    };
+
+    chrome.runtime.sendMessage(
+      { type: "PROBLEM_CAPTURED", data: captured },
+      (response) => {
+        if (chrome.runtime.lastError?.message) {
+          console.error("Vault:", chrome.runtime.lastError.message);
+          return;
+        }
+
+        const payload = response as { ok?: boolean; message?: string } | undefined;
+        if (payload?.ok) {
+          console.log("Vault:", payload.message ?? "Saved to Vault");
+          return;
+        }
+
+        console.error("Vault:", payload?.message ?? "Failed to save to GitHub");
+      },
+    );
+
+    lastCaptureAt = Date.now();
+  } finally {
+    captureInFlight = false;
+  }
+}
+
+function checkForAccepted(): void {
+  if (!findAcceptedElement()) return;
+  void onAcceptedDetected();
+}
+
+const observerConfig: MutationObserverInit = {
+  childList: true,
+  subtree: true,
+  characterData: true,
+};
+
+const observer = new MutationObserver(() => {
+  checkForAccepted();
 });
 
-observer.observe(document.body, config);
+observer.observe(document.body, observerConfig);
+window.setInterval(checkForAccepted, 2_000);
+checkForAccepted();

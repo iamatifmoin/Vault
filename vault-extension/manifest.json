@@ -60,5 +60,12 @@
       "resources": ["notification/notification.html"],
       "matches": ["<all_urls>"]
     }
-  ]
+  ],
+  "externally_connectable": {
+    "matches": [
+      "http://localhost:3000/*",
+      "http://127.0.0.1:3000/*",
+      "https://*.vercel.app/*"
+    ]
+  }
 }

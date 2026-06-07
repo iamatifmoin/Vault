@@ -1,8 +1,11 @@
 import { getAuthState, setAuthState } from "../shared/auth";
-import { saveProblemToGitHub } from "../shared/github";
+import { getAuthenticatedUser, saveProblemToGitHub } from "../shared/github";
 import type { CapturedProblem, ExtensionAuthState } from "../shared/types";
 
 console.log("Vault: background service worker started");
+
+const recentCaptures = new Map<string, number>();
+const CAPTURE_DEDUP_MS = 30_000;
 
 interface ProblemCapturedMessage {
   type: "PROBLEM_CAPTURED";
@@ -68,37 +71,70 @@ async function showInPageNotification(tabId: number, message: string): Promise<v
   }
 }
 
-async function handleCapture(problem: CapturedProblem, tabId?: number): Promise<void> {
+function captureKey(problem: CapturedProblem): string {
+  return `${problem.platform}:${problem.titleSlug}`;
+}
+
+async function handleCapture(
+  problem: CapturedProblem,
+  tabId?: number,
+): Promise<{ ok: boolean; message: string }> {
   const auth = await getAuthState();
 
-  if (!auth.githubToken || !auth.githubUsername) {
+  if (!auth.githubToken) {
+    console.warn("Vault: capture ignored because extension auth is missing.");
     showChromeNotification("Vault", "Connect your GitHub first");
-    return;
+    return { ok: false, message: "Connect your GitHub first" };
   }
 
-  const result = await saveProblemToGitHub(
-    problem,
-    auth.githubToken,
-    auth.githubUsername,
-  );
+  const key = captureKey(problem);
+  const lastCapture = recentCaptures.get(key) ?? 0;
+  if (Date.now() - lastCapture < CAPTURE_DEDUP_MS) {
+    return { ok: true, message: "Already saved recently." };
+  }
+
+  console.log(`Vault: saving ${problem.platform} #${problem.number} ${problem.title}`);
+
+  const result = await saveProblemToGitHub(problem, auth.githubToken);
 
   if (result.success) {
+    recentCaptures.set(key, Date.now());
+
+    if (result.username && result.username !== auth.githubUsername) {
+      await setAuthState({
+        githubToken: auth.githubToken,
+        githubUsername: result.username,
+        vaultConnected: true,
+      });
+    }
+
+    console.log("Vault:", result.message);
     if (tabId !== undefined) {
       await showInPageNotification(tabId, result.message);
     }
-    return;
+    return { ok: true, message: result.message };
   }
 
+  console.error("Vault:", result.message);
   showChromeNotification("Vault", result.message);
+  return { ok: false, message: result.message };
 }
 
 async function handleAuthComplete(
   token: string,
   username: string,
 ): Promise<ExtensionAuthState> {
+  let resolvedUsername = username;
+
+  try {
+    resolvedUsername = await getAuthenticatedUser(token);
+  } catch {
+    // Fall back to the value provided by the web app.
+  }
+
   const nextState: ExtensionAuthState = {
     githubToken: token,
-    githubUsername: username,
+    githubUsername: resolvedUsername,
     vaultConnected: true,
   };
 
@@ -106,19 +142,34 @@ async function handleAuthComplete(
   return nextState;
 }
 
+function handleAuthCompleteMessage(
+  message: AuthCompleteMessage,
+  sendResponse: (response: { ok: boolean; state?: ExtensionAuthState }) => void,
+): boolean {
+  void handleAuthComplete(message.token, message.username).then((state) => {
+    sendResponse({ ok: true, state });
+  });
+  return true;
+}
+
 chrome.runtime.onMessage.addListener((message: BackgroundMessage, sender, sendResponse) => {
   if (message.type === "PROBLEM_CAPTURED") {
-    void handleCapture(message.data, sender.tab?.id).then(() => {
-      sendResponse({ ok: true });
+    void handleCapture(message.data, sender.tab?.id).then((result) => {
+      sendResponse(result);
     });
     return true;
   }
 
   if (message.type === "AUTH_COMPLETE") {
-    void handleAuthComplete(message.token, message.username).then((state) => {
-      sendResponse({ ok: true, state });
-    });
-    return true;
+    return handleAuthCompleteMessage(message, sendResponse);
+  }
+
+  return false;
+});
+
+chrome.runtime.onMessageExternal.addListener((message: AuthCompleteMessage, _sender, sendResponse) => {
+  if (message.type === "AUTH_COMPLETE") {
+    return handleAuthCompleteMessage(message, sendResponse);
   }
 
   return false;

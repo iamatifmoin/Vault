@@ -1,5 +1,5 @@
 import { Octokit } from "@octokit/rest";
-import { REPO_NAME } from "@/lib/constants";
+import { REPO_DESCRIPTION, REPO_NAME } from "@/lib/constants";
 import { buildProblemId, parseProblemMarkdown } from "@/lib/markdown";
 import type {
   ApproachType,
@@ -79,9 +79,7 @@ export async function getPublicIndex(
   username: string,
 ): Promise<ProblemIndex[] | null> {
   const encodedOwner = encodeURIComponent(username);
-  const encodedRepo = encodeURIComponent(REPO_NAME);
-  const url = `${GITHUB_API}/repos/${encodedOwner}/${encodedRepo}/contents/index.json`;
-
+  const url = `${GITHUB_API}/repos/${encodedOwner}/${encodeURIComponent(REPO_NAME)}/contents/index.json`;
   const response = await fetch(url, {
     headers: {
       Accept: "application/vnd.github+json",
@@ -96,6 +94,13 @@ export async function getPublicIndex(
   if (!response.ok) {
     throw new Error(`Failed to fetch public index for ${username}`);
   }
+
+  return await parsePublicIndexResponse(response);
+}
+
+async function parsePublicIndexResponse(
+  response: Response,
+): Promise<ProblemIndex[] | null> {
 
   const data = (await response.json()) as GitHubContentResponse;
 
@@ -145,20 +150,19 @@ export async function getOrCreateRepo(token: string) {
 
     return { owner, repo: REPO_NAME, created: false };
   } catch (error) {
-    const status = (error as { status?: number }).status;
-    if (status !== 404) {
+    if ((error as { status?: number }).status !== 404) {
       throw error;
     }
-
-    await octokit.repos.createForAuthenticatedUser({
-      name: REPO_NAME,
-      private: true,
-      auto_init: true,
-      description: "Personal DSA practice history managed by Vault.",
-    });
-
-    return { owner, repo: REPO_NAME, created: true };
   }
+
+  await octokit.repos.createForAuthenticatedUser({
+    name: REPO_NAME,
+    private: true,
+    auto_init: true,
+    description: REPO_DESCRIPTION,
+  });
+
+  return { owner, repo: REPO_NAME, created: true };
 }
 
 export async function getFile(token: string, path: string) {
@@ -216,8 +220,15 @@ export async function getIndex(token: string) {
   }
 
   try {
-    const parsed = JSON.parse(file.content) as ProblemIndex[];
-    return Array.isArray(parsed) ? parsed : [];
+    const parsed = JSON.parse(file.content) as unknown;
+
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.map((entry) =>
+      normalizeIndexEntry(entry as Record<string, unknown>),
+    );
   } catch {
     return [];
   }
@@ -251,28 +262,41 @@ export async function listRepoStats(token: string): Promise<RepoStats> {
   const octokit = createOctokit(token);
   const owner = await getRepoOwner(token);
   const index = await getIndex(token);
-  const repo = await octokit.repos.get({
-    owner,
-    repo: REPO_NAME,
-  });
 
-  const tree = await octokit.git.getTree({
-    owner,
-    repo: REPO_NAME,
-    tree_sha: repo.data.default_branch,
-    recursive: "true",
-  });
+  try {
+    const repo = await octokit.repos.get({
+      owner,
+      repo: REPO_NAME,
+    });
 
-  const markdownFiles = tree.data.tree.filter(
-    (item) => item.type === "blob" && item.path?.endsWith(".md"),
-  );
-  const sortedDates = [...index]
-    .map((item) => item.latest_date)
-    .sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+    const tree = await octokit.git.getTree({
+      owner,
+      repo: REPO_NAME,
+      tree_sha: repo.data.default_branch,
+      recursive: "true",
+    });
 
-  return {
-    totalFiles: markdownFiles.length,
-    firstSolveDate: sortedDates[0] ?? null,
-    latestSolveDate: sortedDates.at(-1) ?? null,
-  };
+    const markdownFiles = tree.data.tree.filter(
+      (item) => item.type === "blob" && item.path?.endsWith(".md"),
+    );
+    const sortedDates = [...index]
+      .map((item) => item.latest_date)
+      .sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+
+    return {
+      totalFiles: markdownFiles.length,
+      firstSolveDate: sortedDates[0] ?? null,
+      latestSolveDate: sortedDates.at(-1) ?? null,
+    };
+  } catch (error) {
+    if ((error as { status?: number }).status === 404) {
+      return {
+        totalFiles: 0,
+        firstSolveDate: null,
+        latestSolveDate: null,
+      };
+    }
+
+    throw error;
+  }
 }

@@ -1,6 +1,13 @@
 import { type ApproachType, type Difficulty, type Language, type Platform } from "@/types";
 
-export const REPO_NAME = "Data Structures & Algorithms";
+/** GitHub-safe repository slug used when creating the Vault repo. */
+export const REPO_NAME = "Data-Structures-And-Algorithms";
+
+/** User-facing repo label shown in the UI. */
+export const REPO_DISPLAY_NAME = "Data Structures & Algorithms";
+
+export const REPO_DESCRIPTION =
+  "Personal DSA practice history managed by Vault.";
 
 export const PLATFORM_LABELS: Record<Platform, string> = {
   leetcode: "LeetCode",

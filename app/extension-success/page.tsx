@@ -15,12 +15,12 @@ interface ExtensionSession {
 }
 
 interface ChromeRuntime {
-  id?: string;
   sendMessage: (
     extensionId: string,
     message: unknown,
-    responseCallback?: () => void,
+    responseCallback?: (response: unknown) => void,
   ) => void;
+  lastError?: { message?: string };
 }
 
 function getChromeRuntime(): ChromeRuntime | undefined {
@@ -29,27 +29,47 @@ function getChromeRuntime(): ChromeRuntime | undefined {
     ?.runtime;
 }
 
-function notifyExtension(token: string, username: string): void {
-  const runtime = getChromeRuntime();
-  if (!runtime?.sendMessage) return;
+function notifyExtension(token: string, username: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const runtime = getChromeRuntime();
+    const extensionId = process.env.NEXT_PUBLIC_CHROME_EXTENSION_ID;
 
-  const extensionId =
-    process.env.NEXT_PUBLIC_CHROME_EXTENSION_ID ?? runtime.id;
-  if (!extensionId) return;
+    if (!runtime?.sendMessage) {
+      resolve(false);
+      return;
+    }
 
-  try {
-    runtime.sendMessage(extensionId, {
-      type: "AUTH_COMPLETE",
-      token,
-      username,
-    });
-  } catch {
-    // Extension unavailable — page still renders normally.
-  }
+    if (!extensionId) {
+      console.error(
+        "[extension-success] NEXT_PUBLIC_CHROME_EXTENSION_ID is not set.",
+      );
+      resolve(false);
+      return;
+    }
+
+    try {
+      runtime.sendMessage(
+        extensionId,
+        { type: "AUTH_COMPLETE", token, username },
+        (response) => {
+          if (runtime.lastError?.message) {
+            console.error("[extension-success]", runtime.lastError.message);
+            resolve(false);
+            return;
+          }
+
+          resolve(Boolean((response as { ok?: boolean } | undefined)?.ok));
+        },
+      );
+    } catch {
+      resolve(false);
+    }
+  });
 }
 
 export default function ExtensionSuccessPage() {
   const [session, setSession] = useState<ExtensionSession | null>(null);
+  const [extensionLinked, setExtensionLinked] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -77,11 +97,14 @@ export default function ExtensionSuccessPage() {
         const username =
           data.user?.login ?? data.user?.name ?? "vault-user";
 
-        notifyExtension(data.accessToken, username);
+        const linked = await notifyExtension(data.accessToken, username);
+        setExtensionLinked(linked);
 
-        closeTimer = window.setTimeout(() => {
-          window.close();
-        }, 2000);
+        if (linked) {
+          closeTimer = window.setTimeout(() => {
+            window.close();
+          }, 2000);
+        }
       } catch {
         setSession(null);
       } finally {
@@ -115,7 +138,7 @@ export default function ExtensionSuccessPage() {
               Finishing connection…
             </p>
           </div>
-        ) : session?.accessToken ? (
+        ) : session?.accessToken && extensionLinked ? (
           <div className="space-y-6">
             <div className="flex flex-col items-center gap-3">
               <CheckCircle2
@@ -139,6 +162,20 @@ export default function ExtensionSuccessPage() {
 
             <p className="text-sm text-muted-foreground">
               This window will close automatically
+            </p>
+          </div>
+        ) : session?.accessToken ? (
+          <div className="space-y-4 py-2">
+            <h1 className="text-page-title">Extension not linked</h1>
+            <p className="text-sm leading-6 text-muted-foreground">
+              You are signed in to Vault, but the browser extension did not
+              receive your token. Reload the extension in{" "}
+              <code className="text-foreground">chrome://extensions</code>,
+              confirm{" "}
+              <code className="text-foreground">
+                NEXT_PUBLIC_CHROME_EXTENSION_ID
+              </code>{" "}
+              matches your extension ID, then refresh this page.
             </p>
           </div>
         ) : (
