@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { BookOpen, CalendarDays, Flame, Zap } from "lucide-react";
 import { AnimatedMain } from "@/components/animated-main";
 import { EmptyState } from "@/components/empty-state";
+import { IRSWidget } from "@/components/irs-widget";
 import { MiniActivityStrip } from "@/components/mini-activity-strip";
 import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
@@ -58,7 +59,12 @@ export default async function DashboardPage() {
       />
 
       <AnimatedMain className="mx-auto max-w-6xl p-container-padding">
-        <div className="stagger-children grid gap-gutter md:grid-cols-4">
+        <IRSWidget
+          problems={index}
+          username={session.user?.login}
+        />
+
+        <div className="stagger-children mt-6 grid gap-gutter md:grid-cols-4">
           {statConfig.map(({ label, key, icon: Icon, suffix }) => {
             const raw = stats[key];
             const value = suffix && typeof raw === "number" ? `${raw}${suffix}` : raw;
