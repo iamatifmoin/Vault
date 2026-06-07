@@ -25,6 +25,7 @@ import {
   getRecentProblems,
 } from "@/lib/stats";
 import { MilestoneTrigger } from "@/components/milestone-trigger";
+import { WeeklyDigest } from "@/components/weekly-digest";
 import { buildShareableCardData } from "@/lib/share-cards";
 import { cn } from "@/lib/utils";
 
@@ -71,6 +72,8 @@ export default async function DashboardPage() {
       />
 
       <AnimatedMain className="mx-auto max-w-6xl p-container-padding">
+        <WeeklyDigest problems={index} username={username} />
+
         <IRSWidget
           problems={index}
           username={session.user?.login}
