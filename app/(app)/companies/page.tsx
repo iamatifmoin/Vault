@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Target, X } from "lucide-react";
+import { Target, X } from "lucide-react";
 import { AnimatedMain } from "@/components/animated-main";
 import { CompanyCard } from "@/components/company-card";
 import { EmptyState } from "@/components/empty-state";
@@ -118,22 +118,12 @@ function CompanyPill({
       aria-checked={checked}
       onClick={onToggle}
       className={cn(
-        "inline-flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-xs font-medium transition-all duration-150",
+        "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-all duration-150",
         checked
           ? "bg-vault-brand/10 text-vault-brand ring-1 ring-vault-brand/35"
           : "bg-zinc-900/60 text-zinc-400 ring-1 ring-zinc-800 hover:bg-zinc-800/80 hover:text-zinc-200",
       )}
     >
-      <span
-        className={cn(
-          "flex h-5 w-5 items-center justify-center rounded-full transition-colors",
-          checked
-            ? "bg-vault-brand text-vault-brand-foreground"
-            : "border border-zinc-700 bg-zinc-950",
-        )}
-      >
-        {checked ? <Check className="h-3 w-3" strokeWidth={2.5} /> : null}
-      </span>
       {name}
     </button>
   );

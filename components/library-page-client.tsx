@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { BookOpen, Check, PlusSquare, Search, X } from "lucide-react";
+import { BookOpen, PlusSquare, Search, X } from "lucide-react";
 import { AnimatedMain } from "@/components/animated-main";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
@@ -131,22 +131,12 @@ function FilterPill({
       aria-checked={checked}
       onClick={onToggle}
       className={cn(
-        "inline-flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-xs font-medium transition-all duration-150",
+        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all duration-150",
         checked
           ? "bg-vault-brand/10 text-vault-brand ring-1 ring-vault-brand/35"
           : "bg-zinc-900/60 text-zinc-400 ring-1 ring-zinc-800 hover:bg-zinc-800/80 hover:text-zinc-200",
       )}
     >
-      <span
-        className={cn(
-          "flex h-5 w-5 items-center justify-center rounded-full transition-colors",
-          checked
-            ? "bg-vault-brand text-vault-brand-foreground"
-            : "border border-zinc-700 bg-zinc-950",
-        )}
-      >
-        {checked ? <Check className="h-3 w-3" strokeWidth={2.5} /> : null}
-      </span>
       {label}
       <span className="font-mono tabular-nums text-zinc-600">{count}</span>
     </button>
