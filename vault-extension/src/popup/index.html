@@ -9,10 +9,32 @@
   <body>
     <main class="popup">
       <h1 class="popup__title">Vault</h1>
-      <p class="popup__status" id="status">Checking connection…</p>
-      <button class="popup__connect" id="connect" type="button" hidden>
-        Connect to Vault
-      </button>
+
+      <section class="popup__state" id="state-loading">
+        <div class="popup__spinner" aria-hidden="true"></div>
+        <p class="popup__status">Checking connection…</p>
+      </section>
+
+      <section class="popup__state" id="state-connected" hidden>
+        <p class="popup__status">
+          Connected as <span id="username"></span>
+        </p>
+        <p class="popup__meta">
+          <span id="capture-count">0</span> problems captured
+        </p>
+        <button class="popup__action" id="open-vault" type="button">
+          Open Vault
+        </button>
+      </section>
+
+      <section class="popup__state" id="state-disconnected" hidden>
+        <p class="popup__status">
+          Not connected — sign in to Vault to link your account
+        </p>
+        <button class="popup__connect" id="connect" type="button">
+          Connect to Vault
+        </button>
+      </section>
     </main>
     <script type="module" src="./popup.ts"></script>
   </body>

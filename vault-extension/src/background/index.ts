@@ -100,6 +100,10 @@ async function handleCapture(
   if (result.success) {
     recentCaptures.set(key, Date.now());
 
+    const countResult = await chrome.storage.local.get("vault_capture_count");
+    const count = (countResult.vault_capture_count ?? 0) + 1;
+    await chrome.storage.local.set({ vault_capture_count: count });
+
     if (result.username && result.username !== auth.githubUsername) {
       await setAuthState({
         githubToken: auth.githubToken,
